@@ -34,7 +34,7 @@ redirect_from:
   </div>  <div class="profile-image" style="flex: 0 0 200px; margin-left: 40px;">    <!-- Profile photo placeholder -->    <!-- <img src="images/profile.jpg" alt="Hua Shenglu" style="width: 100%; border-radius: 50%; border: 3px solid #0066cc;"> -->  </div> </div> <div class="section-divider" style="border-top: 2px solid #eaeaea; margin: 30px 0;"></div>
 
 <span class='anchor' id='news'></span>
-## 📰 News
+## 🔥 News
 
 <div class="news-container" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
   <ul style="list-style-type: none; padding-left: 0;">
