@@ -21,6 +21,14 @@ redirect_from:
 
 <div class="profile-container" style="display: flex; align-items: flex-start; margin-bottom: 40px;">   <div class="profile-content" style="flex: 1;">     <h1 style="margin-top: 0;">Hua Shenglu</h1>     <p style="font-size: 1.2em; color: #555; margin-bottom: 15px;">Computer Science Undergraduate</p>     <p>Undergraduate student at the Future School of Beijing University of Posts and Telecommunications.</p>
 
+<div style="margin-top: 20px;">
+  <h3 style="margin-bottom: 10px;">Research Interests</h3>
+  <ul style="list-style-type: none; padding-left: 0; margin-top: 0;">
+    <li style="margin-bottom: 5px;">• Electronic Design Automation</li>
+    <li style="margin-bottom: 5px;">• Machine Learning in EDA</li>
+    <li style="margin-bottom: 5px;">• GPU Acceleration</li>
+  </ul>
+</div>
 
 <div style="margin-top: 20px;">
   <h3 style="margin-bottom: 10px;">Contact Information</h3>
