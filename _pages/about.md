@@ -52,13 +52,12 @@ redirect_from:
   <h4 style="margin-top: 0; margin-bottom: 8px;">Transferable Parasitic Estimation via Graph Contrastive Learning and Label Rebalancing in AMS Circuits</h4>
   <p style="margin-bottom: 5px;">Shan Shen*, <strong>Shenglu Hua*</strong>, Jiajun Zou, Jiawei Liu, Jianwang Zhai, Chuan Shi, Wenjian Yu</p>
   <p style="margin-bottom: 0; color: #666;"><em>IEEE/ACM International Conference on Computer-Aided Design (ICCAD) 2025.</em></p>
+</div>
 
 <div class="publication-item" style="margin-bottom: 25px;">
   <h4 style="margin-top: 0; margin-bottom: 8px;">Data Augmentation for Automated Essay Scoring Using Large Language Models and In-Context Learning</h4>
   <p style="margin-bottom: 5px;">Yuli Zhang, Yihan Luo, <strong>Shenglu Hua</strong>, Yuanlong Yu，Bokai Cui</p>
   <p style="margin-bottom: 0; color: #666;"><em>International Conference on Neural Information Processing (ICONIP) 2026.</em></p>
-  
-
 </div>
 
 <div class="section-divider" style="border-top: 2px solid #eaeaea; margin: 30px 0;"></div>
