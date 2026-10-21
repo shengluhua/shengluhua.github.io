@@ -1,6 +1,6 @@
 # Learning Atlas · 每日进阶微课
 
-**在线站点**（发布成功后）：<https://shengluhua.github.io/microcourses/>
+**在线站点**（已通过 GitHub Pages 部署）：<https://shengluhua.github.io/microcourses/>
 
 这是四门 12 周进阶微课的公开阅读与检索网站：**计算机体系结构、算法与数据结构、数学优化理论、人工智能**。课程从 2026-10-20 起编号，第 N 课对应当地日期距起始日的自然日差 + 1。
 
@@ -38,7 +38,7 @@ microcourses/lessons/ai-003.md
 
 ### 推荐完整课稿模板
 
-```markdown
+````markdown
 ---
 title: "Little 定律与内存级并行"
 track: arch
@@ -49,14 +49,19 @@ minutes: 16
 kind: full
 summary: "从平均并发请求数推导实际可达内存带宽。"
 tags: "Little,MLP,带宽,延迟"
-diagram: pipeline
+diagram: ""
 ---
 # 第 3 课｜Little 定律与内存级并行
 
 ## 为什么需要这个模型？
 ...
 
-[[diagram:pipeline]]
+```mermaid
+flowchart LR
+  A[平均请求并发数 L] --> B[Little 定律]
+  C[平均延迟 W] --> B
+  B --> D[完成率 λ = L / W]
+```
 
 ## 数学推导
 ...
@@ -69,7 +74,9 @@ diagram: pipeline
 
 ## 练习 2
 ...
-```
+````
+
+支持 Mermaid 流程图、架构数据流图等自定义示意图（使用 `mermaid` 围栏）；不应为无关概念强行复用一个已有动画。
 
 支持的内置交互图：`amdahl`、`pipeline`、`array`、`recursion`、`convex`、`gradient`、`softmax`。未来可以继续在 `assets/diagrams.js` 中加入新主题动画。文内 `[[diagram:type]]` 会显示该图，无需插入截图。
 
