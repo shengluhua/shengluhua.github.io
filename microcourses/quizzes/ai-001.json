@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "lesson_id": "ai-001",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "标准 K 类分类采用 one-hot 真实标签、Softmax 概率和负对数似然时，NLL 与交叉熵的正确关系是什么？",
+      "hint": "回忆 one-hot 分布中只有真实类别一项非零。",
+      "options": [
+        "NLL 是交叉熵的平方",
+        "二者严格相等（对每个样本）",
+        "交叉熵只适用于连续变量而 NLL 只适用于离散变量",
+        "二者总相差一个依赖模型参数的 KL 项"
+      ],
+      "answer": 1,
+      "explanation": "one-hot 交叉熵 −∑_k y_k log p_k 恰好等于 −log p_{真实类}，即样本 NLL。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "三分类 Logit 为 (ln2, 0, ln3)，真实类别为第 2 类。Softmax 交叉熵（使用自然对数）约为多少？结果保留 4 位小数。",
+      "hint": "先把三个指数求和，再计算真实类别概率的负对数。",
+      "answer": 1.791759,
+      "tolerance": 0.0001,
+      "unit": "nats",
+      "explanation": "Softmax 归一化分母 2+1+3=6，真实类概率1/6，CE=ln6≈1.791759。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "numeric",
+      "points": 25,
+      "prompt": "有 M=1000 个固定候选二分类模型、0-1 损失和独立同分布样本。用 Hoeffding + Union Bound 保证同时对全部模型 |R−R_hat|≤0.05 的概率至少 95%。样本数 N 至少为多少整数？",
+      "hint": "把失败概率设置为 0.05，解 2M·exp(−2Nε²)≤δ。",
+      "answer": 2120,
+      "tolerance": 0,
+      "unit": "个样本",
+      "explanation": "N≥ln(2×1000/0.05)/(2×0.05²)=ln(40000)/0.005≈2119.3269，取整后 N≥2120。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "对 K 类 Softmax 交叉熵 L(z)=−z_y+log∑_j exp(z_j)，推导梯度 ∂L/∂z_k=p_k−1[k=y]；进一步说明 Hessian=diag(p)−ppᵀ 半正定的原因，并解释为什么这并不证明深度神经网络对所有权重凸。",
+      "hint": "对 log-sum-exp 求导；Hessian 的二次型可解释为某个离散随机变量的方差。",
+      "rubric": [
+        "正确推导各 Logit 分量梯度",
+        "写出 Hessian 并用方差形式证明半正定",
+        "区分对 Logit 的凸性和神经网络非线性参数化后的非凸性"
+      ],
+      "model_answer": "设 Z=∑_j e^{z_j}，则 L=−z_y+logZ，对 z_k 求导为 −1[k=y]+e^{z_k}/Z = p_k−1[k=y]。对梯度再次求导得到 H=diag(p)−ppᵀ；任意 v 满足 vᵀHv=∑p_k v_k²−(∑p_k v_k)²=Var_{Y∼p}(v_Y)≥0。虽 L(z) 凸，但 z=f_θ(x) 往往是神经网络的非线性函数，复合后 L(f_θ(x)) 对 θ 不必凸。"
+    }
+  ]
+}
