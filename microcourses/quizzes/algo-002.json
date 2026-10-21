@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "lesson_id": "algo-002",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "递归式 T(n)=4T(n/2)+n 且 T(1)=Θ(1)，哪个渐进紧界正确？",
+      "hint": "对比 f(n)=n 与 n^{log_2 4} 的增长率。",
+      "options": [
+        "Θ(n)",
+        "Θ(n log n)",
+        "Θ(n²)",
+        "Θ(n² log n)"
+      ],
+      "answer": 2,
+      "explanation": "p=log₂4=2，f(n)=n 比 n² 少固定多项式因子，所以叶节点主导，T(n)=Θ(n²)。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "递归式 T(n)=2T(n/2)+n、T(1)=1，且 n 是 2 的整数次幂。T(16) 的精确值是多少？",
+      "hint": "把 n=16 的递归树按层列出总工作量。",
+      "answer": 80,
+      "tolerance": 0,
+      "unit": "单位操作",
+      "explanation": "共 5 层，每层工作量 16，因此 T(16)=80。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "single",
+      "points": 25,
+      "prompt": "对 T(n)=2T(n/2)+n/log₂n，n=2^k、T(1)=Θ(1)，正确的渐进紧界为？",
+      "hint": "计算第 i 层总工作量，尝试换元为调和级数。",
+      "options": [
+        "Θ(n)",
+        "Θ(n log log n)",
+        "Θ(n log n)",
+        "Θ(n²)"
+      ],
+      "answer": 1,
+      "explanation": "第 i 层代价 n/(log₂n−i)；求和为 nH_{log₂n}=Θ(n log log n)。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "分析 T(n)=T(n/4)+T(3n/4)+Θ(n)（忽略常数规模取整）。证明它是 Θ(n log n)：分别给出上界与下界，解释为什么不能直接使用标准 Master 定理。",
+      "hint": "所有内部结点的子问题规模和保持为父节点规模；分别考察最长和最短根叶路径。",
+      "rubric": [
+        "正确辨认子问题大小不同，标准 Master 定理不能直接套用",
+        "使用最深路径 O(log n) 与每层代价 O(n) 得上界",
+        "使用前若干完整层的 Ω(n) 工作量得下界",
+        "清楚说明取整/叶节点只影响常数"
+      ],
+      "model_answer": "每个问题拆成 n/4 和 3n/4，规模和为 n，故任意递归层所有结点规模和至多 n，工作 O(n)。最长路径逐次乘3/4，层数 O(log n)，得总量 O(n log n)。最短路径逐次乘1/4，也需要 Ω(log n) 层到常数大小，在其前的 Ω(log n) 层所有结点仍存在、规模和为 n，因每层工作 Θ(n)，有 Ω(n log n)。合并得 Θ(n log n)。"
+    }
+  ]
+}
