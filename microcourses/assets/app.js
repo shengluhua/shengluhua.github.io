@@ -51,6 +51,20 @@ function renderer(md){
  return window.DOMPurify?.sanitize?DOMPurify.sanitize(html):'<pre>'+esc(safe)+'</pre>';
 }
 function sibling(l){const same=state.lessons.filter(x=>x.track===l.track).sort((a,b)=>a.number-b.number);let k=same.findIndex(x=>x.id===l.id);return {prev:same[k-1],next:same[k+1]}}
+async function renderMermaid(root){
+ const codes=[...(root||document).querySelectorAll('pre code.language-mermaid')];
+ if(!codes.length)return;
+ if(!window.mermaid)return;
+ const nodes=[];
+ codes.forEach(code=>{const div=document.createElement('div');div.className='mermaid';div.textContent=code.textContent;code.closest('pre').replaceWith(div);nodes.push(div)});
+ try{
+   window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral',flowchart:{useMaxWidth:true}});
+   await window.mermaid.run({nodes});
+ }catch(e){
+   console.warn('Mermaid diagram failed:',e);
+   nodes.forEach(n=>{if(n.querySelector('svg'))return;const pre=document.createElement('pre');const code=document.createElement('code');code.textContent=n.textContent;pre.append(code);n.replaceWith(pre)})
+ }
+}
 function makeToc(){let nodes=[...document.querySelectorAll('.article h2, .article h3')];nodes.forEach((h,i)=>h.id='section-'+(i+1));let toc=document.getElementById('toc');if(!toc)return;toc.innerHTML='<div class="toc-title">本课导航</div>'+nodes.map(n=>`<a href="#${n.id}" class="${n.tagName==='H3'?'sub':''}">${esc(n.textContent)}</a>`).join('');}
 async function renderLesson(id,push=true){let lesson=state.lessons.find(l=>l.id===id);if(!lesson)return;if(push)history.pushState({},'',urlFor(lesson.id));state.active=lesson.id;state.track=lesson.track;state.q='';search.value='';updateNav();if(window.ConceptDiagrams)window.ConceptDiagrams.stopAll();let t=trackInfo(lesson.track);crumb.innerHTML='学习地图 <span>/</span> '+esc(t.name)+' <span>/</span> 第 '+lesson.number+' 课';
  const nextprev=sibling(lesson);app.innerHTML='<div class="loading-pane">正在打开课程内容…</div>';
@@ -60,6 +74,7 @@ async function renderLesson(id,push=true){let lesson=state.lessons.find(l=>l.id=
  if(!hasDiagram&&lesson.diagram&&window.ConceptDiagrams?.types.includes(lesson.diagram)){text=text.replace(/^## /m,'[[diagram:'+lesson.diagram+']]\n\n## ')}
  let article=renderer(text);const contentText=`<section class="reader"><div class="reader-head"><button class="back-link" data-back="${esc(lesson.track)}">← 返回 ${esc(t.name)} 目录</button><div class="eyebrow" style="margin-top:14px;color:${t.tone}">第 ${lesson.week} 周 · ${esc(t.name)}</div><h1>${esc(lesson.title)}</h1><div class="reader-meta"><span>第 ${lesson.number} 课</span><span>${esc(lesson.date)}</span><span>预计 ${lesson.minutes} 分钟</span><span>${meta.kind==='full'?'完整课稿':'重点复习讲义'}</span></div><div class="reader-actions"><button id="copy-link">复制本课链接</button><button id="source-link">查看 Markdown 原文 ↗</button></div></div><div class="reader-layout"><article class="article" id="article">${article}</article><aside class="toc" id="toc"></aside></div><div class="reader-pagination"><button data-lesson="${nextprev.prev?.id||''}" ${!nextprev.prev?'disabled':''}>← ${nextprev.prev?'第 '+nextprev.prev.number+' 课':'当前为第一课'}</button><button data-lesson="${nextprev.next?.id||''}" ${!nextprev.next?'disabled':''}>${nextprev.next?'第 '+nextprev.next.number+' 课':'期待下一讲'} →</button></div></section>`;
  app.innerHTML=contentText;makeToc();window.ConceptDiagrams?.mountAll(app);
+ renderMermaid(app);
  if(window.renderMathInElement){try{renderMathInElement(document.getElementById('article'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false,ignoredTags:['script','noscript','style','textarea','pre','code']})}catch(e){}}
  const markdownUrl=`https://github.com/${REPO}/blob/${BRANCH}/${ROOT}/${lesson.file}`;
  document.getElementById('source-link').onclick=()=>window.open(markdownUrl,'_blank','noopener,noreferrer');

@@ -20,3 +20,9 @@ button,input{font:inherit}button{cursor:pointer}a{color:var(--blue);text-decorat
 @media(max-width:600px){.topbar{padding:0 16px}.breadcrumb{max-width:33vw}.searchbox{min-width:unset;padding:8px;width:45vw}.searchbox input{width:100%}.search-shortcut{display:none}.top-actions{gap:6px}.icon-button{width:34px;height:34px}.main-content{padding:27px 16px 53px}.course-grid{grid-template-columns:1fr}.hero h1{font-size:29px}.reader-head{padding:23px 21px}.reader-layout{padding:0 19px}.article{font-size:14px;line-height:1.9}.reader-pagination{padding:18px}.lesson-row{padding:14px;gap:11px}.lesson-no{height:36px;min-width:36px}.tag{display:none}.diagram{padding:12px}.diagram svg{max-height:250px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 .lesson-meta,.lesson-name,.lesson-desc{display:block}
+
+/* Mermaid flow diagrams for future lessons: subtle animated arrows. */
+.article .mermaid{margin:22px 0;padding:15px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto;text-align:center}
+.article .mermaid svg{max-width:100%;height:auto}
+.article .mermaid .edgePaths path{stroke-dasharray:8 6;animation:atlas-arrow-flow 6s linear infinite}
+@keyframes atlas-arrow-flow{to{stroke-dashoffset:-70}}
