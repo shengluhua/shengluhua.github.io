@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f9fc">
+  <meta name="description" content="每天一课，系统学习计算机体系结构、算法与数据结构、数学优化理论和人工智能。含公式推导、例题、可交互示意动画与练习。">
+  <title>Learning Atlas · 每日进阶微课</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="./assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.7/dist/purify.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script defer src="./assets/diagrams.js"></script>
+  <script defer src="./assets/app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="课程导航">
+      <div class="brand" tabindex="0" data-action="home" role="link" aria-label="返回课程首页">
+        <div class="brand-icon">L<span>.</span></div>
+        <div><div class="brand-name">Learning Atlas</div><div class="brand-desc">系统学习 · 每日微课</div></div>
+      </div>
+      <div class="nav-eyebrow">KNOWLEDGE PATHS</div>
+      <nav id="course-nav" class="course-nav"><span class="sidebar-loading">课程加载中…</span></nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><div class="note-label">学习节奏</div>4 门学科 · 12 周进阶<br>每天一课 · 每周复盘</div>
+        <a href="https://github.com/shengluhua/shengluhua.github.io/tree/main/microcourses" target="_blank" rel="noopener" class="repo-link">GitHub 仓库 <span>↗</span></a>
+      </div>
+    </aside>
+    <div class="main-frame">
+      <header class="topbar">
+        <div class="breadcrumb" id="breadcrumb">学习地图 <span>/</span> 课程总览</div>
+        <div class="top-actions">
+          <label class="searchbox"><span class="search-icon" aria-hidden="true">⌕</span><input id="global-search" type="search" placeholder="搜索课程与正文…" aria-label="搜索课程标题、关键词、正文" autocomplete="off"><span class="search-shortcut">⌘ K</span></label>
+          <button id="theme-toggle" class="icon-button" title="切换深浅色主题" aria-label="切换深浅色主题">◐</button>
+        </div>
+      </header>
+      <main class="main-content" id="app-content" tabindex="-1"><div class="loading-pane">正在加载课程知识库…</div></main>
+      <footer class="site-footer">Learning Atlas · 2026　/　<a href="https://github.com/shengluhua/shengluhua.github.io/tree/main/microcourses">查看源码</a>　/　课程从 2026-10-20 开始</footer>
+    </div>
+  </div>
+  <noscript><div class="noscript">本网站需要启用 JavaScript 才能进行全文检索及播放交互式示意图。原始课程 Markdown 可在 GitHub 仓库中阅读。</div></noscript>
+</body>
+</html>

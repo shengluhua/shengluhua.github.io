@@ -1,0 +1,153 @@
+{
+  "version": 2,
+  "title": "每日进阶微课 · Learning Atlas",
+  "startDate": "2026-10-20",
+  "tracks": [
+    {
+      "id": "arch",
+      "name": "计算机体系结构",
+      "description": "CPU/GPU/存储/加速器"
+    },
+    {
+      "id": "algo",
+      "name": "算法与数据结构",
+      "description": "证明/递归/图论/并行算法"
+    },
+    {
+      "id": "opt",
+      "name": "数学优化理论",
+      "description": "凸分析/收敛/混合优化"
+    },
+    {
+      "id": "ai",
+      "name": "人工智能",
+      "description": "统计学习/生成/强化学习"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "arch-001",
+      "track": "arch",
+      "number": 1,
+      "date": "2026-10-20",
+      "week": 1,
+      "title": "CPU Time、CPI 与 Amdahl 定律",
+      "abstract": "定量分析为什么频率更高不一定更快，以及局部优化的整体加速上限。",
+      "file": "lessons/arch-001.md",
+      "minutes": 17,
+      "diagram": "amdahl",
+      "tags": [
+        "CPU",
+        "CPI",
+        "Amdahl",
+        "性能分析"
+      ]
+    },
+    {
+      "id": "arch-002",
+      "track": "arch",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "流水线：Latency、Throughput 与停顿",
+      "abstract": "理解流水线的重叠执行和 Hazard，再把微架构停顿纳入 CPI。",
+      "file": "lessons/arch-002.md",
+      "minutes": 17,
+      "diagram": "pipeline",
+      "tags": [
+        "流水线",
+        "IPC",
+        "RAW",
+        "分支预测"
+      ]
+    },
+    {
+      "id": "algo-001",
+      "track": "algo",
+      "number": 1,
+      "date": "2026-10-20",
+      "week": 1,
+      "title": "摊还分析：动态数组与势能法",
+      "abstract": "证明扩容操作单次昂贵但连续操作平均便宜，并识别缩容阈值反例。",
+      "file": "lessons/algo-001.md",
+      "minutes": 17,
+      "diagram": "array",
+      "tags": [
+        "摊还分析",
+        "势函数",
+        "动态数组"
+      ]
+    },
+    {
+      "id": "algo-002",
+      "track": "algo",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "递归树与 Master Theorem",
+      "abstract": "按层计算工作量，推导主定理及其不能直接使用的边界情形。",
+      "file": "lessons/algo-002.md",
+      "minutes": 17,
+      "diagram": "recursion",
+      "tags": [
+        "递归树",
+        "主定理",
+        "复杂度"
+      ]
+    },
+    {
+      "id": "opt-001",
+      "track": "opt",
+      "number": 1,
+      "date": "2026-10-20",
+      "week": 1,
+      "title": "凸集、凸函数与一阶最优性",
+      "abstract": "用凸函数的全局切线下界建立最优性证明，并理解 KKT 乘子的几何意义。",
+      "file": "lessons/opt-001.md",
+      "minutes": 17,
+      "diagram": "convex",
+      "tags": [
+        "凸性",
+        "最优性",
+        "KKT",
+        "梯度"
+      ]
+    },
+    {
+      "id": "opt-002",
+      "track": "opt",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "L-Smooth、强凸与梯度下降收敛",
+      "abstract": "从 Descent Lemma 推导稳定步长，比较普通凸与强凸的收敛率。",
+      "file": "lessons/opt-002.md",
+      "minutes": 17,
+      "diagram": "gradient",
+      "tags": [
+        "Smooth",
+        "强凸",
+        "梯度下降",
+        "收敛"
+      ]
+    },
+    {
+      "id": "ai-001",
+      "track": "ai",
+      "number": 1,
+      "date": "2026-10-20",
+      "week": 1,
+      "title": "极大似然、交叉熵与泛化",
+      "abstract": "从极大似然推导交叉熵和梯度，理解概率预测与泛化理论之间的联系。",
+      "file": "lessons/ai-001.md",
+      "minutes": 17,
+      "diagram": "softmax",
+      "tags": [
+        "MLE",
+        "交叉熵",
+        "KL",
+        "泛化"
+      ]
+    }
+  ]
+}
