@@ -1,6 +1,6 @@
 # Learning Atlas · 每日进阶微课
 
-**在线站点**（已通过 GitHub Pages 部署）：<https://shengluhua.github.io/microcourses/>
+**在线站点**（发布成功后）：<https://shengluhua.github.io/microcourses/>
 
 这是四门 12 周进阶微课的公开阅读与检索网站：**计算机体系结构、算法与数据结构、数学优化理论、人工智能**。课程从 2026-10-20 起编号，第 N 课对应当地日期距起始日的自然日差 + 1。
 
@@ -38,7 +38,7 @@ microcourses/lessons/ai-003.md
 
 ### 推荐完整课稿模板
 
-````markdown
+```markdown
 ---
 title: "Little 定律与内存级并行"
 track: arch
@@ -49,19 +49,14 @@ minutes: 16
 kind: full
 summary: "从平均并发请求数推导实际可达内存带宽。"
 tags: "Little,MLP,带宽,延迟"
-diagram: ""
+diagram: pipeline
 ---
 # 第 3 课｜Little 定律与内存级并行
 
 ## 为什么需要这个模型？
 ...
 
-```mermaid
-flowchart LR
-  A[平均请求并发数 L] --> B[Little 定律]
-  C[平均延迟 W] --> B
-  B --> D[完成率 λ = L / W]
-```
+[[diagram:pipeline]]
 
 ## 数学推导
 ...
@@ -74,9 +69,7 @@ flowchart LR
 
 ## 练习 2
 ...
-````
-
-支持 Mermaid 流程图、架构数据流图等自定义示意图（使用 `mermaid` 围栏）；不应为无关概念强行复用一个已有动画。
+```
 
 支持的内置交互图：`amdahl`、`pipeline`、`array`、`recursion`、`convex`、`gradient`、`softmax`。未来可以继续在 `assets/diagrams.js` 中加入新主题动画。文内 `[[diagram:type]]` 会显示该图，无需插入截图。
 
@@ -113,3 +106,37 @@ python3 -m http.server 8000
 ## 隐私
 
 这个网站和对应仓库**公开可见**。不应写入私人身份信息、账号令牌、未公开研究成果或其他敏感数据。读过课程的本地阅读进度和深浅色偏好均不在服务器或 GitHub 记录。
+
+## 每课四级递进测验（2026-10-21 起增加）
+
+课程网页的正文下方会自动读取相应 `microcourses/quizzes/<track>-NNN.json`，显示 **4 道递进题**，满分 100 分：
+
+| 级别 | 权重 | 主要技能 | 批改方式 |
+|---|---:|---|---|
+| Lv1 理解 | 15 分 | 概念与机制辨析 | 客观自动 |
+| Lv2 演算 | 20 分 | 数值计算、手工 trace | 客观自动 |
+| Lv3 迁移 | 25 分 | 边界、反例、多步推理 | 客观自动 |
+| Lv4 挑战 | 40 分 | 证明、建模或设计 | 评分要点自评 / 复制给 ChatGPT 批改 |
+
+初次展示不透露答案。点击提交后才会显示客观题答案与解析，以及开放题的评分标准和参考思路。开放题 **不声称自动判分**，需要自评或交由 ChatGPT/老师批改。测验答案、成绩与自评仅存浏览器本地（LocalStorage），**不跨设备同步**。
+
+### 交互测验 JSON 格式
+
+与 `lessons/arch-003.md` 对应的文件为 `quizzes/arch-003.json`，格式：
+
+```json
+{
+  "version": 1,
+  "lesson_id": "arch-003",
+  "questions": [
+    {"id":"q1", "level":1, "type":"single", "points":15, "prompt":"理解性选择题", "options":["选项A","选项B","选项C","选项D"], "answer":1, "hint":"答案中立的提示", "explanation":"正确解释"},
+    {"id":"q2", "level":2, "type":"numeric", "points":20, "prompt":"计算题", "answer":2.5, "tolerance":0.001, "unit":"GB/s", "hint":"提示", "explanation":"正确演算"},
+    {"id":"q3", "level":3, "type":"multi", "points":25, "prompt":"多选题", "options":["A","B","C","D"], "answer":[0,2], "hint":"提示", "explanation":"逻辑解释"},
+    {"id":"q4", "level":4, "type":"open", "points":40, "prompt":"综合推导题", "hint":"提示", "rubric":["必要条件","关键公式","边界条件"], "model_answer":"参考推导"}
+  ]
+}
+```
+
+`answer` 为单选的 **0 起始选项索引**、多选的 **0 起始索引数组** 或数值题实际数值；`tolerance` 为绝对误差上界，不能设置得过宽。`options` 不允许重复等价答案；出题前必须验证计算、正确性与自评要点。
+
+**新增课程归档流程：** 当日生成完整 Markdown 课程（其中四题仅有题面）→ 同步同日四道题的测验 JSON（答案和解析只在 JSON）→ 网站自动识别并显示。题目与 JSON 应相互一致，上传 Markdown 但遗漏测验 JSON 会出现“本课互动测验尚未归档”的提示。ChatGPT 的定时任务负责尝试提交这两个文件，晚间校验任务负责检查它们是否齐全。
