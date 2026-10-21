@@ -54,7 +54,7 @@ function sibling(l){const same=state.lessons.filter(x=>x.track===l.track).sort((
 async function renderMermaid(root){
  const codes=[...(root||document).querySelectorAll('pre code.language-mermaid')];
  if(!codes.length)return;
- if(!window.mermaid)return;
+ if(!window.mermaid)return; // Keep readable source code if the Mermaid CDN is unavailable.
  const nodes=[];
  codes.forEach(code=>{const div=document.createElement('div');div.className='mermaid';div.textContent=code.textContent;code.closest('pre').replaceWith(div);nodes.push(div)});
  try{
@@ -72,8 +72,8 @@ async function renderLesson(id,push=true){let lesson=state.lessons.find(l=>l.id=
  if(state.active!==id)return;
  const {meta,body}=metaParse(raw),hasDiagram=/\[\[diagram:/.test(body);let text=body;
  if(!hasDiagram&&lesson.diagram&&window.ConceptDiagrams?.types.includes(lesson.diagram)){text=text.replace(/^## /m,'[[diagram:'+lesson.diagram+']]\n\n## ')}
- let article=renderer(text);const contentText=`<section class="reader"><div class="reader-head"><button class="back-link" data-back="${esc(lesson.track)}">← 返回 ${esc(t.name)} 目录</button><div class="eyebrow" style="margin-top:14px;color:${t.tone}">第 ${lesson.week} 周 · ${esc(t.name)}</div><h1>${esc(lesson.title)}</h1><div class="reader-meta"><span>第 ${lesson.number} 课</span><span>${esc(lesson.date)}</span><span>预计 ${lesson.minutes} 分钟</span><span>${meta.kind==='full'?'完整课稿':'重点复习讲义'}</span></div><div class="reader-actions"><button id="copy-link">复制本课链接</button><button id="source-link">查看 Markdown 原文 ↗</button></div></div><div class="reader-layout"><article class="article" id="article">${article}</article><aside class="toc" id="toc"></aside></div><div class="reader-pagination"><button data-lesson="${nextprev.prev?.id||''}" ${!nextprev.prev?'disabled':''}>← ${nextprev.prev?'第 '+nextprev.prev.number+' 课':'当前为第一课'}</button><button data-lesson="${nextprev.next?.id||''}" ${!nextprev.next?'disabled':''}>${nextprev.next?'第 '+nextprev.next.number+' 课':'期待下一讲'} →</button></div></section>`;
- app.innerHTML=contentText;makeToc();window.ConceptDiagrams?.mountAll(app);
+ let article=renderer(text);const contentText=`<section class="reader"><div class="reader-head"><button class="back-link" data-back="${esc(lesson.track)}">← 返回 ${esc(t.name)} 目录</button><div class="eyebrow" style="margin-top:14px;color:${t.tone}">第 ${lesson.week} 周 · ${esc(t.name)}</div><h1>${esc(lesson.title)}</h1><div class="reader-meta"><span>第 ${lesson.number} 课</span><span>${esc(lesson.date)}</span><span>预计 ${lesson.minutes} 分钟</span><span>${meta.kind==='full'?'完整课稿':'重点复习讲义'}</span></div><div class="reader-actions"><button id="copy-link">复制本课链接</button><button id="source-link">查看 Markdown 原文 ↗</button></div></div><div class="reader-layout"><article class="article" id="article">${article}</article><aside class="toc" id="toc"></aside></div><section class="quiz-container" id="quiz-root" data-lesson="${esc(lesson.id)}" aria-label="本课分级测评"></section><div class="reader-pagination"><button data-lesson="${nextprev.prev?.id||''}" ${!nextprev.prev?'disabled':''}>← ${nextprev.prev?'第 '+nextprev.prev.number+' 课':'当前为第一课'}</button><button data-lesson="${nextprev.next?.id||''}" ${!nextprev.next?'disabled':''}>${nextprev.next?'第 '+nextprev.next.number+' 课':'期待下一讲'} →</button></div></section>`;
+ app.innerHTML=contentText;makeToc();window.ConceptDiagrams?.mountAll(app);window.ProgressiveQuiz?.mount(document.getElementById("quiz-root"),lesson.id);
  renderMermaid(app);
  if(window.renderMathInElement){try{renderMathInElement(document.getElementById('article'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false,ignoredTags:['script','noscript','style','textarea','pre','code']})}catch(e){}}
  const markdownUrl=`https://github.com/${REPO}/blob/${BRANCH}/${ROOT}/${lesson.file}`;
