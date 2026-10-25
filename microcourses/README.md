@@ -1,16 +1,22 @@
 # Learning Atlas · 每日进阶微课
 
-**在线站点**（发布成功后）：<https://shengluhua.github.io/microcourses/>
+**在线站点**：<https://shengluhua.github.io/microcourses/>
 
 这是四门 12 周进阶微课的公开阅读与检索网站：**计算机体系结构、算法与数据结构、数学优化理论、人工智能**。课程从 2026-10-20 起编号，第 N 课对应当地日期距起始日的自然日差 + 1。
 
+## 归档状态（2026-10-26 源码核验）
+
+当前仓库有 **18 篇可读取的 Markdown**：其中 **11 篇标记为完整课稿、7 篇为较短的复习讲义**。另有 6 个历史课号缺少 Markdown（`arch-003/004`、`algo-003/004`、`opt-003`、`ai-002`），`ai-003` 缺测验 JSON，`arch-004.json` 缺配套讲义。界面会区别显示，**文件缺失不会被当作归档成功**。对旧课稿不自动补写摘要或覆盖原文。
+
 ## 功能
 
-- 四个独立课程目录，按日期/课号排列，可筛选第一周和最近更新。
+- **平板优先**：在 iPad 横屏和竖屏都有完整学科导航，适合触摸的按钮、阅读宽度和字号。阅读时可调 A−/A+、展开章节目录、开启专注阅读和跳到互动测验。
+- 四个独立课程目录、每周 7 天 × 4 门归档对照表、学习进度和最近阅读入口，能看到哪些课稿真实缺失。
+- 「已学完」标记和上次阅读入口保存在本地浏览器，不跨设备同步。
 - 支持标题、标签和已加载正文的全文搜索；搜索时可按需加载其他课稿。
 - `KaTeX` 数学公式、代码块、目录跳转、上一篇/下一篇导航、手机适配、深浅色模式。
 - 7 个可交互 SVG 解释图：Amdahl、流水线、动态数组、递归树、凸函数、梯度下降、Softmax。可播放/暂停/单步；遵循 `prefers-reduced-motion`。
-- **自动发现新课程**：静态页面通过 GitHub 公开 Contents API 读取 `microcourses/lessons/`，将满足文件名约定的新 Markdown 加到课程目录；API 不可用时使用本地 `manifest.json` 兜底。
+- **自动发现新课程**：GitHub Actions 在 `lessons/` 或 `quizzes/` 文件更新后，使用 `scripts/build_manifest.py` 重新生成静态索引；网页另会尝试 GitHub Contents API，新课扫描在 API 不可用时回退到直接检查文件路径。GitHub Actions 是否真正执行成功，还需要查看该次 workflow 运行状态。
 
 > 初始的 7 篇文章是根据已有授课内容重新整理的**复习讲义**，不是历史消息的逐字拷贝。今后的课程按照下面的模板直接保存完整讲稿。
 
@@ -73,7 +79,7 @@ diagram: pipeline
 
 支持的内置交互图：`amdahl`、`pipeline`、`array`、`recursion`、`convex`、`gradient`、`softmax`。未来可以继续在 `assets/diagrams.js` 中加入新主题动画。文内 `[[diagram:type]]` 会显示该图，无需插入截图。
 
-**自动索引无需更新 `manifest.json`。** 只要新的 `.md` 文件被推送到 GitHub，网页就会从 GitHub Contents API 动态识别；首次读取也会解析其 YAML Front Matter。网络/API 失败时只显示已固化到 `manifest.json` 的课程，不会伪造未发布内容。
+**索引更新机制：** 新 `.md` / `.json` 推送后，仓库工作流 `.github/workflows/microcourses-index.yml` 会尝试自动更新 `manifest.json`。网页也会从 GitHub Contents API 补充发现；API 失败时，直接探测历史缺口与近期新课路径。网页不会伪造尚未存储的课程。工作流需要仓库允许 GitHub Actions 使用 `contents: write` 权限。
 
 ### 同步可靠性与边界
 
