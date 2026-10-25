@@ -180,3 +180,11 @@ button.archive-entry:hover{border-color:var(--blue);background:var(--blue-lite)}
  .nav-link.active{border-color:rgba(255,255,255,.22)}
  .nav-main b{font-size:13px}
 }
+
+/* Final iPad touch-target and quick-assessment polish. */
+.reader-actions .quiz-jump{display:inline-flex;align-items:center;justify-content:center;color:var(--blue);font-weight:700;border:1px solid color-mix(in srgb,var(--blue) 40%,var(--line));background:var(--blue-lite);border-radius:9px;padding:8px 13px;min-height:44px;font-size:12px}
+.reader-actions button{min-height:44px}
+.back-link{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+.quiz-container{scroll-margin-top:150px}
+@media(max-width:1180px){.reader-tools button,.week-switch button,.icon-button{min-height:44px}.icon-button{width:44px;height:44px}}
+@media(max-width:699px){.searchbox input{font-size:16px}.reader-tools button{min-height:42px}.reader-actions .quiz-jump{font-size:12px}}
