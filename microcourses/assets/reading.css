@@ -159,3 +159,14 @@ button.archive-entry:hover{border-color:var(--blue);background:var(--blue-lite)}
  .quiz-prompt{font-size:14px}
 }
 @media(prefers-reduced-motion:reduce){.reading-progress>span{transition:none}}
+
+/* Follow-up usability polish: accessible weekly navigation and non-truncated touch labels. */
+.reader{overflow:visible}
+.reader-head{border-radius:17px 17px 0 0}
+.week-switch{display:flex;align-items:center;gap:10px;margin-bottom:12px;color:var(--muted);font-size:12px}
+.week-switch>span{margin:0 4px}
+.week-switch button{min-height:40px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--blue);padding:8px 14px;font-size:12px;font-weight:650}
+.week-switch button:hover{background:var(--blue-lite);border-color:var(--blue)}
+.archive-entry-title{white-space:normal;overflow:hidden;text-overflow:unset;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.45}
+.article .mermaid svg{max-width:100%;height:auto}
+@media(max-width:699px){.reader-tools .mark-done{flex-basis:auto}.week-switch{justify-content:space-between}.reader-head{border-radius:12px 12px 0 0}}
