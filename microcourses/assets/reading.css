@@ -170,3 +170,13 @@ button.archive-entry:hover{border-color:var(--blue);background:var(--blue-lite)}
 .archive-entry-title{white-space:normal;overflow:hidden;text-overflow:unset;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.45}
 .article .mermaid svg{max-width:100%;height:auto}
 @media(max-width:699px){.reader-tools .mark-done{flex-basis:auto}.week-switch{justify-content:space-between}.reader-head{border-radius:12px 12px 0 0}}
+
+/* iPad portrait/landscape: full-width, visible five-tab subject selector. */
+@media (min-width:700px) and (max-width:1180px){
+ .sidebar{display:flex;flex-direction:column;align-items:stretch;gap:10px;overflow:visible;padding:15px 28px 12px}
+ .brand{min-width:0;align-self:flex-start}
+ .course-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%}
+ .nav-link{justify-content:center;text-align:center;white-space:normal;min-width:0;padding:11px 5px;border:1px solid rgba(255,255,255,.06)}
+ .nav-link.active{border-color:rgba(255,255,255,.22)}
+ .nav-main b{font-size:13px}
+}
