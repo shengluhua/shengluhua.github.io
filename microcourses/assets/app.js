@@ -164,7 +164,18 @@ function bindReaderTools(id){
  try{localStorage.setItem('atlas-last-lesson',id)}catch(e){}
  window.requestAnimationFrame(updateReadingProgress);
 }
-async function renderLesson(id,push=true){let lesson=state.lessons.find(l=>l.id===id);if(!lesson)return;if(push)history.pushState({},'',urlFor(lesson.id));state.active=lesson.id;state.track=lesson.track;state.q='';search.value='';updateNav();if(window.ConceptDiagrams)window.ConceptDiagrams.stopAll();let t=trackInfo(lesson.track);crumb.innerHTML='学习地图 <span>/</span> '+esc(t.name)+' <span>/</span> 第 '+lesson.number+' 课';
+async function renderLesson(id,push=true){
+ let lesson=state.lessons.find(l=>l.id===id);
+ if(!lesson&&/^(arch|algo|opt|ai)-\d{3,}$/.test(id)){
+  const guessed=toLesson({},id,'lessons/'+id+'.md');
+  try{
+   const raw=await lessonText(guessed),parsed=metaParse(raw);
+   if(!/^---\s*\n/.test(raw)||raw.trim().length<150)throw Error('缺少有效讲义');
+   lesson=toLesson(parsed.meta,id,guessed.file);
+   combine(lesson);sort();updateNav();
+  }catch(e){app.innerHTML='<div class="empty">这节课目前没有可读取的完整源文件。<p>课程编号：'+esc(id)+'。可在每周课程表中查看其他已归档内容。</p><button class="filter" data-action="home">返回课程首页</button></div>';return}
+ }
+ if(!lesson)return;if(push)history.pushState({},'',urlFor(lesson.id));state.active=lesson.id;state.track=lesson.track;state.q='';search.value='';updateNav();if(window.ConceptDiagrams)window.ConceptDiagrams.stopAll();let t=trackInfo(lesson.track);crumb.innerHTML='学习地图 <span>/</span> '+esc(t.name)+' <span>/</span> 第 '+lesson.number+' 课';
  const nextprev=sibling(lesson);app.innerHTML='<div class="loading-pane">正在打开课程内容…</div>';
  let raw;try{raw=await lessonText(lesson)}catch(e){if(state.active!==id)return;app.innerHTML='<div class="empty">课程暂时无法加载。<br>'+esc(String(e))+'<br><a href="https://github.com/'+REPO+'/tree/'+BRANCH+'/'+ROOT+'/lessons">可在 GitHub 阅读原文</a></div>';return}
  if(state.active!==id)return;
