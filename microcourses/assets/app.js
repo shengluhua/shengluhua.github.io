@@ -10,7 +10,7 @@ const TRACKS=[
  {id:'ai',name:'人工智能',icon:'✳',tone:'#d99455',description:'统计学习 · 大模型 · 生成 · 强化学习'}
 ];
 const app=document.getElementById('app-content'),nav=document.getElementById('course-nav'),search=document.getElementById('global-search'),crumb=document.getElementById('breadcrumb');
-const state={track:'all',filter:'all',q:'',lessons:[],raw:new Map(),body:new Map(),active:null,fetching:new Map(),searchToken:0,initialized:false};
+const state={track:'all',filter:'all',planWeek:1,discoverIssue:null,q:'',lessons:[],raw:new Map(),body:new Map(),active:null,fetching:new Map(),searchToken:0,initialized:false};
 const esc=(v)=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const trackName=id=>(TRACKS.find(t=>t.id===id)||{}).name||id;
 const trackInfo=id=>TRACKS.find(t=>t.id===id)||TRACKS[0];
@@ -25,7 +25,7 @@ function toLesson(meta,id,path){
  const guessed=id.match(/^(arch|algo|opt|ai)-(\d+)$/);if(!guessed)return null;
  const track=meta.track||guessed[1],number=Number(meta.number)||Number(guessed[2]);if(!TRACKS.some(t=>t.id===track)||!Number.isFinite(number)||number<=0)return null;
  const title=meta.title||'第 '+number+' 课',date=meta.date||clockDate(number);
- return {id,track,number,date,week:Number(meta.week)||weekFromNum(number),title,abstract:meta.abstract||meta.summary||'课程正文、推导、示例与练习',minutes:Number(meta.minutes)||16,diagram:meta.diagram||'',file:path||`lessons/${id}.md`,tags:(Array.isArray(meta.tags)?meta.tags:String(meta.tags||'').replace(/^\[/,'').replace(/\]$/,'').split(/\s*,\s*/)).filter(Boolean)};
+ return {id,track,number,date,week:Number(meta.week)||weekFromNum(number),title,abstract:meta.abstract||meta.summary||'课程正文、推导、示例与练习',minutes:Number(meta.minutes)||16,diagram:meta.diagram||'',kind:meta.kind||'full',quiz:meta.quiz!==false,file:path||`lessons/${id}.md`,tags:(Array.isArray(meta.tags)?meta.tags:String(meta.tags||'').replace(/^\[/,'').replace(/\]$/,'').split(/\s*,\s*/)).filter(Boolean)};
 }
 function combine(lesson){if(!lesson)return;const k=state.lessons.findIndex(x=>x.id===lesson.id);if(k<0)state.lessons.push(lesson);else state.lessons[k]={...state.lessons[k],...lesson}}
 function sort(){state.lessons.sort((a,b)=>a.date.localeCompare(b.date)||a.track.localeCompare(b.track)||a.number-b.number)}
@@ -37,11 +37,74 @@ function updateNav(){
  nav.querySelectorAll('[data-track]').forEach(n=>n.classList.toggle('active',n.dataset.track===state.track));
 }
 function courseCards(){return `<div class="section-title"><h2>四条知识路径</h2><span>从基础理论到研究级应用</span></div><div class="course-grid">${TRACKS.map(t=>{let total=state.lessons.filter(l=>l.track===t.id).length;return `<button class="course-box" data-track="${t.id}" style="--tone:${t.tone}"><span class="course-icon">${esc(t.icon)}</span><h3>${esc(t.name)}</h3><p>${esc(t.description)}</p><div class="course-foot"><span>${total} 节已归档</span><span>进入学习 ↗</span></div></button>`}).join('')}</div>`}
-function lessonRow(l){let t=trackInfo(l.track);return `<button class="lesson-row" data-lesson="${esc(l.id)}"><span class="lesson-no">${String(l.number).padStart(2,'0')}</span><span class="lesson-center"><span class="lesson-meta">${esc(t.name)} · ${esc(l.date)} · 第 ${l.week} 周 · 约 ${l.minutes} 分钟</span><span class="lesson-name">${esc(l.title)}</span><span class="lesson-desc">${esc(l.abstract)}</span></span><span class="tag">已归档</span></button>`}
-function matching(){let result=state.lessons.filter(l=>state.track==='all'||l.track===state.track);if(state.filter==='week1')result=result.filter(l=>l.week===1);if(state.filter==='recent')result=result.filter(l=>l.date>='2026-10-21');if(state.q){const q=state.q;result=result.filter(l=>{let hay=[l.title,l.abstract,l.date,'第'+l.number+'课',l.track,trackName(l.track),l.tags.join(' '),(state.body.get(l.id)||'')].join(' ').toLowerCase();return hay.includes(q)})}return result.sort((a,b)=>b.date.localeCompare(a.date)||a.track.localeCompare(b.track)||b.number-a.number)}
+function dateShanghai(){
+ try{return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+ catch(e){return new Date().toISOString().slice(0,10)}
+}
+function courseDay(){return Math.max(1,Math.floor((Date.parse(dateShanghai()+'T00:00:00Z')-Date.UTC(2026,9,20))/86400000)+1)}
+function localCompleted(){try{return new Set(JSON.parse(localStorage.getItem('atlas-completed-lessons')||'[]'))}catch(e){return new Set()}}
+function saveCompleted(set){try{localStorage.setItem('atlas-completed-lessons',JSON.stringify([...set]))}catch(e){}}
+function resumeCard(){
+ let last=null;try{last=localStorage.getItem('atlas-last-lesson')}catch(e){}
+ const l=state.lessons.find(x=>x.id===last);if(!l)return '';
+ return '<div class="continue-card"><div><div class="resume-title">继续上次阅读：'+esc(l.title)+'</div><div class="resume-meta">'+esc(trackName(l.track))+' · 第 '+l.number+' 课 · 阅读进度仅保存在此浏览器</div></div><button data-lesson="'+esc(l.id)+'">继续阅读 →</button></div>';
+}
+function archiveBoard(){
+ const maxWeek=Math.max(1,Math.ceil(courseDay()/7));
+ const week=Math.min(Math.max(1,state.planWeek),Math.max(12,maxWeek));
+ const activeDay=courseDay();
+ const head='<thead><tr><th>课次</th>'+TRACKS.map(t=>'<th>'+esc(t.name)+'</th>').join('')+'</tr></thead>';
+ let rows='';
+ for(let i=1;i<=7;i++){
+  const n=(week-1)*7+i, day=clockDate(n);
+  rows+='<tr><td><span class="archive-date">'+day.slice(5)+'</span><span class="archive-day">第 '+n+' 课'+(i===7?' · 复盘':'')+'</span></td>';
+  TRACKS.forEach(t=>{
+   const l=state.lessons.find(x=>x.track===t.id&&x.number===n);
+   if(l){
+    const status=l.kind==='review'?'复习版':l.quiz?'完整讲义 · 测验':'讲义已归档 · 缺测验';
+    const klass=l.kind==='review'?'review':l.quiz?'full':'noquiz';
+    rows+='<td><button class="archive-entry '+klass+(n===activeDay?' today':'')+'" data-lesson="'+esc(l.id)+'" title="'+esc(l.title)+'"><span class="archive-entry-title">'+esc(l.title)+'</span><span class="archive-entry-state">'+status+'</span></button></td>';
+   }else{
+    const future=n>=activeDay;
+    rows+='<td><div class="archive-entry '+(future?'future':'missing')+'"><span class="archive-entry-title">第 '+n+' 课</span><span class="archive-entry-state">'+(future?'待发布':'尚未归档')+'</span></div></td>';
+   }
+  });
+  rows+='</tr>';
+ }
+ let total=state.lessons.length,full=state.lessons.filter(l=>l.kind==='full').length,reviews=total-full;
+ const prev=week>1?'<button data-week="'+(week-1)+'">← 上一周</button>':'';
+ const next=week<maxWeek?'<button data-week="'+(week+1)+'">下一周 →</button>':'';
+ return '<section class="archive-overview"><div class="section-title"><h2>按日期查看课程</h2><span>第 '+week+' 周 · 已检索 '+total+' 节</span></div><p class="archive-hint">按日期横向对照四门课。<b>完整讲义 '+full+' 节、复习版 '+reviews+' 节</b>；缺稿的日期明确标记，不把缺失内容算作已归档。</p><div class="week-switch">'+prev+'<span>第 '+week+' 周 / '+Math.max(12,maxWeek)+' 周</span>'+next+'</div><div class="archive-scroll" role="region" aria-label="四门课程每周归档表" tabindex="0"><table class="archive-table">'+head+'<tbody>'+rows+'</tbody></table></div><div class="archive-key"><span>● 完整：含推导与测验（部分课可能缺测验）</span><span>● 复习：较短的旧稿</span><span>● 尚未归档：源文件不存在</span></div></section>';
+}
+function lessonRow(l){
+ const t=trackInfo(l.track),done=localCompleted().has(l.id);
+ const badge=done?'已学完':l.kind==='review'?'复习版':l.quiz?'完整讲义':'缺少测验';
+ const cls=done?'finished':l.kind==='review'?'summary':l.quiz?'':'warning';
+ return '<button class="lesson-row" data-lesson="'+esc(l.id)+'"><span class="lesson-no">'+String(l.number).padStart(2,'0')+'</span><span class="lesson-center"><span class="lesson-meta">'+esc(t.name)+' · '+esc(l.date)+' · 第 '+l.week+' 周 · 约 '+l.minutes+' 分钟</span><span class="lesson-name">'+esc(l.title)+'</span><span class="lesson-desc">'+esc(l.abstract)+'</span></span><span class="tag '+cls+'">'+badge+'</span></button>';
+}
+function matching(){
+ let result=state.lessons.filter(l=>state.track==='all'||l.track===state.track);
+ if(state.filter==='week1')result=result.filter(l=>l.week===1);
+ if(state.filter==='recent'){let x=clockDate(Math.max(1,courseDay()-6));result=result.filter(l=>l.date>=x)}
+ if(state.filter==='review')result=result.filter(l=>l.kind==='review'||!l.quiz);
+ if(state.q){const q=state.q;result=result.filter(l=>[l.title,l.abstract,l.date,'第'+l.number+'课',l.track,trackName(l.track),l.tags.join(' '),(state.body.get(l.id)||'')].join(' ').toLowerCase().includes(q))}
+ return result.sort((a,b)=>b.date.localeCompare(a.date)||a.track.localeCompare(b.track)||b.number-a.number);
+}
 function renderIndex(){
- if(!state.initialized)return;state.active=null;updateNav();let current=state.track==='all'?null:trackInfo(state.track),items=matching();crumb.innerHTML='学习地图 <span>/</span> '+(state.q?'搜索结果':current?esc(current.name):'课程总览');
- app.innerHTML=`<section class="hero"><div class="eyebrow">THE DAILY LEARNING ATLAS · EST. 2026</div><h1>${current?esc(current.name):'每天一小步，构建完整知识体系。'}</h1><p>${current?'从基础分析到高级专题，按知识依赖循序推进。每节保留公式推导、数值示例、常见反例与课后练习。':'四门研究生进阶微课，跨设备随时翻阅。不是碎片化知识卡片，而是一套可持续沉淀的课程笔记与交互式学习地图。'}</p><div class="stats"><span class="stat"><strong>4</strong>门课程</span><span class="stat"><strong>${state.lessons.length}</strong>节已归档</span><span class="stat"><strong>12</strong>周学习路径</span><span class="stat">2026.10.20 开课</span></div></section>`+(state.track==='all'&&!state.q?courseCards():'')+`<div class="section-title"><h2>${state.q?'搜索结果':current?'课程目录':'最近更新'}</h2><span>${items.length} 节课程</span></div><div class="filters"><button class="filter ${state.filter==='all'?'active':''}" data-filter="all">全部章节</button><button class="filter ${state.filter==='week1'?'active':''}" data-filter="week1">第一周</button><button class="filter ${state.filter==='recent'?'active':''}" data-filter="recent">最近更新</button></div><div class="lesson-list" style="margin-top:15px">${items.length?items.map(lessonRow).join(''):'<div class="empty">当前没有匹配课程。可以尝试简短关键词，或换一门课。</div>'}</div><div class="notice"><strong>内容说明：</strong>首批 7 节为经整理的复习讲义。以后新增课程可以直接写入 GitHub；网页会自动发现并编入目录。网络异常时会回退到已有索引。课程站点公开可见，个人笔记请勿包含敏感信息。</div>`;
+ if(!state.initialized)return;
+ state.active=null;updateNav();
+ const current=state.track==='all'?null:trackInfo(state.track),items=matching();
+ const count=state.lessons.length,full=state.lessons.filter(l=>l.kind==='full').length,review=count-full;
+ crumb.innerHTML='学习地图 <span>/</span> '+(state.q?'搜索结果':current?esc(current.name):'课程总览');
+ let html='<section class="hero"><div class="eyebrow">LEARNING ATLAS · 系统化微课笔记</div><h1>'+(current?esc(current.name):'每天学习一点，把知识连成体系。')+'</h1><p>'+(current?'依照每周专题逐步学习，课稿、例题和自测分开归档；缺漏会如实标记。':'四门课程一张学习地图。按日期定位课程，在平板上舒适阅读推导、代码、示意图，随时返回上次位置。')+'</p><div class="stats"><span class="stat"><strong>4</strong>门课程</span><span class="stat"><strong>'+count+'</strong>篇讲义</span><span class="stat"><strong>'+full+'</strong>篇完整课稿</span><span class="stat"><strong>'+review+'</strong>篇复习版</span></div></section>';
+ if(!state.q)html+=resumeCard();
+ if(state.track==='all'&&!state.q)html+=archiveBoard()+courseCards();
+ html+='<div class="section-title"><h2>'+(state.q?'搜索结果':current?'课程目录':'全部已归档课程')+'</h2><span>'+items.length+' 节</span></div>';
+ html+='<div class="filters"><button class="filter '+(state.filter==='all'?'active':'')+'" data-filter="all">全部</button><button class="filter '+(state.filter==='week1'?'active':'')+'" data-filter="week1">第 1 周</button><button class="filter '+(state.filter==='recent'?'active':'')+'" data-filter="recent">最近 7 天</button><button class="filter '+(state.filter==='review'?'active':'')+'" data-filter="review">需补全</button></div>';
+ html+='<div class="lesson-list" style="margin-top:15px">'+(items.length?items.map(lessonRow).join(''):'<div class="empty">没有匹配课程。可以试试缩短关键词或选择另一门课。</div>')+'</div>';
+ html+='<div class="notice"><strong>归档说明：</strong>早期讲义存在较短复习版，个别课号及测验源文件尚未归档。页面会显示实际已确认的内容；若自动发现受 GitHub API 限制，仍使用站点随附的完整静态清单。答题结果仅存于当前浏览器。</div>';
+ if(state.discoverIssue)html+='<p class="archive-alert">'+esc(state.discoverIssue)+'</p>';
+ app.innerHTML=html;
 }
 async function lessonText(l){if(state.raw.has(l.id))return state.raw.get(l.id);if(state.fetching.has(l.id))return state.fetching.get(l.id);
  const promise=(async()=>{let urls=location.hostname==='localhost'||location.hostname==='127.0.0.1'?[`./${l.file}`,BASE_RAW+l.file]:[BASE_RAW+l.file,`./${l.file}`];for(const url of urls){try{const r=await fetch(url,{cache:'no-store'});if(r.ok){const txt=await r.text();state.raw.set(l.id,txt);state.body.set(l.id,metaParse(txt).body);return txt}}catch(e){}}throw Error('课程 Markdown 暂不可用')})();state.fetching.set(l.id,promise);try{return await promise}finally{state.fetching.delete(l.id)}}
