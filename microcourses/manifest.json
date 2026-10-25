@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "title": "每日进阶微课 · Learning Atlas",
   "startDate": "2026-10-20",
   "tracks": [
@@ -41,25 +41,9 @@
         "CPI",
         "Amdahl",
         "性能分析"
-      ]
-    },
-    {
-      "id": "arch-002",
-      "track": "arch",
-      "number": 2,
-      "date": "2026-10-21",
-      "week": 1,
-      "title": "流水线：Latency、Throughput 与停顿",
-      "abstract": "理解流水线的重叠执行和 Hazard，再把微架构停顿纳入 CPI。",
-      "file": "lessons/arch-002.md",
-      "minutes": 17,
-      "diagram": "pipeline",
-      "tags": [
-        "流水线",
-        "IPC",
-        "RAW",
-        "分支预测"
-      ]
+      ],
+      "kind": "review",
+      "quiz": true
     },
     {
       "id": "algo-001",
@@ -76,24 +60,9 @@
         "摊还分析",
         "势函数",
         "动态数组"
-      ]
-    },
-    {
-      "id": "algo-002",
-      "track": "algo",
-      "number": 2,
-      "date": "2026-10-21",
-      "week": 1,
-      "title": "递归树与 Master Theorem",
-      "abstract": "按层计算工作量，推导主定理及其不能直接使用的边界情形。",
-      "file": "lessons/algo-002.md",
-      "minutes": 17,
-      "diagram": "recursion",
-      "tags": [
-        "递归树",
-        "主定理",
-        "复杂度"
-      ]
+      ],
+      "kind": "review",
+      "quiz": true
     },
     {
       "id": "opt-001",
@@ -111,25 +80,9 @@
         "最优性",
         "KKT",
         "梯度"
-      ]
-    },
-    {
-      "id": "opt-002",
-      "track": "opt",
-      "number": 2,
-      "date": "2026-10-21",
-      "week": 1,
-      "title": "L-Smooth、强凸与梯度下降收敛",
-      "abstract": "从 Descent Lemma 推导稳定步长，比较普通凸与强凸的收敛率。",
-      "file": "lessons/opt-002.md",
-      "minutes": 17,
-      "diagram": "gradient",
-      "tags": [
-        "Smooth",
-        "强凸",
-        "梯度下降",
-        "收敛"
-      ]
+      ],
+      "kind": "review",
+      "quiz": true
     },
     {
       "id": "ai-001",
@@ -147,7 +100,282 @@
         "交叉熵",
         "KL",
         "泛化"
+      ],
+      "kind": "review",
+      "quiz": true
+    },
+    {
+      "id": "arch-002",
+      "track": "arch",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "流水线：Latency、Throughput 与停顿",
+      "abstract": "理解流水线的重叠执行和 Hazard，再把微架构停顿纳入 CPI。",
+      "file": "lessons/arch-002.md",
+      "minutes": 17,
+      "diagram": "pipeline",
+      "tags": [
+        "流水线",
+        "IPC",
+        "RAW",
+        "分支预测"
+      ],
+      "kind": "review",
+      "quiz": true
+    },
+    {
+      "id": "algo-002",
+      "track": "algo",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "递归树与 Master Theorem",
+      "abstract": "按层计算工作量，推导主定理及其不能直接使用的边界情形。",
+      "file": "lessons/algo-002.md",
+      "minutes": 17,
+      "diagram": "recursion",
+      "tags": [
+        "递归树",
+        "主定理",
+        "复杂度"
+      ],
+      "kind": "review",
+      "quiz": true
+    },
+    {
+      "id": "opt-002",
+      "track": "opt",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "L-Smooth、强凸与梯度下降收敛",
+      "abstract": "从 Descent Lemma 推导稳定步长，比较普通凸与强凸的收敛率。",
+      "file": "lessons/opt-002.md",
+      "minutes": 17,
+      "diagram": "gradient",
+      "tags": [
+        "Smooth",
+        "强凸",
+        "梯度下降",
+        "收敛"
+      ],
+      "kind": "review",
+      "quiz": true
+    },
+    {
+      "id": "ai-003",
+      "track": "ai",
+      "number": 3,
+      "date": "2026-10-22",
+      "week": 1,
+      "title": "偏差—方差分解：正则化为什么可能改善泛化？",
+      "abstract": "平方损失偏差—方差分解、Ridge 与验证集选择。",
+      "file": "lessons/ai-003.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": false,
+      "tags": [
+        "偏差方差",
+        "Ridge",
+        "泛化"
+      ]
+    },
+    {
+      "id": "opt-004",
+      "track": "opt",
+      "number": 4,
+      "date": "2026-10-23",
+      "week": 1,
+      "title": "投影、法锥与有约束凸优化的一阶最优性",
+      "abstract": "从投影定理推导法锥、KKT 及投影梯度法的收敛界。",
+      "file": "lessons/opt-004.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "投影",
+        "法锥",
+        "KKT"
+      ]
+    },
+    {
+      "id": "ai-004",
+      "track": "ai",
+      "number": 4,
+      "date": "2026-10-23",
+      "week": 1,
+      "title": "泛化误差的概率保证：Hoeffding、统一收敛与 ERM",
+      "abstract": "从 Hoeffding 和 Union Bound 推出统一收敛与风险界。",
+      "file": "lessons/ai-004.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "Hoeffding",
+        "ERM",
+        "泛化"
+      ]
+    },
+    {
+      "id": "arch-005",
+      "track": "arch",
+      "number": 5,
+      "date": "2026-10-24",
+      "week": 1,
+      "title": "计算机体系结构第5课：从 CPI 到多瓶颈性能诊断",
+      "abstract": "将 CPI、Roofline、Little 定律与 Amdahl 结合，定位计算、带宽和并发约束。",
+      "file": "lessons/arch-005.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "CPI",
+        "IPC",
+        "Roofline",
+        "Little",
+        "MLP"
+      ]
+    },
+    {
+      "id": "algo-005",
+      "track": "algo",
+      "number": 5,
+      "date": "2026-10-24",
+      "week": 1,
+      "title": "摊还分析进阶：势函数与动态数组扩缩容",
+      "abstract": "分段势函数证明扩缩容常数摊还界，理解二进制计数器。",
+      "file": "lessons/algo-005.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "势函数",
+        "摊还",
+        "动态数组"
+      ]
+    },
+    {
+      "id": "opt-005",
+      "track": "opt",
+      "number": 5,
+      "date": "2026-10-24",
+      "week": 1,
+      "title": "支持超平面、凸集分离与 Slater",
+      "abstract": "解释严格分离、约束资格、对偶乘子与 KKT 的关系。",
+      "file": "lessons/opt-005.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "Slater",
+        "支持超平面",
+        "对偶"
+      ]
+    },
+    {
+      "id": "ai-005",
+      "track": "ai",
+      "number": 5,
+      "date": "2026-10-24",
+      "week": 1,
+      "title": "无限假设类与 VC 维",
+      "abstract": "从打散、增长函数和 Sauer–Shelah 推出 VC 统一收敛。",
+      "file": "lessons/ai-005.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "VC维",
+        "Shattering",
+        "ERM"
+      ]
+    },
+    {
+      "id": "arch-006",
+      "track": "arch",
+      "number": 6,
+      "date": "2026-10-25",
+      "week": 1,
+      "title": "计算机体系结构第6课：强扩展、弱扩展与能耗",
+      "abstract": "区分 Amdahl 与 Gustafson，建模共享带宽、通信与能耗选型。",
+      "file": "lessons/arch-006.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "Amdahl",
+        "Gustafson",
+        "多核",
+        "能耗"
+      ]
+    },
+    {
+      "id": "algo-006",
+      "track": "algo",
+      "number": 6,
+      "date": "2026-10-25",
+      "week": 1,
+      "title": "不均匀分治递归与 Akra–Bazzi",
+      "abstract": "通过非均匀归并、逆序对和递归树证明理解 Akra–Bazzi。",
+      "file": "lessons/algo-006.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "递归",
+        "分治",
+        "Akra–Bazzi"
+      ]
+    },
+    {
+      "id": "opt-006",
+      "track": "opt",
+      "number": 6,
+      "date": "2026-10-25",
+      "week": 1,
+      "title": "强凸性、Smooth 与梯度映射",
+      "abstract": "推导强凸和 Smooth 上下界、PGD 下降及线性收缩。",
+      "file": "lessons/opt-006.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "强凸",
+        "Smooth",
+        "PGD"
+      ]
+    },
+    {
+      "id": "ai-006",
+      "track": "ai",
+      "number": 6,
+      "date": "2026-10-25",
+      "week": 1,
+      "title": "算法稳定性与正则化泛化",
+      "abstract": "从单样本替换推导稳定性和期望泛化界。",
+      "file": "lessons/ai-006.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "tags": [
+        "稳定性",
+        "正则化",
+        "泛化"
       ]
     }
+  ],
+  "indexVerifiedOn": "2026-10-26",
+  "indexDescription": "静态清单仅包含实际核实存在的 Markdown；前 7 篇为短复习稿。",
+  "missingLessons": [
+    "ai-002",
+    "arch-003",
+    "algo-003",
+    "opt-003",
+    "arch-004",
+    "algo-004"
+  ],
+  "orphanQuizzes": [
+    "arch-004"
   ]
 }
