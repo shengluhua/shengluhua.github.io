@@ -1,0 +1,49 @@
+name: Refresh Learning Atlas Catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'microcourses/lessons/**'
+      - 'microcourses/quizzes/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: learning-atlas-index-main
+  cancel-in-progress: false
+
+jobs:
+  update-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Update catalog from real lecture files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git checkout -B index-rebuild origin/main
+            python3 microcourses/scripts/build_manifest.py
+            if git diff --quiet -- microcourses/manifest.json; then
+              echo "No catalog changes."
+              exit 0
+            fi
+            git add microcourses/manifest.json
+            git commit -m "chore: update Learning Atlas catalog"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Branch advanced during catalog write; retrying from latest."
+            sleep 2
+          done
+          echo "Could not push catalog after three attempts."
+          exit 1
