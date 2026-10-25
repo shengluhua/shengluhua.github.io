@@ -10,7 +10,7 @@ const TRACKS=[
  {id:'ai',name:'人工智能',icon:'✳',tone:'#d99455',description:'统计学习 · 大模型 · 生成 · 强化学习'}
 ];
 const app=document.getElementById('app-content'),nav=document.getElementById('course-nav'),search=document.getElementById('global-search'),crumb=document.getElementById('breadcrumb');
-const state={track:'all',filter:'all',planWeek:1,discoverIssue:null,q:'',lessons:[],raw:new Map(),body:new Map(),active:null,fetching:new Map(),searchToken:0,initialized:false};
+const state={track:'all',filter:'all',planWeek:1,knownGaps:[],discoverIssue:null,q:'',lessons:[],raw:new Map(),body:new Map(),active:null,fetching:new Map(),searchToken:0,initialized:false};
 const esc=(v)=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const trackName=id=>(TRACKS.find(t=>t.id===id)||{}).name||id;
 const trackInfo=id=>TRACKS.find(t=>t.id===id)||TRACKS[0];
@@ -180,13 +180,48 @@ async function renderLesson(id,push=true){let lesson=state.lessons.find(l=>l.id=
  window.scrollTo({top:0,behavior:'instant'});
 }
 async function refreshFromGithub(){
- // GitHub API listing is public; the fallback manifest is always available if API is blocked or rate limited.
- try{const res=await fetch(API,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});if(!res.ok)throw Error('GitHub API '+res.status);const files=await res.json();if(!Array.isArray(files))throw Error('Unexpected GitHub listing');let newOnes=[];
- for(const f of files){let m=f.name.match(/^(arch|algo|opt|ai)-(\d{3,})\.md$/);if(!m)continue;let id=f.name.slice(0,-3);if(state.lessons.find(l=>l.id===id))continue;let info=toLesson({},id,'lessons/'+f.name);if(info)newOnes.push(info)}
- // Initial filename metadata is enough for browsing; parse actual front matter for precise title and date.
- await Promise.all(newOnes.map(async l=>{try{const raw=await lessonText(l),parsed=metaParse(raw),heading=parsed.body.match(/^#\s+(.*)$/m);let meta={...parsed.meta};if(!meta.title&&heading)meta.title=heading[1].replace(/^第\s*\d+\s*课[｜|·：:\s]*/,'').trim();combine(toLesson(meta,l.id,l.file))}catch(e){combine(l)}}));
- if(newOnes.length){sort();updateNav();if(!state.active)renderIndex()}
- }catch(e){console.info('课程自动发现暂不可用，已使用静态目录。',String(e))}
+ // A committed manifest makes page loads independent of GitHub API rate limits.
+ // Discovery first uses the public directory API, then falls back to direct Pages paths.
+ let candidateIds=new Set(),apiAvailable=false;
+ try{
+  const resp=await fetch(API,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
+  if(!resp.ok)throw Error('GitHub API '+resp.status);
+  const files=await resp.json();
+  if(!Array.isArray(files))throw Error('Unexpected listing format');
+  apiAvailable=true;
+  files.forEach(f=>{if(/^(arch|algo|opt|ai)-\d{3,}\.md$/.test(f.name))candidateIds.add(f.name.slice(0,-3))});
+ }catch(e){
+  // Files remain discoverable via GitHub Pages even when the public API hits a rate limit.
+  const today=courseDay();
+  const maxKnown=state.lessons.reduce((m,l)=>Math.max(m,l.number),0);
+  state.knownGaps.forEach(id=>candidateIds.add(id));
+  const floor=Math.max(maxKnown+1,today-18);
+  TRACKS.forEach(t=>{
+   for(let n=floor;n<=today;n++)candidateIds.add(t.id+'-'+String(n).padStart(3,'0'));
+  });
+  if(today-maxKnown>19)state.discoverIssue='GitHub API 暂时不可访问。网页已扫描最近新课，但部分较久的新增文件可能尚未列入索引。可到 GitHub 仓库核对。';
+  console.info('GitHub 自动索引不可用，改用直接文件探测。',String(e));
+ }
+ const ids=[...candidateIds].filter(id=>!state.lessons.some(l=>l.id===id));
+ const found=[];let cursor=0;
+ async function worker(){
+  while(cursor<ids.length){
+   const id=ids[cursor++],l=toLesson({},id,'lessons/'+id+'.md');
+   if(!l)continue;
+   try{
+    const raw=await lessonText(l);
+    if(!/^---\s*\n/.test(raw)||raw.trim().length<150)continue;
+    const parsed=metaParse(raw),heading=parsed.body.match(/^#\s+(.*)$/m);
+    const meta={...parsed.meta};
+    if(!meta.title&&heading)meta.title=heading[1].replace(/^第\s*\d+\s*课[｜|·：:\s]*/,'').trim();
+    found.push(toLesson(meta,id,l.file));
+   }catch(e){/* Not archived is not a valid catalog entry. */}
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(ids.length,6)},()=>worker()));
+ for(const l of found){if(l)combine(l)}
+ if(found.length){sort();updateNav()}
+ if(!state.active&&(found.length||state.discoverIssue))renderIndex();
 }
 async function prepareSearchBodies(){let token=++state.searchToken;const missing=state.lessons.filter(l=>!state.body.has(l.id));let pos=0;async function worker(){while(pos<missing.length){let l=missing[pos++];try{await lessonText(l)}catch(e){}if(token!==state.searchToken)return}}
  await Promise.all(Array.from({length:Math.min(6,missing.length)},worker));if(token===state.searchToken&&!state.active)renderIndex()}
@@ -201,6 +236,6 @@ function startNav(){
  const theme=document.getElementById('theme-toggle');try{let t=localStorage.getItem('atlas-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}
  theme.onclick=()=>{let dark=document.documentElement.getAttribute('data-theme')==='dark';if(dark)document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme','dark');try{localStorage.setItem('atlas-theme',dark?'light':'dark')}catch(e){}};
 }
-async function init(){startNav();try{let r=await fetch('./manifest.json',{cache:'no-store'});if(!r.ok)throw Error('目录获取失败：'+r.status);let manifest=await r.json();let lessons=manifest.lessons||[];state.lessons=lessons.map(l=>toLesson(l,l.id,l.file)).filter(Boolean);sort();state.initialized=true;updateNav();const id=queryLesson();if(id)await renderLesson(id,false);else renderIndex();refreshFromGithub();}catch(e){app.innerHTML=`<div class="empty">载入失败：${esc(e.message)}<p>请检查网络连接，或直接通过 GitHub 查看课程 Markdown 原文。</p></div>`}}
+async function init(){startNav();try{let r=await fetch('./manifest.json',{cache:'no-store'});if(!r.ok)throw Error('目录获取失败：'+r.status);let manifest=await r.json();let lessons=manifest.lessons||[];state.lessons=lessons.map(l=>toLesson(l,l.id,l.file)).filter(Boolean);state.knownGaps=Array.isArray(manifest.missingLessons)?manifest.missingLessons:[];sort();state.initialized=true;updateNav();const id=queryLesson();if(id)await renderLesson(id,false);else renderIndex();refreshFromGithub();}catch(e){app.innerHTML=`<div class="empty">载入失败：${esc(e.message)}<p>请检查网络连接，或直接通过 GitHub 查看课程 Markdown 原文。</p></div>`}}
 init();
 })();
