@@ -34,7 +34,7 @@
       "title": "CPU Time、CPI 与 Amdahl 定律",
       "abstract": "定量分析为什么频率更高不一定更快，以及局部优化的整体加速上限。",
       "file": "lessons/arch-001.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "amdahl",
       "tags": [
         "CPU",
@@ -42,7 +42,7 @@
         "Amdahl",
         "性能分析"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
