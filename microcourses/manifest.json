@@ -170,16 +170,19 @@
       "date": "2026-10-22",
       "week": 1,
       "title": "偏差—方差分解：正则化为什么可能改善泛化？",
-      "abstract": "平方损失偏差—方差分解、Ridge 与验证集选择。",
+      "abstract": "从平方损失的偏差—方差分解推导 Ridge 回归，理解正则化、验证集与泛化误差的权衡。",
       "file": "lessons/ai-003.md",
       "minutes": 17,
       "kind": "full",
       "quiz": false,
       "tags": [
-        "偏差方差",
+        "偏差-方差",
+        "正则化",
         "Ridge",
-        "泛化"
-      ]
+        "泛化",
+        "模型选择"
+      ],
+      "diagram": ""
     },
     {
       "id": "opt-004",
@@ -188,16 +191,20 @@
       "date": "2026-10-23",
       "week": 1,
       "title": "投影、法锥与有约束凸优化的一阶最优性",
-      "abstract": "从投影定理推导法锥、KKT 及投影梯度法的收敛界。",
+      "abstract": "从欧氏投影定理推导法锥最优性条件、线性不等式KKT及投影梯度法收敛界。",
       "file": "lessons/opt-004.md",
       "minutes": 17,
       "kind": "full",
       "quiz": true,
       "tags": [
+        "凸集",
         "投影",
         "法锥",
-        "KKT"
-      ]
+        "KKT",
+        "投影梯度",
+        "约束优化"
+      ],
+      "diagram": ""
     },
     {
       "id": "ai-004",
@@ -206,16 +213,20 @@
       "date": "2026-10-23",
       "week": 1,
       "title": "泛化误差的概率保证：Hoeffding、统一收敛与 ERM",
-      "abstract": "从 Hoeffding 和 Union Bound 推出统一收敛与风险界。",
+      "abstract": "从固定模型的 Hoeffding 不等式到有限假设类的统一收敛，再推导 ERM 超额风险界、样本复杂度和模型选择边界。",
       "file": "lessons/ai-004.md",
       "minutes": 17,
       "kind": "full",
       "quiz": true,
       "tags": [
+        "统计学习",
         "Hoeffding",
+        "统一收敛",
+        "并集界",
         "ERM",
         "泛化"
-      ]
+      ],
+      "diagram": ""
     },
     {
       "id": "arch-005",
@@ -224,7 +235,7 @@
       "date": "2026-10-24",
       "week": 1,
       "title": "计算机体系结构第5课：从 CPI 到多瓶颈性能诊断",
-      "abstract": "将 CPI、Roofline、Little 定律与 Amdahl 结合，定位计算、带宽和并发约束。",
+      "abstract": "将 CPI、执行槽位、Roofline、Little 定律和 Amdahl 定律结合，推导可检验的性能下界，识别并发受限与带宽受限并分析瓶颈迁移。",
       "file": "lessons/arch-005.md",
       "minutes": 18,
       "kind": "full",
@@ -234,8 +245,11 @@
         "IPC",
         "Roofline",
         "Little",
-        "MLP"
-      ]
+        "MLP",
+        "Amdahl",
+        "performance-analysis"
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "algo-005",
@@ -243,17 +257,20 @@
       "number": 5,
       "date": "2026-10-24",
       "week": 1,
-      "title": "摊还分析进阶：势函数与动态数组扩缩容",
-      "abstract": "分段势函数证明扩缩容常数摊还界，理解二进制计数器。",
+      "title": "算法与数据结构 第5课｜摊还分析进阶：势函数与动态数组扩缩容",
+      "abstract": "构造分段势函数证明动态数组插入与删除的常数摊还界，识别扩缩容抖动，并通过二进制计数器理解势能储蓄。",
       "file": "lessons/algo-005.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
-        "势函数",
-        "摊还",
-        "动态数组"
-      ]
+        "amortized-analysis",
+        "potential-method",
+        "dynamic-array",
+        "binary-counter",
+        "invariants"
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "opt-005",
@@ -261,17 +278,21 @@
       "number": 5,
       "date": "2026-10-24",
       "week": 1,
-      "title": "支持超平面、凸集分离与 Slater",
-      "abstract": "解释严格分离、约束资格、对偶乘子与 KKT 的关系。",
+      "title": "第5课：支持超平面、凸集分离与 Slater 约束资格条件",
+      "abstract": "用投影推导严格分离，以扰动值函数的支持线解释 Slater 为什么保证对偶乘子存在，并辨析 KKT、零对偶间隙与对偶达到。",
       "file": "lessons/opt-005.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
-        "Slater",
-        "支持超平面",
-        "对偶"
-      ]
+        "convex-analysis",
+        "separation",
+        "slater",
+        "kkt",
+        "duality",
+        "constraint-qualification"
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "ai-005",
@@ -279,17 +300,21 @@
       "number": 5,
       "date": "2026-10-24",
       "week": 1,
-      "title": "无限假设类与 VC 维",
-      "abstract": "从打散、增长函数和 Sauer–Shelah 推出 VC 统一收敛。",
+      "title": "人工智能第5课：无限假设类与 VC 维——为什么连续参数仍能泛化",
+      "abstract": "从打散、增长函数和 Sauer–Shelah 引理推导有限 VC 维的统一收敛，理解无限模型类的泛化边界。",
       "file": "lessons/ai-005.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
+        "统计学习",
         "VC维",
         "Shattering",
+        "Sauer-Shelah",
+        "统一收敛",
         "ERM"
-      ]
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "arch-006",
@@ -298,7 +323,7 @@
       "date": "2026-10-25",
       "week": 1,
       "title": "计算机体系结构第6课：强扩展、弱扩展与能耗",
-      "abstract": "区分 Amdahl 与 Gustafson，建模共享带宽、通信与能耗选型。",
+      "abstract": "严格区分 Amdahl 强扩展与 Gustafson 弱扩展，构建计算/共享带宽/同步资源时间模型并求解延迟与能耗的选型差异。",
       "file": "lessons/arch-006.md",
       "minutes": 18,
       "kind": "full",
@@ -306,9 +331,14 @@
       "tags": [
         "Amdahl",
         "Gustafson",
-        "多核",
-        "能耗"
-      ]
+        "strong-scaling",
+        "weak-scaling",
+        "Roofline",
+        "energy",
+        "EDP",
+        "multicore"
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "algo-006",
@@ -316,17 +346,20 @@
       "number": 6,
       "date": "2026-10-25",
       "week": 1,
-      "title": "不均匀分治递归与 Akra–Bazzi",
-      "abstract": "通过非均匀归并、逆序对和递归树证明理解 Akra–Bazzi。",
+      "title": "第6课：不均匀分治递归与 Akra–Bazzi",
+      "abstract": "用非均匀归并和逆序对计数重建递归树证明，学习 Akra–Bazzi 及其适用边界，并联系 BFPRT 的最坏线性选择。",
       "file": "lessons/algo-006.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
-        "递归",
-        "分治",
-        "Akra–Bazzi"
-      ]
+        "recurrence",
+        "divide-and-conquer",
+        "akra-bazzi",
+        "inversion-count",
+        "complexity"
+      ],
+      "diagram": "mermaid"
     },
     {
       "id": "opt-006",
@@ -334,17 +367,21 @@
       "number": 6,
       "date": "2026-10-25",
       "week": 1,
-      "title": "强凸性、Smooth 与梯度映射",
-      "abstract": "推导强凸和 Smooth 上下界、PGD 下降及线性收缩。",
+      "title": "第 6 课｜强凸性、Smooth 与梯度映射：收敛速度与 KKT",
+      "abstract": "推导强凸与光滑上下界、PGD 的梯度映射和下降不等式，以及 Hessian 条件下的线性收缩与二维 KKT 数值例子。",
       "file": "lessons/opt-006.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
-        "强凸",
-        "Smooth",
-        "PGD"
-      ]
+        "convexity",
+        "strong-convexity",
+        "smoothness",
+        "projected-gradient",
+        "gradient-mapping",
+        "KKT"
+      ],
+      "diagram": "markdown"
     },
     {
       "id": "ai-006",
@@ -352,28 +389,60 @@
       "number": 6,
       "date": "2026-10-25",
       "week": 1,
-      "title": "算法稳定性与正则化泛化",
-      "abstract": "从单样本替换推导稳定性和期望泛化界。",
+      "title": "第6课｜算法稳定性与正则化泛化：只替换一个训练样本会怎样？",
+      "abstract": "从单样本扰动出发证明正则化ERM的统一稳定性与期望泛化界，解释稳定性和偏差的权衡。",
       "file": "lessons/ai-006.md",
       "minutes": 18,
       "kind": "full",
       "quiz": true,
       "tags": [
-        "稳定性",
+        "统计学习",
+        "算法稳定性",
+        "泛化",
         "正则化",
-        "泛化"
+        "强凸",
+        "幽灵样本"
+      ],
+      "diagram": "mermaid"
+    },
+    {
+      "id": "arch-007",
+      "track": "arch",
+      "number": 7,
+      "date": "2026-10-26",
+      "week": 1,
+      "title": "第7课｜第一周系统复盘：用证据定位性能瓶颈",
+      "abstract": "复盘 CPI、流水线、Amdahl、Roofline、Little 定律与强扩展，借同一案例完成多资源诊断、反事实优化和证伪。",
+      "file": "lessons/arch-007.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "CPI",
+        "IPC",
+        "pipeline",
+        "Amdahl",
+        "Roofline",
+        "Little",
+        "MLP",
+        "performance",
+        "weekly-review"
       ]
     }
   ],
   "indexVerifiedOn": "2026-10-26",
-  "indexDescription": "静态清单仅包含实际核实存在的 Markdown；前 7 篇为短复习稿。",
+  "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
     "ai-002",
     "arch-003",
     "algo-003",
     "opt-003",
     "arch-004",
-    "algo-004"
+    "algo-004",
+    "algo-007",
+    "opt-007",
+    "ai-007"
   ],
   "orphanQuizzes": [
     "arch-004"
