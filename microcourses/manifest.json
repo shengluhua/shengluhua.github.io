@@ -164,6 +164,28 @@
       "quiz": true
     },
     {
+      "id": "arch-003",
+      "track": "arch",
+      "number": 3,
+      "date": "2026-10-22",
+      "week": 1,
+      "title": "Little 定律、内存级并行与可持续带宽",
+      "abstract": "由 Little 定律和在途请求时间面积推导 MLP 带宽上界，区分通道带宽与延迟受限，并建立测量方法。",
+      "file": "lessons/arch-003.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "little",
+      "tags": [
+        "Little",
+        "MLP",
+        "MSHR",
+        "内存延迟",
+        "带宽",
+        "并发"
+      ]
+    },
+    {
       "id": "ai-003",
       "track": "ai",
       "number": 3,
@@ -435,7 +457,6 @@
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
     "ai-002",
-    "arch-003",
     "algo-003",
     "opt-003",
     "arch-004",
