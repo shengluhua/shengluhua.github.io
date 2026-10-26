@@ -152,7 +152,7 @@
       "title": "L-Smooth、强凸与梯度下降收敛",
       "abstract": "从 Descent Lemma 推导稳定步长，比较普通凸与强凸的收敛率。",
       "file": "lessons/opt-002.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "gradient",
       "tags": [
         "Smooth",
@@ -160,7 +160,7 @@
         "梯度下降",
         "收敛"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
