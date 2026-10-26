@@ -260,7 +260,7 @@
       "file": "lessons/ai-003.md",
       "minutes": 17,
       "kind": "full",
-      "quiz": false,
+      "quiz": true,
       "tags": [
         "偏差-方差",
         "正则化",
