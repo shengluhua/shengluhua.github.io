@@ -113,7 +113,7 @@
       "title": "流水线：Latency、Throughput 与停顿",
       "abstract": "理解流水线的重叠执行和 Hazard，再把微架构停顿纳入 CPI。",
       "file": "lessons/arch-002.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "pipeline",
       "tags": [
         "流水线",
@@ -121,7 +121,7 @@
         "RAW",
         "分支预测"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
