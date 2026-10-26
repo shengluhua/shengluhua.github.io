@@ -250,6 +250,28 @@
       ]
     },
     {
+      "id": "algo-004",
+      "track": "algo",
+      "number": 4,
+      "date": "2026-10-23",
+      "week": 1,
+      "title": "Quickselect：为何第 k 小可以在线性期望时间找到？",
+      "abstract": "用 Lomuto 与三路分区追踪枢轴排名，证明 Quickselect 期望线性与 BFPRT 最坏线性，辨析重复键边界。",
+      "file": "lessons/algo-004.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "quickselect",
+      "tags": [
+        "Quickselect",
+        "Partition",
+        "BFPRT",
+        "randomized",
+        "selection",
+        "invariants"
+      ]
+    },
+    {
       "id": "opt-004",
       "track": "opt",
       "number": 4,
@@ -501,7 +523,6 @@
   "missingLessons": [
     "ai-002",
     "opt-003",
-    "algo-004",
     "algo-007",
     "opt-007",
     "ai-007"
