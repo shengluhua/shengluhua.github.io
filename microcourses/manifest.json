@@ -164,6 +164,27 @@
       "quiz": true
     },
     {
+      "id": "ai-002",
+      "track": "ai",
+      "number": 2,
+      "date": "2026-10-21",
+      "week": 1,
+      "title": "泛化、偏差与方差：训练误差低为什么还不够？",
+      "abstract": "从经验与总体风险的差异出发，推导收缩均值估计的偏差—方差分解，理解正则化与独立验证的作用。",
+      "file": "lessons/ai-002.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "markdown",
+      "tags": [
+        "generalization",
+        "bias-variance",
+        "regularization",
+        "model-selection",
+        "holdout"
+      ]
+    },
+    {
       "id": "arch-003",
       "track": "arch",
       "number": 3,
@@ -543,12 +564,9 @@
   "indexVerifiedOn": "2026-10-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "ai-002",
     "algo-007",
     "opt-007",
     "ai-007"
   ],
-  "orphanQuizzes": [
-    "ai-002"
-  ]
+  "orphanQuizzes": []
 }
