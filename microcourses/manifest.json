@@ -207,6 +207,28 @@
       ]
     },
     {
+      "id": "opt-003",
+      "track": "opt",
+      "number": 3,
+      "date": "2026-10-22",
+      "week": 1,
+      "title": "次梯度：不可微凸函数如何建立全局最优性与收敛界？",
+      "abstract": "从支撑超平面定义次微分，求解绝对值次梯度，推导投影次梯度方法 O(RG/√T) 误差界与固定步长失效反例。",
+      "file": "lessons/opt-003.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "subgradient",
+        "nonsmooth",
+        "convex",
+        "projection",
+        "convergence",
+        "absolute-value"
+      ]
+    },
+    {
       "id": "ai-003",
       "track": "ai",
       "number": 3,
@@ -522,7 +544,6 @@
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
     "ai-002",
-    "opt-003",
     "algo-007",
     "opt-007",
     "ai-007"
