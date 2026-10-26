@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="智能设计自动化：理论、考试与实验。课程筹备与材料覆盖清单，尚待主材料仓库读取授权。">
+<title>智能设计自动化 · Learning Atlas</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--card:#fff;--text:#243044;--muted:#5a677b;--line:#dce3ee;--accent:#305ba8;--warn:#fff4de;--warntext:#79530a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:18px/1.9 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}a{color:var(--accent);text-underline-offset:4px}main{max-width:1000px;margin:auto;padding:24px 30px 70px}header{margin:26px 0}h1{font-size:clamp(30px,4vw,44px);line-height:1.35;margin:14px 0}h2{font-size:25px;line-height:1.5;margin:0 0 18px}h3{font-size:20px;margin:24px 0 9px}.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700}.lead{color:var(--muted)}nav{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}nav a{display:flex;align-items:center;min-height:44px;padding:7px 15px;border:1px solid var(--line);border-radius:9px;background:var(--card);text-decoration:none}section{margin:22px 0;padding:28px;border:1px solid var(--line);border-radius:16px;background:var(--card);scroll-margin-top:20px}.notice{background:var(--warn);color:var(--warntext);border-radius:12px;padding:18px 22px}.notice p{margin:6px 0}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:16px;min-width:620px}td,th{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:13px 10px}th{font-weight:700}small,.meta{color:var(--muted);font-size:14px}.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.flow div{border:1px solid var(--line);padding:15px;border-radius:10px}.flow b{display:block;color:var(--accent)}.flow span{font-size:15px;color:var(--muted)}.lab{border-left:3px solid var(--accent);padding-left:17px}code{font-size:.87em;overflow-wrap:anywhere}footer{font-size:14px;color:var(--muted);margin-top:24px}.status{font-weight:700;color:var(--warntext)}@media(max-width:760px){main{padding:18px 18px 50px}section{padding:22px 18px}.flow{grid-template-columns:1fr 1fr}body{font-size:18px}h2{font-size:23px}}@media(prefers-color-scheme:dark){:root{--bg:#141b27;--card:#1d2735;--text:#e5eaf2;--muted:#adbace;--line:#364459;--accent:#9ebeff;--warn:#352c1c;--warntext:#f3ce89}}
+</style>
+</head>
+<body><main>
+<a href="../">← 返回 Learning Atlas</a>
+<header><div class="eyebrow">第五门课程 · THEORY / EXAM / LAB</div><h1>智能设计自动化</h1><p class="lead">理论推导、考试训练、实验源码三条线并行。以材料为边界，不用通用 EDA 提纲替代原课件。</p><p class="meta">筹备记录：2026-10-26 · 本页是课程设计，不是已经完成的完整课程。</p></header>
+<div class="notice"><strong>主材料尚未读取，不能宣称全覆盖。</strong><p>指定课程仓库的目录与元信息读取返回 404，且当前连接可访问仓库列表未包含它。PDF 文件清单、2025 真题内容及实验版本尚未核验。已读取公开复习网站，并确认另有 2024 年实验仓库可作待核对参考。</p><p><b>正式课次、真题考点映射及完整覆盖率：待材料读取后确定。</b>当前发布正式讲义 0 节，不把规划条目计作已授课程。</p></div>
+<nav aria-label="课程筹备导航"><a href="#scope">理论范围</a><a href="#exam">考试路线</a><a href="#labs">实验路线</a><a href="#method">讲解方式</a><a href="#coverage">材料覆盖</a></nav>
+<section id="scope"><h2>一、已核实的公开复习范围</h2><p>下列八个模块来自公开复习网站。它们只是目前可读的范围，不代表尚未读取的 PDF 已全部涵盖。网站部分条目要求参考 PPT，因此不能只依靠网页形成最终课表。</p><div class="table-wrap"><table><thead><tr><th>模块</th><th>已看到的范围</th><th>拟采用的讲解方式</th></tr></thead><tbody>
+<tr><td>互斥与并行</td><td>Amdahl、Safety / Liveness / Fairness、LockOne、LockTwo、Peterson</td><td>线程交错逐步播放；逐条验证安全性与进展性，写清内存模型前提。</td></tr>
+<tr><td>布尔代数</td><td>Cofactor、Shannon 展开、布尔差分、量词、网络修复</td><td>真值表与 MUX 同步变化；代入、化简、量词消除不跳步。</td></tr>
+<tr><td>逻辑综合</td><td>SOP / POS、两级与多级优化、technology mapping、tree covering</td><td>逻辑图逐步改写，库匹配和动态规划成本逐节点计算。</td></tr>
+<tr><td>布局</td><td>模拟退火、划分、线长模型、二次与非线性解析布局</td><td>拖动单元显示目标变化；区分真实约束、代理目标与优化假设。</td></tr>
+<tr><td>布线</td><td>Steiner 树、Hannan 网格、FLUTE、Lee、Akers 编码</td><td>逐层波前传播、逐边回溯；区分拓扑类别与具体坐标权重。</td></tr>
+<tr><td>静态时序分析</td><td>时序图、cell/net arc、AT / RAT / slack、setup / hold</td><td>沿图传播时间，逐步写出 max/min 的来源与约束符号。</td></tr>
+<tr><td>体系结构</td><td>CPU 时间、CPI、流水线与三类 hazard</td><td>逐周期执行表，明确理想模型与真实停顿的区别。</td></tr>
+<tr><td>存储系统</td><td>层次存储、locality、Cache hit/miss、memory stall</td><td>地址拆分与访存 trace，同一例子逐次计算命中及周期成本。</td></tr>
+</tbody></table></div><p class="meta">依据：<a href="https://eda.youwei.xyz/">2025 年课程公开复习网站</a>及其八个专题页。以上为范围记录，不是对 2025 试卷的题型统计或预测。</p></section>
+<section id="exam"><h2>二、考试线：重点必须有依据</h2><p>课程区分三种标签：<b>复习范围明确出现</b>、<b>往年真题实际考过</b>、<b>为理解而补充</b>。只有读到试卷原文后，才添加题号、分值及“真题已考”标签；不编造高频考点或今年命题趋势。</p><p>每道真题按“题面与条件 → 对应知识 → 最小解题步骤 → 易错符号与边界 → 得分步骤 → 变式练习”讲解。计算题展示中间数值，证明题标出使用的假设，算法题保留每一步状态。</p><p><strong>2025 年试卷状态：未读到正文。</strong>当前不能给出真实题目分布、分值权重或逐题解答。正式试卷解析与日常自测分开，自测第一次展示不泄露答案。</p></section>
+<section id="labs"><h2>三、实验线：从代码入口讲到验证与报告</h2><p>已核实的参考仓库 <a href="https://github.com/pku-gsun/dacs-lab">pku-gsun/dacs-lab</a> 列出下面三个实验，分支属于 <code>dacs2024</code>。尚不能把它们认定为指定材料仓库中的 2025 年实验版本。</p>
+<div class="lab"><h3>参考实验 1｜前缀加法器设计优化</h3><p>教学拆解：进位 generate/propagate → 前缀算子与拓扑 → 设计编码 → 生成 RTL → 正确性检查 → PPA 测量 → 面积/延迟权衡。具体函数、配置和评分方式以核验后的实验源码为准。</p></div>
+<div class="lab"><h3>参考实验 2｜EDA 流程参数调优</h3><p>教学拆解：设计与工艺库输入 → 参数空间 → 工具流程调用 → 日志/报告解析 → 目标函数 → 搜索策略 → 重复实验与消融。须检查失败状态、版本依赖与资源预算。</p></div>
+<div class="lab"><h3>参考实验 3｜AI 加速器设计优化</h3><p>教学拆解：工作负载 → 架构参数与映射 → 容量/带宽约束 → 代价模型 → 设计空间搜索 → 结果验证。实际接口、工具和交付要求待仓库源码核对。</p></div>
+<h3>每个实验固定交付</h3><p>源码阅读图、环境与版本清单、逐条命令及用途、最小可验证样例、关键代码讲解、测试方法、日志定位、基线与消融表、报告结构。严格区分“原实验规定”“新增教学练习”“已实测”“未运行”。没有 Genus/Innovus 许可或 GPU 设备时，不伪造实验结果。</p><p class="meta">参考仓库 README 列有 Python ≥3.12、Cadence Genus / Innovus 与 ASAP7 库。最终要求必须按实际课程版本重新确认。</p></section>
+<section id="method"><h2>四、每节讲解：让推理过程可见</h2><div class="flow"><div><b>01 问题与输入</b><span>要解决什么？符号、单位、约束是什么？</span></div><div><b>02 直观模型</b><span>先画结构、状态或几何关系，再引入公式。</span></div><div><b>03 逐步推导</b><span>每次等号和不等号写明依据，代码索引逐项解释。</span></div><div><b>04 检验与变式</b><span>算例、反例、边界条件，再用递进题检测。</span></div></div><p>理论单元拟按约 25–40 分钟的阅读量拆分；实验讲解独立成节，允许更长。内容量由材料决定，不强行压缩成固定 12 周，也不为保持短篇而省略证明。学习时长仅为阅读规划，不代表工具运行耗时。</p><p>每节保留 Lv1–Lv4 四道递进自测，15/20/25/40 分。前三题客观判分，证明、程序设计和实验报告需自评或人工/ChatGPT 批改。可视化提供暂停、单步、参数修改与文字等价说明，平板阅读不依赖悬停。</p></section>
+<section id="coverage"><h2>五、完整覆盖不是一句承诺</h2><p>正式覆盖台账按“文件路径与版本 → PDF 页码/章节 → 知识点 → 讲义编号 → 真题小题 → 实验步骤 → 验证状态”建立。状态分别为未读取、已读取、已规划、已讲解、已测评，不能相互替代。</p><div class="table-wrap"><table><thead><tr><th>材料类别</th><th>当前状态</th><th>尚需完成</th></tr></thead><tbody><tr><td>指定 GitHub 材料仓库</td><td class="status">读取失败</td><td>授权后枚举全部文件、固定 commit、建立清单。</td></tr><tr><td>公开复习网站</td><td>已读取八个专题页</td><td>与 PDF 和真题逐项交叉核对。</td></tr><tr><td>2025 期末试卷</td><td class="status">正文未读取</td><td>逐页读题、检查图表、建立题号与分值映射。</td></tr><tr><td>课件 PDF 全集</td><td class="status">清单未核验</td><td>核对每份文件及每个章节，不以标题猜内容。</td></tr><tr><td>实验</td><td>找到 2024 参考仓库</td><td>确认课程版本、读具体代码与任务书。</td></tr></tbody></table></div><p><b>尚未建立正式课次推送，也尚未发布本课的教学讲义。</b>待主材料可读后才能确定课序、编号与完整覆盖范围。既有四门课不受此筹备页影响。</p></section>
+<footer>Learning Atlas · 课程筹备页 · 不转载未授权的私有 PDF，不发布密码、许可证或实验服务器信息。<br><a href="../">返回四门进阶微课</a> · <a href="https://eda.youwei.xyz/">公开复习范围</a> · <a href="https://github.com/pku-gsun/dacs-lab">参考实验仓库（2024）</a></footer>
+</main></body></html>
