@@ -73,7 +73,7 @@
       "title": "凸集、凸函数与一阶最优性",
       "abstract": "用凸函数的全局切线下界建立最优性证明，并理解 KKT 乘子的几何意义。",
       "file": "lessons/opt-001.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "convex",
       "tags": [
         "凸性",
@@ -81,7 +81,7 @@
         "KKT",
         "梯度"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
