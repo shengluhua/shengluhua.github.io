@@ -581,12 +581,36 @@
         "BFPRT",
         "lower-bound"
       ]
+    },
+    {
+      "id": "opt-007",
+      "track": "opt",
+      "number": 7,
+      "date": "2026-10-26",
+      "week": 1,
+      "title": "第 7 课｜第一周复盘：凸性、KKT、对偶与收敛证书",
+      "abstract": "第一周系统复盘：从分离、法锥与次梯度走向 KKT/对偶证书，再把曲率界连接到投影梯度下降与线性收缩；重点辨析资格条件和零乘子。",
+      "file": "lessons/opt-007.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "convexity",
+        "separation",
+        "normal-cone",
+        "subgradient",
+        "KKT",
+        "Slater",
+        "duality",
+        "projected-gradient",
+        "review"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-007",
     "ai-007"
   ],
   "orphanQuizzes": []
