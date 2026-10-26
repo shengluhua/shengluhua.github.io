@@ -54,14 +54,14 @@
       "title": "摊还分析：动态数组与势能法",
       "abstract": "证明扩容操作单次昂贵但连续操作平均便宜，并识别缩容阈值反例。",
       "file": "lessons/algo-001.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "array",
       "tags": [
         "摊还分析",
         "势函数",
         "动态数组"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
