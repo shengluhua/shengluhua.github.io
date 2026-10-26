@@ -110,7 +110,7 @@ async function lessonText(l){if(state.raw.has(l.id))return state.raw.get(l.id);i
  const promise=(async()=>{let urls=location.hostname==='localhost'||location.hostname==='127.0.0.1'?[`./${l.file}`,BASE_RAW+l.file]:[BASE_RAW+l.file,`./${l.file}`];for(const url of urls){try{const r=await fetch(url,{cache:'no-store'});if(r.ok){const txt=await r.text();state.raw.set(l.id,txt);state.body.set(l.id,metaParse(txt).body);return txt}}catch(e){}}throw Error('课程 Markdown 暂不可用')})();state.fetching.set(l.id,promise);try{return await promise}finally{state.fetching.delete(l.id)}}
 function renderer(md){
  const safe=String(md).replace(/^\[\[diagram:(amdahl|pipeline|array|recursion|convex|gradient|softmax)\]\]$/gm,(_,t)=>`<div data-diagram="${t}"></div>`);
- const enhanced=safe.replace(/^\[\[viz:(roofline|little|quickselect|vc|projection|biasvariance)\]\]$/gm,(_,t)=>`<div data-viz="${t}"></div>`);
+ const enhanced=safe.replace(/^\[\[viz:(roofline|little|quickselect|vc|projection|biasvariance|subgradient)\]\]$/gm,(_,t)=>`<div data-viz="${t}"></div>`);
  let html=window.marked?.parse?window.marked.parse(enhanced,{gfm:true,breaks:false}):'<pre>'+esc(enhanced)+'</pre>';
  return window.DOMPurify?.sanitize?DOMPurify.sanitize(html):'<pre>'+esc(safe)+'</pre>';
 }
