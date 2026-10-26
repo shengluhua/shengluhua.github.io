@@ -207,6 +207,28 @@
       "diagram": ""
     },
     {
+      "id": "arch-004",
+      "track": "arch",
+      "number": 4,
+      "date": "2026-10-23",
+      "week": 1,
+      "title": "Roofline：算术强度、带宽屋顶与 MLP 扩展",
+      "abstract": "推导计算和数据移动的统一吞吐上界，理解算术强度、Tiling、缓存流量以及并发访存瓶颈。",
+      "file": "lessons/arch-004.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "roofline",
+      "tags": [
+        "Roofline",
+        "Arithmetic-Intensity",
+        "DRAM",
+        "Tiling",
+        "MLP",
+        "Cache"
+      ]
+    },
+    {
       "id": "opt-004",
       "track": "opt",
       "number": 4,
@@ -459,13 +481,10 @@
     "ai-002",
     "algo-003",
     "opt-003",
-    "arch-004",
     "algo-004",
     "algo-007",
     "opt-007",
     "ai-007"
   ],
-  "orphanQuizzes": [
-    "arch-004"
-  ]
+  "orphanQuizzes": []
 }
