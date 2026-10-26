@@ -559,12 +559,33 @@
         "performance",
         "weekly-review"
       ]
+    },
+    {
+      "id": "algo-007",
+      "track": "algo",
+      "number": 7,
+      "date": "2026-10-26",
+      "week": 1,
+      "title": "第一周复习：摊还、递归与第 k 小选择的统一证明",
+      "abstract": "复盘动态数组势函数、比较排序下界、三路选择及 BFPRT，串起在线更新与最坏线性选择的完整证明。",
+      "file": "lessons/algo-007.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "weekly-review",
+        "amortized-analysis",
+        "recurrence",
+        "selection",
+        "BFPRT",
+        "lower-bound"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-007",
     "opt-007",
     "ai-007"
   ],
