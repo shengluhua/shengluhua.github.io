@@ -1,0 +1,114 @@
+name: Validate EDA tablet reader
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'microcourses/eda/index.html'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript and curriculum coverage
+        run: |
+          mkdir -p eda-qa
+          for f in microcourses/eda/*-data.js microcourses/eda/course-ui.js; do node --check "$f"; done
+          node <<'JS'
+          const fs=require('fs'),vm=require('vm'),assert=require('assert');
+          const ctx={window:{}};vm.createContext(ctx);
+          for(const file of ['course-data.js','lab-data.js','lesson-data.js'])vm.runInContext(fs.readFileSync('microcourses/eda/'+file,'utf8'),ctx);
+          const D=ctx.window.EDACourse,L=ctx.window.EDALabs,F=ctx.window.EDALessons;
+          assert.equal(D.units.length,85);assert.equal(new Set(D.units.map(u=>u.id)).size,85);
+          assert.equal(D.pageMap.length,807);assert(D.pageMap.every(p=>p.units.length));
+          assert.equal(D.exams.length,28);assert.equal(D.exams.reduce((s,q)=>s+q.points,0),100);
+          assert.equal(L.tasks.length,43);assert.equal(new Set(L.tasks.map(t=>t.id)).size,43);
+          assert.equal(L.labs.length,16);
+          const ids=new Set(D.units.map(u=>u.id));
+          for(const u of D.units)for(const p of u.prerequisites)assert(ids.has(p),'Missing prerequisite '+p);
+          for(const [id,lecture]of Object.entries(F)){
+            assert.equal(lecture.quiz.questions.length,4);
+            assert.equal(lecture.quiz.questions.map(q=>q.points).join(','),'15,20,25,40');
+            assert.equal(lecture.quiz.questions.map(q=>q.level).join(','),'1,2,3,4');
+            assert(lecture.html.length>3000);
+            assert(lecture.quiz.questions[3].rubric.length&&lecture.quiz.questions[3].model_answer);
+          }
+          fs.writeFileSync('eda-qa/integrity.json',JSON.stringify({source_commit:D.sourceCommit,units:D.units.length,mapped_pages:D.pageMap.length,tasks:L.tasks.length,labs:L.labs.length,exam_questions:D.exams.length,exam_points:100,full_lessons:Object.keys(F),status:'PASS'},null,2));
+          fs.writeFileSync('eda-qa/public-course-data.json',JSON.stringify({curriculum:D,labs:L,lessons:F},null,2));
+          JS
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium
+      - name: Exercise tablet viewports and step-by-step lessons
+        run: |
+          python -m http.server 8765 --directory . >/tmp/eda-server.log 2>&1 &
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          import json,time
+          results=[]
+          with sync_playwright() as p:
+              browser=p.chromium.launch()
+              for width,height in [(768,1024),(1024,768)]:
+                  page=browser.new_page(viewport={'width':width,'height':height},device_scale_factor=1,has_touch=True)
+                  errors=[]
+                  page.on('pageerror',lambda error:errors.append(str(error)))
+                  base='http://127.0.0.1:8765/microcourses/eda/'
+                  page.goto(base,wait_until='networkidle')
+                  page.locator('.metrics').wait_for()
+                  assert page.locator('.feature').count()==2
+                  assert page.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1')
+                  page.screenshot(path=f'eda-qa/home-{width}.png',full_page=True)
+                  page.goto(base+'#tab=theory')
+                  page.wait_for_timeout(100)
+                  assert page.locator('.unit-card').count()==61
+                  page.goto(base+'#tab=exam')
+                  page.wait_for_timeout(100)
+                  assert page.locator('.exam-card').count()==28
+                  page.goto(base+'#lab=L15')
+                  page.wait_for_timeout(100)
+                  assert 'bandwidth_gbps' in page.locator('main').inner_text()
+                  assert page.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1')
+                  page.screenshot(path=f'eda-qa/lab15-{width}.png',full_page=True)
+                  page.goto(base+'#lesson=T03')
+                  page.wait_for_timeout(100)
+                  page.locator('[data-demo=shannon]').scroll_into_view_if_needed()
+                  assert 'F=0' in page.locator('[data-picture]').inner_text()
+                  page.locator('[data-bit=a]').check()
+                  assert 'F=1' in page.locator('[data-picture]').inner_text()
+                  page.screenshot(path=f'eda-qa/shannon-{width}.png')
+                  form=page.locator('[data-quiz=T03]')
+                  form.locator('input[name=q1][value="1"]').check()
+                  form.locator('input[name=q2]').fill('4')
+                  form.locator('input[name=q3][value="0"]').check()
+                  form.locator('input[name=q3][value="2"]').check()
+                  form.locator('button[type=submit]').click()
+                  assert '60 / 60' in form.locator('[data-score]').inner_text()
+                  assert '开放题40分尚未评阅' in form.locator('[data-score]').inner_text()
+                  page.goto(base+'#lesson=L06')
+                  page.wait_for_timeout(100)
+                  demo=page.locator('[data-demo=gemm]')
+                  for _ in range(4):demo.locator('[data-next]').click()
+                  assert '= 7' in demo.locator('[data-formula]').inner_text()
+                  demo.scroll_into_view_if_needed()
+                  assert page.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1')
+                  page.screenshot(path=f'eda-qa/gemm-{width}.png')
+                  assert not errors,errors
+                  results.append({'viewport':[width,height],'touch':True,'overflow':False,'theory_cards':61,'exam_questions':28,'shannon_interaction':'PASS','gemm_trace':'PASS','objective_quiz':'60/60; open pending','js_errors':errors})
+                  page.close()
+              browser.close()
+          open('eda-qa/browser-results.json','w').write(json.dumps(results,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eda-reader-qa
+          path: |
+            eda-qa/
+            microcourses/eda/
+          retention-days: 3
