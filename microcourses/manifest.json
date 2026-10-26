@@ -548,5 +548,7 @@
     "opt-007",
     "ai-007"
   ],
-  "orphanQuizzes": []
+  "orphanQuizzes": [
+    "ai-002"
+  ]
 }
