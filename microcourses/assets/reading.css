@@ -188,3 +188,20 @@ button.archive-entry:hover{border-color:var(--blue);background:var(--blue-lite)}
 .quiz-container{scroll-margin-top:150px}
 @media(max-width:1180px){.reader-tools button,.week-switch button,.icon-button{min-height:44px}.icon-button{width:44px;height:44px}}
 @media(max-width:699px){.searchbox input{font-size:16px}.reader-tools button{min-height:42px}.reader-actions .quiz-jump{font-size:12px}}
+
+/* Interactive visualizations: read-first, touch-friendly, explanatory at every step */
+.viz-card{border:1px solid color-mix(in srgb,var(--blue) 35%,var(--line));background:color-mix(in srgb,var(--blue) 3%,var(--panel));margin:28px 0;border-radius:16px;padding:22px;overflow:hidden}
+.viz-kicker{font-size:11px;color:var(--blue);font-weight:750;letter-spacing:.1em;margin-bottom:7px}
+.article .viz-card h3{font-size:18px;margin:0 0 15px;color:var(--strong)}
+.viz-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 17px}
+.viz-field{font-size:13px;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.viz-field b{font-variant-numeric:tabular-nums}
+.viz-field input{width:100%;max-width:100%;min-height:28px;accent-color:var(--blue)}
+.viz-picture{max-width:100%;overflow-x:auto;margin:13px 0;background:var(--panel);border:1px solid var(--line);padding:10px;border-radius:11px}
+.viz-picture svg{width:100%;height:auto;max-height:260px;display:block}
+.article .viz-caption{font-size:15px;font-weight:500;line-height:1.75;min-height:82px;margin:9px 0 13px}
+.viz-controls{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:12px}
+.viz-controls button{padding:8px 15px;min-height:44px;border-radius:8px;background:var(--panel);color:var(--blue);border:1px solid var(--line);font-weight:700;font-size:12px}
+.viz-controls button:disabled{opacity:.35;cursor:default}
+.viz-controls [data-counter]{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+@media(max-width:699px){.viz-card{padding:14px}.viz-fields{grid-template-columns:1fr}.article .viz-caption{font-size:14px}.viz-controls{gap:8px;flex-wrap:wrap}.viz-controls button{flex:1;min-width:90px}}
