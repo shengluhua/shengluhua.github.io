@@ -93,7 +93,7 @@
       "title": "极大似然、交叉熵与泛化",
       "abstract": "从极大似然推导交叉熵和梯度，理解概率预测与泛化理论之间的联系。",
       "file": "lessons/ai-001.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "softmax",
       "tags": [
         "MLE",
@@ -101,7 +101,7 @@
         "KL",
         "泛化"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
