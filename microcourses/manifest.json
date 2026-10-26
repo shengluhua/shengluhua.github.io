@@ -133,14 +133,14 @@
       "title": "递归树与 Master Theorem",
       "abstract": "按层计算工作量，推导主定理及其不能直接使用的边界情形。",
       "file": "lessons/algo-002.md",
-      "minutes": 17,
+      "minutes": 18,
       "diagram": "recursion",
       "tags": [
         "递归树",
         "主定理",
         "复杂度"
       ],
-      "kind": "review",
+      "kind": "full",
       "quiz": true
     },
     {
