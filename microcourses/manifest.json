@@ -705,12 +705,34 @@
         "multipliers",
         "duality"
       ]
+    },
+    {
+      "id": "ai-008",
+      "track": "ai",
+      "number": 8,
+      "date": "2026-10-27",
+      "week": 2,
+      "title": "梯度下降为什么会下降？学习率、光滑性与曲率",
+      "abstract": "从方向导数和L-smooth下降引理推导学习率范围，用二维二次函数和Hessian谱解释振荡发散，并证明非凸GD一阶驻点界及SGD噪声边界。",
+      "file": "lessons/ai-008.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "gradient-descent",
+        "learning-rate",
+        "smoothness",
+        "descent-lemma",
+        "Hessian",
+        "curvature",
+        "nonconvex",
+        "SGD"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-27",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-008"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
