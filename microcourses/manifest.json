@@ -658,12 +658,34 @@
         "DAG",
         "precise-exception"
       ]
+    },
+    {
+      "id": "algo-008",
+      "track": "algo",
+      "number": 8,
+      "date": "2026-10-27",
+      "week": 2,
+      "title": "随机化算法：Las Vegas / Monte Carlo 与随机 Quickselect 的期望线性证明",
+      "abstract": "从固定输入上的条件概率出发，推导三路 Quickselect 的正确性、好枢轴概率、几何等待及期望 O(n)；辨析 Monte Carlo 与最坏情况。",
+      "file": "lessons/algo-008.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "randomization",
+        "probability",
+        "las-vegas",
+        "monte-carlo",
+        "quickselect",
+        "conditional-expectation",
+        "geometric-series"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-27",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-008",
     "opt-008",
     "ai-008"
   ],
