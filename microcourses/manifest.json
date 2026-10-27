@@ -631,10 +631,41 @@
         "stability",
         "evaluation"
       ]
+    },
+    {
+      "id": "arch-008",
+      "track": "arch",
+      "number": 8,
+      "date": "2026-10-27",
+      "week": 2,
+      "title": "第8课｜ILP与寄存器重命名：让独立指令越过等待",
+      "abstract": "区分RAW/WAR/WAW与真假相关，推导程序依赖DAG及周期下界，手算乱序调度和物理寄存器重命名，并解释执行、写回、退休与精确异常边界。",
+      "file": "lessons/arch-008.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "ILP",
+        "RAW",
+        "WAR",
+        "WAW",
+        "register-renaming",
+        "RAT",
+        "ROB",
+        "OoO",
+        "issue",
+        "DAG",
+        "precise-exception"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-10-26",
+  "indexVerifiedOn": "2026-10-27",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-008",
+    "opt-008",
+    "ai-008"
+  ],
   "orphanQuizzes": []
 }
