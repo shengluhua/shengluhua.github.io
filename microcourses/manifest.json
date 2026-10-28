@@ -753,12 +753,34 @@
         "ROB",
         "precise-exception"
       ]
+    },
+    {
+      "id": "algo-009",
+      "track": "algo",
+      "number": 9,
+      "date": "2026-10-28",
+      "week": 2,
+      "title": "随机哈希与通用哈希：从碰撞概率证明期望 O(1) 查找",
+      "abstract": "定义通用哈希族，构造有限域仿射随机哈希并严谨证明碰撞上界，再用指示变量和线性期望推导链地址查询的期望复杂度及适用边界。",
+      "file": "lessons/algo-009.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "randomization",
+        "hashing",
+        "universal-hashing",
+        "separate-chaining",
+        "indicator-variables",
+        "expectation",
+        "load-factor"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-009",
     "opt-009",
     "ai-009"
   ],
