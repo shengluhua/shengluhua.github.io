@@ -1,0 +1,100 @@
+name: Validate unified Learning Atlas
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/learning-atlas-integration-qa.yml'
+      - 'microcourses/index.html'
+      - 'microcourses/eda/index.html'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax, content and quiz integrity
+        run: |
+          mkdir -p atlas-qa
+          for f in microcourses/assets/*.js microcourses/eda/*.js; do node --check "$f"; done
+          node <<'JS'
+          const fs=require('fs'),vm=require('vm'),assert=require('assert');
+          const ctx={window:{},console};vm.createContext(ctx);
+          const base='microcourses/eda/';
+          const html=fs.readFileSync(base+'index.html','utf8');
+          const files=[...html.matchAll(/<script[^>]+src="\.\/([^"?]+)(?:\?[^" ]*)?"/g)].map(m=>m[1]);
+          for(const file of files)if(!/course-ui|reader-enhancements/.test(file))vm.runInContext(fs.readFileSync(base+file,'utf8'),ctx,{filename:file});
+          const D=ctx.window.EDACourse,L=ctx.window.EDALabs,F=ctx.window.EDALessons;
+          assert.equal(D.units.length,85);assert.equal(new Set(D.units.map(x=>x.id)).size,85);
+          assert.equal(D.pageMap.length,807);assert(D.pageMap.every(p=>p.units.length));
+          assert.equal(L.tasks.length,43);assert.equal(L.labs.length,16);
+          assert.equal(D.exams.length,28);assert.equal(D.exams.reduce((s,q)=>s+q.points,0),100);
+          const ids=new Set(D.units.map(u=>u.id));
+          for(const u of D.units)for(const p of u.prerequisites)assert(ids.has(p),'Missing prerequisite '+p);
+          for(const [id,l]of Object.entries(F)){
+            assert(ids.has(id));assert(l.html.length>3000,id+' lecture too short');
+            assert((l.html.match(/<h2[ >]/g)||[]).length>=8,id+' missing sections');
+            const qs=l.quiz.questions;assert.equal(qs.length,4);
+            assert.equal(qs.map(q=>q.level).join(','),'1,2,3,4');assert.equal(qs.map(q=>q.points).join(','),'15,20,25,40');
+            for(const q of qs){assert(q.prompt&&q.hint);if(q.type==='numeric'){assert(Number.isFinite(q.answer));assert(q.tolerance>=0)}if(q.options){const a=Array.isArray(q.answer)?q.answer:[q.answer];assert(a.every(i=>Number.isInteger(i)&&i>=0&&i<q.options.length));assert.equal(new Set(a).size,a.length)}}
+            assert.equal(qs[3].type,'open');assert(qs[3].rubric.length>=3&&qs[3].model_answer);
+          }
+          if(ctx.window.EDACompletion){assert.equal(Object.keys(F).length,85);assert(D.units.every(u=>u.status==='full_ready'));}
+          fs.writeFileSync('atlas-qa/integrity.json',JSON.stringify({commit:process.env.GITHUB_SHA,units:85,full_lectures:Object.keys(F).length,questions:Object.values(F).reduce((n,l)=>n+l.quiz.questions.length,0),mapped_pages:807,tasks:43,exams:28,status:'PASS'},null,2));
+          fs.writeFileSync('atlas-qa/public-course-data.json',JSON.stringify({curriculum:D,labs:L,lessons:F},null,2));
+          JS
+      - name: Install browser tests
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Test common entrance and every complete lesson
+        run: |
+          python -m http.server 8765 --directory . >/tmp/atlas-server.log 2>&1 &
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          import json
+          results=[]
+          data=json.load(open('atlas-qa/public-course-data.json'))
+          with sync_playwright() as p:
+              browser=p.chromium.launch()
+              for width,height in [(768,1024),(1024,768),(390,844)]:
+                  page=browser.new_page(viewport={'width':width,'height':height},has_touch=True)
+                  errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.route('https://**/*',lambda r:r.abort())
+                  page.goto('http://127.0.0.1:8765/microcourses/',wait_until='networkidle')
+                  page.locator('[data-eda-course]').wait_for()
+                  assert page.locator('.course-grid .course-box').count()==5
+                  assert page.locator('[data-eda-navigation]').count()==1
+                  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+                  page.screenshot(path=f'atlas-qa/common-home-{width}.png',full_page=True)
+                  page.locator('#global-search').fill('Shannon')
+                  page.locator('#eda-search-results a').first.wait_for()
+                  page.locator('#eda-search-results a').first.click()
+                  page.locator('.full-lesson').wait_for()
+                  assert 'T03' in page.url
+                  page.screenshot(path=f'atlas-qa/shared-search-{width}.png',full_page=True)
+                  for id in data['lessons']:
+                      page.goto('http://127.0.0.1:8765/microcourses/eda/#lesson='+id)
+                      page.locator('[data-quiz="'+id+'"]').wait_for()
+                      assert page.locator('.full-lesson h2').count()>=8,id
+                      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),id
+                  assert not errors,errors
+                  results.append({'viewport':[width,height],'five_course_cards':True,'shared_search':True,'lectures_opened':len(data['lessons']),'horizontal_overflow':False,'page_errors':errors})
+                  page.close()
+              browser.close()
+          json.dump(results,open('atlas-qa/browser-results.json','w'),ensure_ascii=False,indent=2)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: learning-atlas-integration-qa
+          path: |
+            atlas-qa/
+            microcourses/
+          retention-days: 7
