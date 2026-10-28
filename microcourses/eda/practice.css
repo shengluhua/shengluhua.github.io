@@ -1,0 +1,32 @@
+/* Learning Atlas EDA: responsive interaction for all practice and prior-paper questions */
+.practice-card{margin:27px 0;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:25px;max-width:850px}
+.practice-head{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px}
+.practice-card h3{font-size:21px;margin:14px 0}
+.practice-prompt{font-size:16px;font-weight:600;line-height:1.8;color:var(--ink)}
+.practice-options{display:grid;grid-template-columns:1fr;gap:9px;margin:18px 0}
+.practice-option{display:flex;align-items:center;gap:12px;padding:12px 15px;min-height:51px;border:1px solid var(--line);border-radius:9px;font-size:15px;line-height:1.65;cursor:pointer;color:var(--ink);background:var(--card)}
+.practice-option:hover{border-color:var(--accent);background:var(--soft)}
+.practice-option input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin:0}
+.practice-option .choice-letter{display:inline-flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;border-radius:7px;background:var(--soft);font-weight:750;color:var(--accent)}
+.practice-option:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.practice-option.is-answer{border-color:var(--green);background:color-mix(in srgb,var(--green) 9%,var(--card))}
+.practice-option.is-mistake{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 8%,var(--card))}
+.practice-feedback{margin:17px 0;padding:16px 18px;border-radius:9px;background:var(--soft);font-size:15px;line-height:1.85;overflow-wrap:anywhere}
+.practice-feedback.is-correct{border-left:4px solid var(--green)}
+.practice-feedback.is-wrong{border-left:4px solid var(--warn)}
+.practice-feedback strong{color:var(--ink)}
+.practice-feedback p{margin:8px 0 0}
+.practice-assist{color:var(--muted);font-size:13px;line-height:1.8}
+.practice-actions{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:18px;padding-top:15px}
+.practice-score{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.exam-interactive{margin:5px 0 20px}
+.exam-interactive .practice-card{margin:24px 0}
+.exam-answer-label{display:block;font-size:16px;color:var(--ink)}
+.exam-answer-label strong{display:block;margin:12px 0;font-weight:700}
+.exam-answer-label textarea{display:block;width:100%;min-height:130px;resize:vertical;background:var(--card);color:var(--ink);padding:14px 16px;border-radius:10px;border:1px solid var(--line);font-size:16px;line-height:1.8;margin-bottom:12px}
+.self-mark-label{font-size:15px;display:block;margin:17px 0;color:var(--ink)}
+.self-mark-label select{display:block;margin:8px 0 0;padding:10px 14px;min-height:44px;background:var(--card);color:var(--ink);border-radius:9px;border:1px solid var(--line)}
+.practice-unavailable{padding:12px;color:var(--muted)}
+.exam-body .practice-card{padding:17px}
+.exam-body .practice-card h3{font-size:18px}
+@media(max-width:700px){.practice-card{padding:17px 14px}.practice-option{padding:11px 10px;min-height:50px;font-size:14px;align-items:flex-start}.practice-option input{margin-top:7px}.practice-option .choice-letter{width:28px;height:28px}.practice-actions{align-items:stretch;flex-direction:column}.practice-actions button{width:100%}.exam-body .practice-card{padding:16px 11px}.practice-prompt{font-size:15px}}
