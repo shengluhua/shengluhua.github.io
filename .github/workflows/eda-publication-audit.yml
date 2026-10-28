@@ -1,0 +1,42 @@
+name: Audit EDA publication
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/eda-publication-audit.yml'
+      - 'microcourses/eda/index.html'
+      - 'microcourses/eda/publication-checkpoint.json'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Evaluate all authored data packets, including not yet linked files
+        run: |
+          mkdir -p publication-audit
+          node <<'JS'
+          const fs=require('fs'),vm=require('vm'),cp=require('child_process');
+          const base='microcourses/eda/',ctx={window:{},console};vm.createContext(ctx);
+          const all=fs.readdirSync(base),failures=[],loaded=[];
+          const files=['course-data.js','lab-data.js','lesson-data.js','lesson-supplements.js','full-core.js',...all.filter(f=>/^full-/.test(f)&&f!=='full-core.js').sort(),'routing-data.js','examples-core.js',...all.filter(f=>/^examples-/.test(f)&&!['examples-core.js','examples-ui.js','examples-engine.js'].includes(f)).sort()];
+          for(const file of files){if(!fs.existsSync(base+file))continue;try{cp.execFileSync('node',['--check',base+file]);vm.runInContext(fs.readFileSync(base+file,'utf8'),ctx,{filename:file});loaded.push(file)}catch(e){failures.push({file,error:String(e)})}}
+          const D=ctx.window.EDACourse,F=ctx.window.EDALessons||{},E=ctx.window.EDAExamples||[];
+          const html=fs.readFileSync(base+'index.html','utf8');
+          const summary={commit:process.env.GITHUB_SHA,loaded,failures,units:D?.units.length,full_lessons:Object.keys(F),missing:D?.units.filter(u=>!F[u.id]).map(u=>u.id),example_groups:E.length,example_questions:E.reduce((s,e)=>s+e.questions.length,0),unlinked:loaded.filter(f=>!html.includes(f)),status:failures.length?'FAIL':'PASS'};
+          fs.writeFileSync('publication-audit/audit.json',JSON.stringify(summary,null,2));
+          fs.writeFileSync('publication-audit/content.json',JSON.stringify({curriculum:D,labs:ctx.window.EDALabs,lessons:F,examples:E,grids:ctx.window.EDAGrids},null,2));
+          console.log(JSON.stringify(summary,null,2));
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eda-publication-snapshot
+          path: |
+            publication-audit/
+            microcourses/
+          retention-days: 7
