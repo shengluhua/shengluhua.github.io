@@ -6,7 +6,7 @@
     "nodeTests": 39,
     "modelCommand": "node tests/animations-models.cjs",
     "modelConfigurations": 566,
-    "modelFrames": 3834,
+    "modelFrames": 3861,
     "domRoutes": 85
   },
   "ciSnapshots": [
@@ -33,6 +33,14 @@
       "chromiumCourse85x3": "PASS",
       "chromiumAssessment": "PASS",
       "chromiumAnimations": "FAIL diagnosed: duplicate blur change moved reset button between pointer events; input/signature deduplication fix pending browser rerun"
+    },
+    {
+      "commit": "185ceefba56ad528e8a9453d5556bc35b3d64eb8",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40698598922",
+      "content": "PASS",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAssessment": "PASS",
+      "chromiumAnimations": "FAIL: occupancy input/blur/reset fix confirmed; two constant renderers identified and replaced by staged geometric derivations; full rerun pending"
     }
   ],
   "finalRelease": "not_yet_verified",
