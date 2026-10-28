@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'microcourses/eda/index.html'
+      - 'microcourses/eda/practice-*.js'
+      - 'microcourses/eda/course-ui.js'
+      - 'microcourses/eda/practice.css'
 permissions:
   contents: read
 jobs:
@@ -23,6 +26,15 @@ jobs:
           const fs=require('fs'),vm=require('vm'),assert=require('assert');
           const ctx={window:{}};vm.createContext(ctx);
           for(const file of ['course-data.js','lab-data.js','lesson-data.js','lesson-supplements.js'])vm.runInContext(fs.readFileSync('microcourses/eda/'+file,'utf8'),ctx);
+          for(const file of ['practice-base.js','practice-theory.js','practice-gpu.js','practice-labs.js','practice-exam.js'])vm.runInContext(fs.readFileSync('microcourses/eda/'+file,'utf8'),ctx);
+          const bank=ctx.window.EDAPractice.bank;
+          assert.equal(Object.keys(bank).length,105);
+          for(const u of ctx.window.EDACourse.units.filter(u=>u.track!=='exam'))assert(bank[u.id],'Missing interactive question '+u.id);
+          for(const q of ctx.window.EDACourse.exams)assert(bank['Q'+q.question],'Missing exam interactive check Q'+q.question);
+          for(const q of Object.values(bank)){
+            assert(q.prompt&&q.explanation&&q.options.length===4);
+            assert(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);
+          }
           const D=ctx.window.EDACourse,L=ctx.window.EDALabs,F=ctx.window.EDALessons;
           assert.equal(D.units.length,85);assert.equal(new Set(D.units.map(u=>u.id)).size,85);
           assert.equal(D.pageMap.length,807);assert(D.pageMap.every(p=>p.units.length));
@@ -70,8 +82,36 @@ jobs:
                   assert page.locator('.unit-card').count()==61
                   page.goto(base+'#tab=exam');page.wait_for_timeout(100)
                   assert page.locator('.exam-card').count()==28
+                  page.goto(base+'#unit=T12');page.wait_for_timeout(100)
+                  card=page.locator('[data-practice=T12]')
+                  assert card.count()==1
+                  assert '正确选项' not in card.inner_text()
+                  card.locator('input[type=radio][value="0"]').check()
+                  card.locator('button[type=submit]').click()
+                  assert '回答不正确' in page.locator('[data-practice=T12]').inner_text()
+                  page.locator('[data-practice-retry=T12]').click()
+                  page.locator('[data-practice=T12] input[value="1"]').check()
+                  page.locator('[data-practice=T12] button[type=submit]').click()
+                  assert '回答正确' in page.locator('[data-practice=T12]').inner_text()
+                  page.goto(base+'#tab=exam');page.wait_for_timeout(100)
+                  first=page.locator('#exam-1')
+                  first.locator('summary').click()
+                  assert first.locator('[data-practice=Q1]').count()==1
+                  assert first.locator('[data-exam-form=Q1] textarea').count()==1
+                  assert '参考解题步骤' not in first.locator('.exam-interactive').inner_text()
+                  first.locator('[data-exam-form=Q1] textarea').fill('我先固定x=0，检查另一支')
+                  first.locator('[data-exam-form=Q1] button[type=submit]').click()
+                  assert '参考解题步骤' in first.locator('.exam-interactive').inner_text()
+                  first.locator('[data-practice=Q1] input[value="1"]').check()
+                  first.locator('[data-practice=Q1] button[type=submit]').click()
+                  assert '回答正确' in first.locator('[data-practice=Q1]').inner_text()
                   page.goto(base+'#lab=L15');page.wait_for_timeout(100)
                   assert 'bandwidth_gbps' in page.locator('main').inner_text()
+                  lab_card=page.locator('[data-practice=L15]')
+                  assert lab_card.count()==1
+                  lab_card.locator('input[value="1"]').check()
+                  lab_card.locator('button[type=submit]').click()
+                  assert '回答正确' in lab_card.inner_text()
                   assert page.evaluate('document.documentElement.scrollWidth<=window.innerWidth+1')
                   page.screenshot(path=f'eda-qa/lab15-{width}.png',full_page=True)
                   page.goto(base+'#lesson=T03');page.wait_for_timeout(100)
