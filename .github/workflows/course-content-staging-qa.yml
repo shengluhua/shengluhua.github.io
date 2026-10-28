@@ -1,55 +1,8 @@
-name: Validate complete course content modules
+name: EDA staging validation (manual)
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/course-content-staging-qa.yml'
-      - 'microcourses/eda/index.html'
 permissions:
   contents: read
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Load and audit all authored modules
-        run: |
-          mkdir -p course-staging-qa
-          for f in microcourses/eda/*.js; do node --check "$f"; done
-          node <<'JS'
-          const fs=require('fs'),vm=require('vm'),assert=require('assert');
-          const base='microcourses/eda/',ctx={window:{},console};vm.createContext(ctx);
-          const errors=[],loaded=[];
-          function load(f){try{vm.runInContext(fs.readFileSync(base+f,'utf8'),ctx,{filename:f});loaded.push(f)}catch(e){errors.push({file:f,error:String(e),stack:e.stack})}}
-          for(const f of ['course-data.js','lab-data.js','lesson-data.js','lesson-supplements.js','full-core.js'])load(f);
-          for(const f of fs.readdirSync(base).filter(f=>/^full-.*\.js$/.test(f)&&f!=='full-core.js').sort())load(f);
-          if(fs.existsSync(base+'routing-data.js'))load('routing-data.js');
-          if(fs.existsSync(base+'examples-core.js'))load('examples-core.js');
-          for(const f of fs.readdirSync(base).filter(f=>/^examples-.*\.js$/.test(f)&&f!=='examples-core.js').sort())load(f);
-          const D=ctx.window.EDACourse,F=ctx.window.EDALessons,E=ctx.window.EDAExamples||[];
-          const lessonChecks=[];
-          for(const [id,l] of Object.entries(F)){
-            try{assert(l.html.length>3000);assert((l.html.match(/<h2[ >]/g)||[]).length>=8);assert.equal(l.quiz.questions.length,4);assert.equal(l.quiz.questions.map(q=>q.points).join(','),'15,20,25,40');assert.equal(l.quiz.questions.map(q=>q.level).join(','),'1,2,3,4');assert.equal(l.quiz.questions[3].type,'open');assert(l.quiz.questions[3].rubric.length&&l.quiz.questions[3].model_answer)}catch(e){errors.push({lesson:id,error:String(e)})}
-            lessonChecks.push({id,html_characters:l.html.length,sections:(l.html.match(/<h2[ >]/g)||[]).length,questions:l.quiz.questions.length});
-          }
-          const ids=new Set();
-          for(const e of E){try{assert(!ids.has(e.id));ids.add(e.id);assert(D.units.some(u=>u.id===e.unit));assert.equal(e.questions.reduce((s,q)=>s+q.points,0),100);for(const q of e.questions){assert(q.prompt&&q.hint);if(q.type==='numeric')assert(Number.isFinite(q.answer)&&q.tolerance>=0);if(q.type==='vector')assert(q.labels.length===q.answer.length&&q.answer.every(Number.isFinite));if(q.options){let a=Array.isArray(q.answer)?q.answer:[q.answer];assert(a.every(i=>Number.isInteger(i)&&i>=0&&i<q.options.length));}if(q.type==='open')assert(q.rubric.length&&q.model_answer);if(q.type==='path')assert.equal(ctx.window.EDARouting.search(q.grid).length,q.optimal_length)}}catch(err){errors.push({example:e.id,error:String(err)})}}
-          const routing={};if(ctx.window.EDARouting){for(const mode of ['bfs','hadlock','astar']){let r=ctx.window.EDARouting.search('R037',mode);routing[mode]={length:r.length,expanded:r.expanded,discovered:r.discovered,cost:r.cost}}assert.equal(routing.bfs.expanded,156);assert.equal(routing.bfs.discovered,168);assert.equal(routing.hadlock.expanded,28);assert.equal(routing.hadlock.discovered,42);assert.equal(routing.astar.expanded,19);}
-          const report={commit:process.env.GITHUB_SHA,loaded,lessons:lessonChecks,full_count:Object.keys(F).length,remaining:D.units.filter(u=>!F[u.id]).map(u=>u.id),example_groups:E.length,example_questions:E.reduce((s,e)=>s+e.questions.length,0),routing,errors,status:errors.length?'FAIL':'PASS'};
-          fs.writeFileSync('course-staging-qa/report.json',JSON.stringify(report,null,2));
-          fs.writeFileSync('course-staging-qa/assembled-course.json',JSON.stringify({curriculum:D,lessons:F,examples:E,grids:ctx.window.EDAGrids},null,2));
-          console.log(JSON.stringify({full_count:report.full_count,example_groups:report.example_groups,errors,status:report.status},null,2));
-          if(errors.length)process.exitCode=1;
-          JS
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: course-content-staging-qa
-          path: |
-            course-staging-qa/
-            microcourses/
-          retention-days: 7
+  consolidated:
+    uses: ./.github/workflows/eda-complete-qa.yml

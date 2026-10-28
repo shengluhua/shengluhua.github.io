@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+const base='microcourses/eda/',all=fs.readdirSync(base),v='20261028-complete';
+const scripts=['course-data.js','lab-data.js','lesson-data.js','lesson-supplements.js','theory-enrichment.js','full-core.js',...JSON.parse(fs.readFileSync('scripts/eda-active-lessons.json','utf8')),'practice-base.js','practice-theory.js','practice-gpu.js','practice-labs.js','practice-exam.js','practice-ui.js','routing-data.js','examples-core.js',...all.filter(f=>/^examples-.*\.js$/.test(f)&&!['examples-core.js','examples-engine.js','examples-advanced-engine.js','examples-integrity-supplements.js','examples-ui.js'].includes(f)).sort(),'examples-integrity-supplements.js','lesson-assessments.js','assessment-engine.js','examples-ui.js','animations-core.js',...all.filter(f=>/^animations-.*\.js$/.test(f)&&f!=='animations-core.js').sort(),'audit-ui.js','course-ui.js'];
+const css=['course.css','practice.css','examples.css','animations.css'];
+fs.writeFileSync(base+'index.html',`<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f7fb">
+<meta name="description" content="智能设计自动化与智能计算：85讲中文推导、课程原例与新增变式、9类互动批改、独立概念动画、16周实验教程及可核查材料矩阵。"><title>智能设计自动化 · Learning Atlas</title>
+${css.map(f=>`<link rel="stylesheet" href="./${f}?v=${v}">`).join('\n')}
+<style>p,h1,h2,h3,.unit-card{overflow-wrap:anywhere}.demo{scroll-margin-top:170px}.matrix-pair>div{min-width:0}.main-nav{flex-wrap:wrap}.reading .concept-animation{font-size:17px}.evidence-list{display:grid;gap:10px}@media(max-width:700px){.demo{scroll-margin-top:65px}.anim-inputs label{min-width:0}.anim-inputs input,.anim-inputs select{max-width:100%}}</style>
+${scripts.map(f=>`<script defer src="./${f}?v=${v}"></script>`).join('\n')}
+</head><body>
+<div class="shell site-head"><a href="#tab=home" class="brand">Learning Atlas<small>智能设计自动化 · 理论 / GPU / 考试 / 实验</small></a><a href="../" class="back">← 五门课程统一入口</a></div>
+<div class="bar"><div class="shell bar-inner"><nav class="main-nav" aria-label="智能设计自动化课程导航"><a href="#tab=home">学习地图</a><a href="#tab=theory">理论目录</a><a href="#tab=labs">实验路线</a><a href="#tab=exam">真题解析</a><a href="#tab=full">85讲正文</a><a href="#tab=examples">互动例题</a><a href="#tab=coverage">材料覆盖</a><a href="#tab=audit">验收矩阵</a></nav><label class="search-label"><input id="course-search" type="search" aria-label="搜索课程、例题、文件、题号或实验任务" placeholder="搜索知识点 / 课号 / 原题…" autocomplete="off"></label></div></div>
+<div class="shell"><main id="course-content" tabindex="-1"><p>正在加载完整课程与互动工具…</p></main><footer class="site-footer"><p>课程原材料快照 2026-10-28。原始私有课件、个人作业、账户和内部服务器信息不在本站公开。</p><p>客观题使用确定性验证；开放证明/设计采用明确标记的人工分项评阅。阅读、网页模型和CPU/Mock结果不代表真实CUDA实验已通过。</p><p><a href="https://github.com/shengluhua/shengluhua.github.io/tree/main/microcourses/eda" target="_blank" rel="noopener">课程源码与测试证据</a> · <a href="../">返回四门每日微课与系统课程</a></p></footer></div>
+<noscript><div class="shell notice">请启用JavaScript查看课程和互动练习。原始私有材料不由本站公开。</div></noscript></body></html>\n`);
+console.log(`Index links ${scripts.length} scripts and ${css.length} stylesheets.`);

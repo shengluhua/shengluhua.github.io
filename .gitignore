@@ -1,3 +1,8 @@
 _site/
 push.sh
 .DS_Store
+
+# Local QA artifacts (published summaries are under eda/evidence)
+test-results/
+__pycache__/
+*.pyc

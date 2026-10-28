@@ -61,7 +61,7 @@ const labs=[
 'python -m pytest tests/week03 -q',
 '网格向下取整、只保护写不保护读、空grid、无意改输入、CPU提交计时冒充GPU执行时间。'],
 ['Grid-stride与融合的正确性','线程负责i,i+G,i+2G…，G为整个grid的线程数。任意j按除法唯一分解成线程余数和迭代商。融合删除中间global写读，但需守住dtype和舍入顺序。',
-'n1000、G256：线程0处理0/256/512/768；线程231最后999；232仅三项。FP32的z=ReLU(a×x+y)逻辑流量：两kernel约20n字节，融合约12n字节；不是实测DRAM或保证加速比。',
+'n1000、G256：线程0处理0/256/512/768；线程231最后999；232仅三项。课程FP32的scale-bias-ReLU中scale和bias是标量，三kernel读写约24n字节，融合约8n字节；n=2^20时24MiB→8MiB。这是逻辑流量而非实测DRAM或保证加速比。',
 'T01替换grid-stride索引；T02用寄存器计算并一次写出。覆盖负/零/正值、尾部与低精度；扫block大小时固定输入、预热、计时。资源增加造成spill可能抵消收益。',
 'python -m pytest tests/week04 -q',
 'stride只用blockDim导致重复、忽略原地语义、低精度中间舍入改变、通过不同预热/工作量虚报优化。'],
@@ -106,8 +106,8 @@ const labs=[
 'python -m pytest tests/week12 -q -k "not w12_t05"\npython -m pytest tests/week12 -q',
 '分配失败仍弹出部分块、逻辑块号误作物理号、tail未屏蔽、写错layer/head轴、释放其他序列资源。CPU管理与CUDA验证分开。'],
 ['连续批处理与预算','max_num_seqs与max_num_batched_tokens是两个不同预算。Chunked prefill用scheduled_start/end和prefill_offset记录切片与已完成进度。只有完整prefill后采首token，课程prefill优先策略不等于最优公平调度。',
-'A先prefill，再发10；B到达后单独prefill，此轮A暂停；下一轮A发11、B发10。连续批处理允许旧请求未结束就接纳新请求，但prefill仍可能拉长旧请求ITL。',
-'T01入队，T02完整/分块prefill遵守预算，T03按状态过滤并保持顺序，T04写回KV和offset、采样/发事件、完成释放。状态和模型输出需保持一致，不重复发首token。',
+'A的prefill轮只采首token存next_token_id、不发token事件，后续DECODE轮才追加/发出。B到达触发prefill时A可暂停；随后再恢复DECODE。连续批处理允许旧请求未结束就接纳新请求，但prefill仍可能拉长旧请求ITL。',
+'T01入队，T02完整/分块prefill遵守预算，T03按状态过滤并保持顺序，T04写回KV和offset、采样/发事件、完成释放。状态和模型输出需保持一致，不重复发首token。当前AsyncEngine尚未接HTTP，HTTP仍为BatchingEngine→Engine.generate_batch，不能把前者测试通过当服务已接入。',
 'python -m pytest tests/week13/test_continuous_batching.py -q',
 '预算混用、offset过早前移、decode早于prefill、finish后仍占running/KV、把并发吞吐改善说成每用户时延都改善。'],
 ['测量、准入与重叠计划','性能比较固定模型、shape、dtype、到达流和计时范围。预热不计正式样本，按任务保留三次原始结果。准入数/拒绝数同样影响服务指标，不能通过少做工作伪造加速。',
@@ -123,7 +123,7 @@ const labs=[
 ['从模块通过到系统证据','把数值正确、真正接入、服务行为正确、性能可复现四种结论分开。Kernel通过不证明forward调用它；返回文本不证明EOS/取消/KV回收正确；吞吐高不证明SLO达标。',
 '完整链路：tokenizer→scheduler→prefill→KV→sampling→decode→finished/release。逐边写实际实现与测试证据，汇合L06 dispatch、L11 early-close、L12 atomic、L13错峰请求、L14原始样本和L15模拟限制。',
 '执行验收前列明TODO完成状态，不改测试掩盖错误。标记pass/fail/not_run/not_integrated/blocked；CPU/mock/CUDA分开。归档排除账号、token、权重、内部路径和其他学生代码。本周无独立W16代码任务ID。',
-'python -m microllm.benchmarks.grader week16\npython -m pytest tests -q',
+'python -m pytest tests -q\n# 平台/教师环境才提供 week16 grader；学生仓库不含该模块',
 '没有原始样本、拿更短负载比较、未运行CUDA却标全通过、模拟PD冒充真实分布式实验。交付环境、数据流、集成表、故障复盘和限制。']
 ].map((a,i)=>({id:'L'+String(i+1).padStart(2,'0'),week:i+1,focus:a[0],concept:a[1],trace:a[2],implementation:a[3],commands:a[4],pitfalls:a[5]}));
 if(tasks.length!==43||new Set(tasks.map(t=>t.id)).size!==43||labs.length!==16)throw Error('Lab coverage mismatch');

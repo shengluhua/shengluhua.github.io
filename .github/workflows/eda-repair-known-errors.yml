@@ -1,9 +1,6 @@
 name: Repair identified EDA authoring errors
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/eda-repair-known-errors.yml'
 permissions:
   contents: write
 jobs:

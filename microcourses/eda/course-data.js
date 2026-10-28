@@ -1,6 +1,6 @@
 /* Authored curriculum; no private documents, student records or credentials. */
 (function(){'use strict';
-const sourceCommit='ccba13eee88d573aecc96db28d26a4e1fb242c7d';
+const sourceCommit='e54dfbaa6e3e3807193184f2d4c6eee9c4f809aa';
 const decks={
 B:['dacs/slides/04-Boolean-Algebra.pptx',58],S:['dacs/slides/02-LogicSynthesis.pptx',106],P:['dacs/slides/03.1-Placement-GP.pdf',93],R:['dacs/slides/04.1-Routing.pdf',74],A1:['dacs/slides/Lecture-10-Arch-1.pdf',68],A2:['dacs/slides/Lecture-11-Arch-2.pdf',53],
 G01:['intelligent-computing/slides/week01-智能计算系统基本概念.pdf',56],G02:['intelligent-computing/slides/week02-Performance-Analysis-Roofline.pdf',75],G03:['intelligent-computing/slides/week03-CUDA编程.pdf',54],G04:['intelligent-computing/slides/week04-GPU架构机制与优化.pdf',59],G05:['intelligent-computing/slides/week05-全局内存访问.pdf',33],G06:['intelligent-computing/slides/week06-矩阵乘法与模型算子.pdf',78]};
@@ -15,7 +15,7 @@ T08|逻辑综合|AIG、结构哈希与重写优化|S:17-24|T07|结构等价和�
 T09|技术映射|门库、Subject Graph 与成本模型|S:25-36|T07|NAND/INV规范化；AOI/OAI模式和面积/延迟|同一函数的不同库实现
 T10|技术映射|Tree Covering 与 DAG 切分|S:37-53|T09|合法覆盖、重叠/遗漏、共享扇出与切树损失|共享节点复制前后对比
 T11|技术映射|模式匹配、对称引脚与旋转|S:54-61|T10|递归匹配、外部叶子、不对称引脚枚举|逐层标出匹配或失败原因
-T12|技术映射|最小成本 DP 与覆盖回溯|S:62-83|T11|cost(v)=min(门成本+边界叶成本和)；缓存、回溯、延迟扩展|完整比较18与14的代价树
+T12|技术映射|最小成本 DP 与覆盖回溯|S:62-83|T11|cost(v)=min(门成本+边界叶成本和)；缓存、回溯、延迟扩展|课件候选15/14/12与原卷18/14分开比较的代价树
 T13|形式化方法|CNF、Tseitin 与逻辑等价验证|S:84-97|T03,T08|逐门SAT约束、miter、反例与不可满足|真值表逐行验证CNF
 T14|形式化方法|精确综合与 SAT 网络修复|S:98-106|T13,T06|结构、功能、连接、输出变量；规模递增搜索|候选门数变化与可行性
 T15|布局|布局建模、网表与指标|P:1-14|T01|单元坐标、合法性、密度与HPWL|拖动引脚改变包围盒与真实树长
@@ -106,5 +106,5 @@ for(const u of units)u.exam_questions=exams.filter(q=>q.units.includes(u.id)).ma
 const reviews={ 'boolean-algebra':['T02','T03','T04','T05','T06'], 'logic-synthesis':['T07','T08','T09','T10','T11','T12','T13','T14'], placement:['T15','T16','T17','T18','T19','T20','T21'], routing:['T22','T23','T24','T25','T26','T27','T28','T29'], 'static-timing-analysis':['T30'], 'computer-architecture':['T01','T31','T32','T33','T34','T35','T36'], 'memory-architecture':['T37'], 'mutual-exclusion':['T38','T39','T40'] };
 const pageMap=[];for(const [key,[path,n]]of Object.entries(decks)){for(let p=1;p<=n;p++)pageMap.push({path,page:p,units:units.filter(u=>u.sources.some(s=>s.path===path&&s.pages&&s.pages[0]<=p&&p<=s.pages[1])).map(u=>u.id)})}
 if(units.length!==85||pageMap.length!==807||pageMap.some(x=>!x.units.length)||exams.reduce((s,q)=>s+q.points,0)!==100||taskCount.reduce((a,b)=>a+b,0)!==43)throw Error('EDA curriculum integrity check failed');
-window.EDACourse={version:1,date:'2026-10-26',sourceCommit,decks,units,exams,reviews,pageMap,stats:{units:85,theory:40,gpu:21,labs:16,exam:8,pages:807,dacsPages:452,gpuPages:355,tasks:43,fullLessons:2},examDate:'2026-01-07',scopeWarning:'文件名年份2025，卷面为2025–2026学年第一学期，日期2026-01-07；教师说明今年范围改变。往年已考不等于本年命题预测。',legacy:'六份非完全相同旧版共358页已建立文本回查；保留等效率、执行DAG关键路径、忙区间与时长和等差异。文本相似度不代表所有图像语义等价已核验。'};
+window.EDACourse={version:1,date:'2026-10-28',sourceCommit,decks,units,exams,reviews,pageMap,stats:{units:85,theory:40,gpu:21,labs:16,exam:8,pages:807,dacsPages:452,gpuPages:355,tasks:43,fullLessons:2},examDate:'2026-01-07',scopeWarning:'文件名年份2025，卷面为2025–2026学年第一学期，日期2026-01-07；教师说明今年范围改变。往年已考不等于本年命题预测。',legacy:'六份非完全相同旧版共358页已建立文本回查；保留等效率、执行DAG关键路径、忙区间与时长和等差异。文本相似度不代表所有图像语义等价已核验。'};
 })();

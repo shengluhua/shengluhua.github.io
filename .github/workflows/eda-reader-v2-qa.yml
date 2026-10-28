@@ -1,11 +1,6 @@
 name: Validate complete EDA reader
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/eda-reader-v2-qa.yml'
-      - 'microcourses/eda/index.html'
-      - 'microcourses/eda/publication-checkpoint.json'
 permissions:
   contents: read
 jobs:
