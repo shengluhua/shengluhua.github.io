@@ -3,7 +3,7 @@
   "local": {
     "status": "PASS",
     "nodeCommand": "node --test tests/*.test.js",
-    "nodeTests": 36,
+    "nodeTests": 37,
     "modelCommand": "node tests/animations-models.cjs",
     "modelConfigurations": 566,
     "modelFrames": 3834,
@@ -17,6 +17,14 @@
       "chromiumCourse85x3": "PASS",
       "chromiumAnimations": "FAIL: test locator was not scoped to one model; production-route replacement pending",
       "chromiumAssessment": "PASS"
+    },
+    {
+      "commit": "3aadba596400a581da0f11c804875f07edb5a409",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40692672524",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAssessment": "PASS",
+      "content": "36 tests PASS; generated example hash differs across Node Math.pow implementations; explicit high precision reference constants added",
+      "chromiumAnimations": "FAIL: occupancy reset trace mismatch; enhanced browser evidence queued, no assertion weakened"
     }
   ],
   "finalRelease": "not_yet_verified",
