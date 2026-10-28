@@ -729,10 +729,38 @@
         "nonconvex",
         "SGD"
       ]
+    },
+    {
+      "id": "arch-009",
+      "track": "arch",
+      "number": 9,
+      "date": "2026-10-28",
+      "week": 2,
+      "title": "第9课｜Tomasulo：保留站、标签广播、Wakeup/Select与ROB",
+      "abstract": "介绍Tomasulo动态调度的保留站V/Q字段、CDB标签广播、Wakeup/Select差异、逐周期争用案例及与现代ROB按序退休的关系。",
+      "file": "lessons/arch-009.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "Tomasulo",
+        "reservation-station",
+        "CDB",
+        "wakeup",
+        "select",
+        "issue-queue",
+        "ROB",
+        "precise-exception"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-10-27",
+  "indexVerifiedOn": "2026-10-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-009",
+    "opt-009",
+    "ai-009"
+  ],
   "orphanQuizzes": []
 }
