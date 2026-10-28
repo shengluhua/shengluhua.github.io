@@ -3,7 +3,7 @@
   "local": {
     "status": "PASS",
     "nodeCommand": "node --test tests/*.test.js",
-    "nodeTests": 37,
+    "nodeTests": 39,
     "modelCommand": "node tests/animations-models.cjs",
     "modelConfigurations": 566,
     "modelFrames": 3834,
@@ -25,6 +25,14 @@
       "chromiumAssessment": "PASS",
       "content": "36 tests PASS; generated example hash differs across Node Math.pow implementations; explicit high precision reference constants added",
       "chromiumAnimations": "FAIL: occupancy reset trace mismatch; enhanced browser evidence queued, no assertion weakened"
+    },
+    {
+      "commit": "fb9564d9b6c316d73deed1cc8ba0a45e8917d7ae",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40695814130",
+      "content": "PASS",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAssessment": "PASS",
+      "chromiumAnimations": "FAIL diagnosed: duplicate blur change moved reset button between pointer events; input/signature deduplication fix pending browser rerun"
     }
   ],
   "finalRelease": "not_yet_verified",

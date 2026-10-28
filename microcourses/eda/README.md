@@ -30,7 +30,7 @@ python tests/assessment-browser.py
 python tests/animations-browser.py
 ```
 
-`.github/workflows/eda-complete-qa.yml`对实际生产路由运行Chromium，覆盖390×844、768×1024、1024×768、85讲、题目空/错/对答、重置/导航恢复与模型参数/播放控制。截图和逐项报告见对应提交的Actions artifacts。实际执行状态在[verification.json](evidence/verification.json)，未运行或未通过不冒充通过；模型/DOM测试不能替代浏览器。
+`.github/workflows/eda-complete-qa.yml`对实际生产路由运行Chromium，覆盖390×844、768×1024、1024×768、85讲、题目空/错/对答、重置/导航恢复与模型参数/播放控制。三个动画视口并行运行，仍逐一覆盖全部模型与参数。main部署后额外核对全部公开JS/CSS字节SHA，并在公网重新走85讲路由；截图和逐项报告见对应提交的Actions artifacts。实际执行状态在[verification.json](evidence/verification.json)，未运行或未通过不冒充通过；模型/DOM测试不能替代浏览器。
 
 真实CUDA、课程平台、生产EDA以及实体iPad Safari未在此云环境执行。网页可视化不构成这些实验成功的证据。原卷年份标签、今年范围与原PPT/现行实验合同差异均在对应题目说明。
 

@@ -54,7 +54,12 @@ def main():
   launch={'headless':True}
   if os.environ.get('CHROMIUM_EXECUTABLE'):launch['executable_path']=os.environ['CHROMIUM_EXECUTABLE']
   browser=p.chromium.launch(**launch)
-  for width,height in [(390,844),(768,1024),(1024,768)]:
+  viewports=[(390,844),(768,1024),(1024,768)]
+  selected=os.environ.get('EDA_ANIMATION_VIEWPORT','')
+  if selected:
+   assert selected in ['390x844','768x1024','1024x768'],'Unsupported QA viewport'
+   viewports=[tuple(map(int,selected.split('x')))]
+  for width,height in viewports:
    page=browser.new_page(viewport={'width':width,'height':height},has_touch=True,reduced_motion='reduce')
    page.set_default_timeout(15000)
    errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
@@ -114,7 +119,7 @@ def main():
      card.locator('[data-anim-reset]').click()
      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(width,aid,page.evaluate('document.documentElement.scrollWidth'))
      REPORT['checks'].append({'viewport':[width,height],'id':aid,'default_states':default_states,'parameter_variants':variants,'play_pause_reset':'PASS','overflow':False})
-     write()
+     write();print('PASS animation',width,height,aid,flush=True)
     if unit in ['T05','T18','T25','T34','T40','G06','G16','G19','L12']:
      page.screenshot(path=str(OUT/f'{unit}-{width}.png'),full_page=True)
    # Retain a detached old card: route cleanup must actually stop its interval.
