@@ -6,16 +6,16 @@ const D=window.EDACourse,questions=window.EDAPractice?.bank;
 if(!D||!questions)throw Error('Missing EDA data for quiz');
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function key(id){return 'eda-practice-v2-'+id}
-function get(id){try{const s=JSON.parse(localStorage.getItem(key(id))||'null');return s&&typeof s==='object'?s:{} }catch(e){return{}}}
+function get(id){try{const raw=localStorage.getItem(key(id));if(raw!==null){const s=JSON.parse(raw);return s&&typeof s==='object'?s:{}}if(!/^original-/.test(id)){const oldRaw=localStorage.getItem('eda-v2-attempt:practice:'+id);if(oldRaw!==null){const old=JSON.parse(oldRaw),a=old?.answers?.[0],value=Array.isArray(a)&&a.length===1?a[0]:a,choice=String(value??''),n=Number(choice),q=questions[id];if(choice.trim()!==''&&Number.isInteger(n)&&q&&n>=0&&n<q.options.length){const migrated={choice:n,submitted:false,migration:{source:'reader-v2',historical:old}};set(id,migrated);return migrated}}}return{}}catch(e){return{}}}
 function set(id,v){try{localStorage.setItem(key(id),JSON.stringify(v))}catch(e){}}
 function baseId(id){return /^[0-9]+$/.test(String(id))?'Q'+Number(id):String(id)}
 function render(id,brief=false){
  id=baseId(id);const q=questions[id];if(!q)return '<div class="practice-unavailable">本单元的客观知识检查尚未准备好，不能自动评分。</div>';
- const stored=get(id),done=stored.submitted===true,chosen=Number(stored.choice),hasSelection=Number.isInteger(chosen)&&chosen>=0&&chosen<q.options.length;
+ const stored=get(id),done=stored.submitted===true,chosen=Number(stored.choice),hasSelection=stored.choice!==null&&stored.choice!==undefined&&String(stored.choice).trim()!==''&&Number.isInteger(chosen)&&chosen>=0&&chosen<q.options.length;
  const correct=done&&hasSelection&&chosen===q.answer;
  return '<section class="practice-card" data-practice="'+esc(id)+'"><div class="practice-head"><span class="unit-id">'+id+'</span><span>交互知识检查 · 10 分</span></div><h3>'+(brief?'这道题的相关知识自测':'学完以后，独立回答这一题')+'</h3><p class="practice-prompt">'+esc(q.prompt)+'</p>'+
  '<form data-practice-form="'+esc(id)+'"><div class="practice-options">'+q.options.map((o,i)=>'<label class="practice-option '+(done&&i===q.answer?'is-answer ':'')+(done&&i===chosen&&!correct?'is-mistake':'')+'"><input type="radio" name="practice-'+esc(id)+'" value="'+i+'" '+(hasSelection&&chosen===i?'checked':'')+(done?' disabled':'')+'><span class="choice-letter">'+String.fromCharCode(65+i)+'</span><span>'+esc(o)+'</span></label>').join('')+'</div>'+
- (done?'<div class="practice-feedback '+(correct?'is-correct':'is-wrong')+'" role="status"><strong>'+(correct?'✓ 回答正确 · 10 / 10 分':'✕ 回答不正确 · 0 / 10 分')+'</strong><p>正确选项：'+String.fromCharCode(65+q.answer)+'。'+esc(q.explanation)+'</p></div>':'<p class="practice-assist">先选择答案，提交后才显示标准答案和逐步解释。</p>')+
+ (done?'<div class="practice-feedback '+(correct?'is-correct':'is-wrong')+'" role="status"><strong>'+(correct?'✓ 回答正确 · 10 / 10 分':'✕ 回答不正确 · 0 / 10 分')+'</strong><p>正确选项：'+String.fromCharCode(65+q.answer)+'。'+esc(q.explanation)+'</p></div>':'<p class="practice-assist">'+(stored.migration?'已恢复旧版作答草稿，旧分数不沿用；请重新检查。':'先选择答案，提交后才显示标准答案和逐步解释。')+'</p>')+
  '<div class="practice-actions">'+(done?'<button type="button" data-practice-retry="'+esc(id)+'">重新作答</button>':'<button type="submit" class="primary">检查答案</button>')+
  '<span class="practice-score">'+(done?'这次知识检查 '+(correct?10:0)+'/10':'尚未提交')+'</span></div></form></section>';
 }

@@ -10,6 +10,9 @@ on:
       - '.github/workflows/eda-complete-qa.yml'
 permissions:
   contents: read
+concurrency:
+  group: eda-complete-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   content:
     runs-on: ubuntu-latest
@@ -26,6 +29,8 @@ jobs:
           for f in microcourses/eda/*.js microcourses/assets/*.js tests/*.js; do node --check "$f"; done
           node --test tests/*.test.js
           node tests/animations-models.cjs
+          node scripts/build-eda-evidence.cjs
+          git diff --exit-code microcourses/eda/evidence/
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -42,8 +42,10 @@ function expression(q,invert=false){
 }
 function segment(vertices){const out=[vertices[0]];for(let i=1;i<vertices.length;i++){let [r,c]=out[out.length-1];const t=vertices[i];if(r!==t[0]&&c!==t[1])throw Error('Non-Manhattan fixture');while(r!==t[0]||c!==t[1]){r+=Math.sign(t[0]-r);c+=Math.sign(t[1]-c);out.push([r,c])}}return out;}
 function selections(q){let combinations=[[]];q.candidates.forEach(cs=>combinations=combinations.flatMap(a=>cs.map((_,i)=>a.concat(i))));return combinations;}
-function reference(q){switch(q.type){case'open':return '';case'expression':return expression(q);case'path':return window.EDARouting.search(q.grid).path;case'multiroute':if(q.grid!=='R059')throw Error('New multiroute requires an independent feasible fixture: '+q.grid);return {a:segment([[0,7],[0,8],[6,8],[6,0],[2,0],[2,3]]),b:segment([[2,7],[2,4],[5,4],[5,7]])};case'ip-routing':return selections(q).find(a=>E.grade(q,a).correct);default:return q.answer;}}
-function incorrect(q,correct){switch(q.type){case'open':return '';case'numeric':{const delta=Math.max(Math.abs(q.answer)*0.2,1,4*(q.tolerance||0));return Number.isFinite(q.answer+delta)?q.answer+delta:0;}case'vector':return q.answer.map((x,i)=>i?x:x+Math.max(Math.abs(x)*0.2,1,4*(q.tolerance||0)));case'expression':return expression(q,true);case'single':return (q.answer+1)%q.options.length;case'multi':{if(q.answer.length>1)return q.answer.slice(0,-1);const off=q.options.map((_,i)=>i).find(i=>!q.answer.includes(i));return off===undefined?[]:[off];}case'path':return [correct[0]];case'multiroute':return Object.fromEntries(Object.entries(correct).map(([k,path])=>[k,[path[0]]]));case'ip-routing':return selections(q).find(a=>!E.grade(q,a).correct);}}
+function independentPath(q){const g=window.EDAGrids[q.grid],starts=g.sources||[g.start],queue=starts.map(x=>x.slice()),seen=new Map(starts.map(x=>[x.join(','),null]));for(let at=0;at<queue.length;at++){const p=queue[at],key=p.join(',');if(key===g.target.join(',')){const path=[];for(let k=key;k!==null;k=seen.get(k))path.push(k.split(',').map(Number));return path.reverse()}for(const [dr,dc]of [[0,1],[1,0],[0,-1],[-1,0]]){const r=p[0]+dr,c=p[1]+dc,k=r+','+c;if(r>=0&&r<g.rows.length&&c>=0&&c<g.rows[0].length&&g.rows[r][c]!=='#'&&!seen.has(k)){seen.set(k,key);queue.push([r,c])}}}throw Error('No independent BFS path '+q.grid)}
+function candidateFacts(q,a){const loads=Array(q.edges.length).fill(0);let cost=0;for(let k=0;k<a.length;k++){const c=q.candidates[k][a[k]];cost+=c.cost;for(const edge of c.edges)loads[q.edges.indexOf(edge)]++}return{cost,feasible:loads.every((x,i)=>x<=q.capacities[i])}}
+function reference(q){switch(q.type){case'open':return '';case'expression':return expression(q);case'path':return independentPath(q);case'multiroute':if(q.grid!=='R059')throw Error('New multiroute requires an independent feasible fixture: '+q.grid);return {a:segment([[0,7],[0,8],[6,8],[6,0],[2,0],[2,3]]),b:segment([[2,7],[2,4],[5,4],[5,7]])};case'ip-routing':{const valid=selections(q).filter(a=>candidateFacts(q,a).feasible),best=Math.min(...valid.map(a=>candidateFacts(q,a).cost));if(best!==q.optimal_cost)throw Error('Declared route optimum is wrong');return valid.find(a=>candidateFacts(q,a).cost===best);}default:return q.answer;}}
+function incorrect(q,correct){switch(q.type){case'open':return '';case'numeric':{const delta=Math.max(Math.abs(q.answer)*0.2,1,4*(q.tolerance||0));return Number.isFinite(q.answer+delta)?q.answer+delta:0;}case'vector':return q.answer.map((x,i)=>i?x:x+Math.max(Math.abs(x)*0.2,1,4*(q.tolerance||0)));case'expression':return expression(q,true);case'single':return (q.answer+1)%q.options.length;case'multi':{if(q.answer.length>1)return q.answer.slice(0,-1);const off=q.options.map((_,i)=>i).find(i=>!q.answer.includes(i));return off===undefined?[]:[off];}case'path':return [correct[0]];case'multiroute':return Object.fromEntries(Object.entries(correct).map(([k,path])=>[k,[path[0]]]));case'ip-routing':return selections(q).find(a=>{const f=candidateFacts(q,a);return !f.feasible||f.cost!==q.optimal_cost});}}
 return window.EDAExamples.map(e=>({id:e.id,unit:e.unit,category:e.category||'',questions:e.questions.map(q=>{const right=reference(q),wrong=incorrect(q,right);if(q.type!=='open'){if(wrong===undefined||wrong===null)throw Error('No wrong fixture '+e.id+'/'+q.id);if(!E.grade(q,right).correct)throw Error('Invalid reference '+e.id+'/'+q.id);if(E.grade(q,wrong).correct)throw Error('Wrong fixture accidentally correct '+e.id+'/'+q.id);}return{id:q.id,type:q.type,points:q.points,labels:q.labels,options:q.options,right,wrong};}),objectiveMax:e.questions.filter(q=>q.type!=='open').reduce((s,q)=>s+q.points,0)}));
 }"""
 
@@ -97,13 +99,21 @@ def exercise_group(page,group,all_phases=True):
     submit(form);assert_score(form,group['objectiveMax'],group['objectiveMax'])
     objective_count=sum(q['type']!='open' for q in group['questions'])
     assert form.locator('.example-feedback.correct').count()==objective_count,group['id']
+    if not any(q['type']=='open' for q in group['questions']):assert form.locator('.example-solution').count()==1
     if all_phases:
+        go(page,'B011' if group['id']=='R032' else 'R032');form=go(page,group['id'])
+        assert_score(form,group['objectiveMax'],group['objectiveMax'])
+        assert form.locator('.example-feedback.correct').count()==objective_count,group['id']+' navigation recovery'
         submit(form);assert_score(form,group['objectiveMax'],group['objectiveMax'])
         reset(form)
         for q in group['questions']:fill_question(form,q,q['wrong'])
         submit(form);assert_score(form,0,group['objectiveMax'])
         assert form.locator('.example-feedback.correct').count()==0,'Wrong fixture passed: '+group['id']
-    return {'id':group['id'],'objective_questions':objective_count,'open_questions':len(group['questions'])-objective_count,'objective_max':group['objectiveMax'],'correct':'PASS','wrong':'PASS' if all_phases else 'covered in exhaustive viewport','blank':'PASS' if all_phases else 'covered in exhaustive viewport','repeat_submit':'PASS' if all_phases else 'covered in exhaustive viewport'}
+        reset(form)
+        assert '尚未提交' in form.locator('[data-example-score]').inner_text()
+        assert form.locator('.example-explanation,.example-solution').count()==0
+        assert page.evaluate('(id)=>{const e=EDAExamples.find(e=>e.id===id),s=EDAExampleUI.state(e);return !s.submitted&&Object.keys(s.answers).length===0}',group['id'])
+    return {'id':group['id'],'objective_questions':objective_count,'open_questions':len(group['questions'])-objective_count,'objective_max':group['objectiveMax'],'correct':'PASS','wrong':'PASS' if all_phases else 'covered in exhaustive viewport','blank':'PASS' if all_phases else 'covered in exhaustive viewport','repeat_submit':'PASS' if all_phases else 'covered in exhaustive viewport','navigation_and_reset':'PASS' if all_phases else 'covered in exhaustive viewport'}
 
 def manual_and_recovery(page,groups):
     group=next(g for g in groups if any(q['type']=='open' for q in g['questions']))
@@ -134,7 +144,96 @@ def manual_and_recovery(page,groups):
     form.locator('[data-path-clear]').click();assert form.locator('.chosen').count()==0
     REPORT['flow_tests'].append({'name':'path invalid start/jump, keyboard focus, undo, reload and clear','status':'PASS'})
 
-def storage_flows(browser):
+def legacy_quick_checks(page):
+    for uid in ['T03','G14','L04','Q1']:
+        if uid.startswith('Q'):
+            page.goto(BASE+'#exam='+uid[1:]);page.locator('[data-practice-form="'+uid+'"]').wait_for(state='visible')
+        else:
+            page.goto(BASE+'#lesson='+uid);page.locator('[data-example="CHECK-'+uid+'"]').wait_for()
+            page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+        form=page.locator('[data-practice-form="'+uid+'"]')
+        if form.locator('[data-practice-retry]').count():form.locator('[data-practice-retry]').click()
+        for _ in range(2):form.locator('button[type=submit]').click()
+        assert '空白不能计为正确' in form.inner_text()
+        assert form.locator('.practice-feedback').count()==0
+        q=page.evaluate('(id)=>EDAPractice.bank[id]',uid)
+        form.locator('input[value="'+str((q['answer']+1)%len(q['options']))+'"]').check();form.locator('button[type=submit]').click()
+        assert '0 / 10' in form.locator('.practice-feedback').inner_text()
+        form.locator('[data-practice-retry]').click();assert form.locator('input:checked').count()==0
+        form.locator('input[value="'+str(q['answer'])+'"]').check();form.locator('button[type=submit]').click()
+        assert '10 / 10' in form.locator('.practice-feedback').inner_text()
+        page.reload(wait_until='domcontentloaded')
+        if not uid.startswith('Q'):page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+        form=page.locator('[data-practice-form="'+uid+'"]');form.wait_for(state='visible')
+        assert '10 / 10' in form.locator('.practice-feedback').inner_text()
+        form.locator('[data-practice-retry]').click();assert '尚未提交' in form.inner_text()
+        assert page.evaluate('(id)=>JSON.parse(localStorage.getItem("eda-practice-v2-"+id))',uid)=={}
+    REPORT['flow_tests'].append({'name':'original quick checks theory/GPU/lab/exam: repeated blank, wrong/correct, reload and reset','status':'PASS'})
+
+def storage_flows(browser,groups):
+    # Old reader-v2 stores positional answers, including one-element arrays for
+    # single choice. Import all nine types through actual production routes.
+    representatives={}
+    for g in groups:
+        for q in g['questions']:representatives.setdefault(q['type'],(g,q))
+    selected={g['id']:g for g,q in representatives.values()}
+    seeds={}
+    for g in selected.values():
+        answers={str(i):([q['right']] if q['type']=='single' else '旧版开放推导草稿' if q['type']=='open' else q['right']) for i,q in enumerate(g['questions'])}
+        manual={str(i):17 for i,q in enumerate(g['questions']) if q['type']=='open'}
+        seeds['eda-v2-attempt:example:'+g['id']]=json.dumps({'answers':answers,'manual':manual,'automatic_score':100,'automatic_max':100},ensure_ascii=False)
+    context=browser.new_context()
+    context.add_init_script('const seeds='+json.dumps(seeds,ensure_ascii=False)+';for(const [k,v]of Object.entries(seeds))localStorage.setItem(k,v);localStorage.setItem("unrelated-private-test","must not be exported");')
+    page=context.new_page();page.set_default_timeout(15000)
+    for kind,(g,q) in representatives.items():
+        form=go(page,g['id'])
+        assert '旧版作答已作为草稿迁移' in page.locator('[data-progress-history]').inner_text()
+        assert '尚未提交' in form.locator('[data-example-score]').inner_text()
+        assert form.locator('.example-feedback.correct,.example-manual').count()==0
+        if kind=='single':assert form.locator(f'[data-answer="{q["id"]}"][value="{q["right"]}"]').is_checked()
+        elif kind=='multi':assert sorted(form.locator(f'[data-answer="{q["id"]}"]:checked').evaluate_all('xs=>xs.map(x=>Number(x.value))'))==sorted(q['right'])
+        elif kind=='vector':assert [form.locator(f'[data-answer="{q["id"]}"][data-vector-index="{i}"]').input_value() for i in range(len(q['right']))]==[num(x) for x in q['right']]
+        elif kind=='path':assert form.locator(f'[data-path="{q["id"]}"] .chosen').count()==len(q['right'])
+        elif kind=='multiroute':
+            for net,route in q['right'].items():assert form.locator(f'[data-path="{q["id"]}"][data-net="{net}"] .chosen').count()==len(route)
+        elif kind=='ip-routing':
+            for i,value in enumerate(q['right']):assert form.locator(f'[data-answer="{q["id"]}"][data-route-index="{i}"][value="{value}"]').is_checked()
+        else:assert form.locator(f'[data-answer="{q["id"]}"]').input_value()==('旧版开放推导草稿' if kind=='open' else num(q['right']) if kind=='numeric' else q['right'])
+        if kind=='open':assert '旧版人工总分（仅历史参考）' in page.locator('[data-progress-history]').inner_text()
+    exported=page.evaluate('EDAExampleUI.exportProgress()')
+    assert 'unrelated-private-test' not in exported['storage']
+    for key,raw in seeds.items():assert exported['storage'][key]==raw
+    reset(form);page.reload(wait_until='domcontentloaded');form=page.locator(f'[data-example-form="{g["id"]}"]');form.wait_for(state='visible')
+    assert page.evaluate('(id)=>Object.keys(EDAExampleUI.state(EDAExamples.find(e=>e.id===id)).answers).length',g['id'])==0
+    assert '尚未提交' in form.locator('[data-example-score]').inner_text()
+    context.close();REPORT['flow_tests'].append({'name':'reader-v2 nine-type positional migration, old manual-score isolation, reset/reload and privacy-scoped export','status':'PASS'})
+    for uid in ['T03','Q1']:
+        key='eda-v2-attempt:practice:'+uid
+        raw=json.dumps({'answers':{'0':[0]},'automatic_score':10,'automatic_max':10})
+        context=browser.new_context();context.add_init_script('localStorage.setItem('+json.dumps(key)+','+json.dumps(raw)+');')
+        page=context.new_page();page.goto(BASE+('#exam='+uid[1:] if uid.startswith('Q') else '#lesson='+uid),wait_until='networkidle')
+        if not uid.startswith('Q'):page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+        form=page.locator('[data-practice-form="'+uid+'"]')
+        assert form.locator('input[value="0"]').is_checked()
+        assert '已恢复旧版作答草稿，旧分数不沿用' in form.inner_text()
+        assert '尚未提交' in form.inner_text() and form.locator('.practice-feedback').count()==0
+        form.locator('button[type=submit]').click();form.locator('[data-practice-retry]').click()
+        page.reload(wait_until='domcontentloaded')
+        if not uid.startswith('Q'):page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+        form=page.locator('[data-practice-form="'+uid+'"]');form.wait_for(state='visible')
+        assert form.locator('input:checked').count()==0 and '尚未提交' in form.inner_text()
+        assert page.evaluate('(k)=>localStorage.getItem(k)',key)==raw
+        context.close()
+    REPORT['flow_tests'].append({'name':'reader-v2 quick-check lesson/exam draft migration discards old score and honors reset after reload','status':'PASS'})
+    context=browser.new_context()
+    context.add_init_script("if(!localStorage.getItem('eda-practice-v2-T03'))localStorage.setItem('eda-practice-v2-T03',JSON.stringify({choice:0,submitted:true}));")
+    page=context.new_page();page.goto(BASE+'#lesson=T03',wait_until='networkidle')
+    page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+    assert '10 / 10' in page.locator('[data-practice-form="T03"] .practice-feedback').inner_text()
+    page.locator('[data-practice-retry="T03"]').click();page.reload(wait_until='domcontentloaded')
+    page.get_by_text('原版快速知识检查 · 保留此前作答',exact=True).click()
+    assert '尚未提交' in page.locator('[data-practice-form="T03"]').inner_text()
+    context.close();REPORT['flow_tests'].append({'name':'pre-existing original quick-check record and reset survive upgrade/reload','status':'PASS'})
     # Disposable test contexts: no user data or public production answer is changed.
     context=browser.new_context();context.add_init_script("localStorage.setItem('eda-answers-T03',JSON.stringify({q1:['1'],q2:'4',q3:['0','2'],q4:'旧草稿保留'}));")
     page=context.new_page();form=go(page,'CHECK-T03')
@@ -163,6 +262,7 @@ def main():
         page=browser.new_page(viewport={'width':1024,'height':768},has_touch=True)
         page.set_default_timeout(15000)
         errors=[];page.on('pageerror',lambda err:errors.append(str(err)))
+        page.on('response',lambda r:errors.append('HTTP '+str(r.status)+' '+r.url) if r.status>=400 else None)
         page.goto(BASE,wait_until='networkidle')
         page.wait_for_function('window.EDAExamples && window.EDAExampleEngine && window.EDAExampleUI')
         groups=page.evaluate(REFERENCE_JS)
@@ -192,14 +292,17 @@ def main():
                     mark=form.locator('[data-manual]').first
                     mark.fill(mark.get_attribute('max'))
                     assert '自报人工分' in form.locator('[data-example-score]').inner_text()
+                page.reload(wait_until='domcontentloaded');page.locator(f'[data-example-form="{g["id"]}"]').wait_for(state='visible')
+                assert_score(page.locator(f'[data-example-form="{g["id"]}"]'),g['objectiveMax'],g['objectiveMax'])
                 assert_no_overflow(page,g['id'],[width,height])
                 page.screenshot(path=str(OUT/f'{kind}-{width}.png'),full_page=True)
             for g in groups:
                 go(page,g['id']);assert_no_overflow(page,g['id'],[width,height])
             REPORT['viewports'].append({'viewport':[width,height],'all_groups_rendered':len(groups),'types_with_real_input':list(representatives),'overflow':'PASS'})
             write_report()
+        legacy_quick_checks(page)
         assert not errors,errors
-        storage_flows(browser)
+        storage_flows(browser,groups)
         page.close();browser.close()
         REPORT['page_errors']=errors;REPORT['status']='PASS';write_report()
 

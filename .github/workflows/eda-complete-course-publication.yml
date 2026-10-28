@@ -1,0 +1,9 @@
+# Compatibility entrypoint: publication is integrated once, not by a second writer.
+name: Complete course publication gate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    uses: ./.github/workflows/eda-complete-qa.yml

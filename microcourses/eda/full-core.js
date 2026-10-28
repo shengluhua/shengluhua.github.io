@@ -31,7 +31,7 @@ function lesson(id,lead,sections,questions,next){
  body+=(window.EDAEnrichment?.[id]||'');
  body+=labAppend(u)+examAppend(u);
  body+='<h2>材料联系与先修回看</h2><p>先修：'+(u.prerequisites.length?u.prerequisites.map(p=>link(p)).join(' '):'无需本课程内先修单元。')+'</p><p>本节对应原材料：'+u.sources.map(s=>'<code>'+esc(s.path.split('/').pop())+'</code>'+(s.pages?'，物理页 / 张 '+s.pages.join('–'):'，'+esc(s.section||'对应正文'))).join('；')+'。页码按物理顺序计；完整路径在文末保留。讲解、示例和自测是独立编写的教学材料，不是原始课件的公开镜像。</p>'+(u.exam_questions?.length?'<p>往年题关联：'+u.exam_questions.map(n=>'<a class="unit-link" href="#exam='+n+'">Q'+n+'</a>').join(' ')+'。这是本卷知识映射，不是今年命题预测。</p>':'');
- body+='<h2>学习验收与下一步</h2><p>先在不看解析时完成下面四题：概念辨析15分、数值或执行过程20分、机制边界25分、综合推导或设计40分。前三题可客观判分；开放题依评分步骤人工或自评，不把60分自动分数误报为100分总成绩。总分≥80继续，60–79补一例，低于60回看推导后再练。所有参考答案只在提交或主动展开后显示。</p>'+(next?'<p>下一单元：'+link(next)+'。先能复述本讲的假设、关键等式和一个失败反例，再把结论迁移到下一种模型。</p>':'<p>完成后返回课程地图，把理论、代码与实验观测相互核对；“已读”不是“实验已通过”。</p>');
+ body+='<h2>学习验收与下一步</h2><p>先在不看解析时完成下面四题：概念辨析15分、数值或执行过程20分、机制边界25分、综合推导或设计40分。客观计算使用有限数值或结构检查；综合题中的计算与开放解释可拆开计分。需要论证的部分依评分步骤人工或自评，自动上限按实际题型显示，不把未评的人工分算入总成绩。总分≥80继续，60–79补一例，低于60回看推导后再练。所有参考答案只在提交或主动展开后显示。</p>'+(next?'<p>下一单元：'+link(next)+'。先能复述本讲的假设、关键等式和一个失败反例，再把结论迁移到下一种模型。</p>':'<p>完成后返回课程地图，把理论、代码与实验观测相互核对；“已读”不是“实验已通过”。</p>');
  if(body.length<3000)throw Error(id+' needs a substantive lecture, not an outline ('+body.length+')');
  F[id]={html:body,quiz:{version:1,lesson_id:id,questions:qs}};u.status='full_ready';
  D.stats.fullLessons=Object.keys(F).length;

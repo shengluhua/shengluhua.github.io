@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "local": {
+    "status": "PASS",
+    "nodeCommand": "node --test tests/*.test.js",
+    "nodeTests": 36,
+    "modelCommand": "node tests/animations-models.cjs",
+    "modelConfigurations": 566,
+    "modelFrames": 3834,
+    "domRoutes": 85
+  },
+  "ciSnapshots": [
+    {
+      "commit": "7086144d1eb332f0136ca561ee5043bfb6ed0ce4",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40689045514",
+      "content": "PASS",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAnimations": "FAIL: test locator was not scoped to one model; production-route replacement pending",
+      "chromiumAssessment": "PASS"
+    }
+  ],
+  "finalRelease": "not_yet_verified",
+  "notRun": [
+    "physical iPad Safari",
+    "real CUDA lab execution",
+    "course platform grader",
+    "production EDA tools"
+  ],
+  "scope": "Local DOM/model checks are not real browser results. Use the exact commit's completed GitHub Actions and artifacts; a pending snapshot is not a pass."
+}

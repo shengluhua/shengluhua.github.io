@@ -1,52 +1,111 @@
+"""Real Chromium checks of the production index, routes and concept controls.
+
+No handwritten test page or injected model script substitutes for the deployed
+loader. Pure-model exhaustive numeric checks live in animations-models.cjs.
+"""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-import json, os
-base=Path(__file__).resolve().parents[1]/'microcourses'/'eda'
-out=Path(os.environ.get('EDA_ANIMATION_QA_DIR','test-results/animations'));out.mkdir(parents=True,exist_ok=True)
-files=['course-data.js','routing-data.js','animations-core.js']+sorted(p.name for p in base.glob('animations-*.js') if p.name!='animations-core.js')
-results=[]
-with sync_playwright() as p:
- launch={'headless':True}
- if os.environ.get('CHROMIUM_EXECUTABLE'):launch['executable_path']=os.environ['CHROMIUM_EXECUTABLE']
- b=p.chromium.launch(**launch)
- for width,height in [(390,844),(768,1024)]:
-  page=b.new_page(viewport={'width':width,'height':height},has_touch=True,reduced_motion='reduce')
-  errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-  page.set_content('<html lang="zh-CN"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><main id="course-content" style="max-width:900px;margin:auto;padding:8px"><article class="reading full-lesson"></article></main></body></html>')
-  for name in ['course.css','animations.css']:page.add_style_tag(content=(base/name).read_text())
-  for name in files:page.add_script_tag(content=(base/name).read_text())
-  unitids=page.evaluate('Array.from(new Set(EDAAnimations.registry.map(x=>x.unit)))')
-  for unit in unitids:
-   page.evaluate('(id)=>{EDAAnimations.mount(document.querySelector("main"),id)}',unit)
-   cards=page.locator('[data-animation]')
-   for i in range(cards.count()):
-    card=cards.nth(i);aid=card.get_attribute('data-animation')
-    states=card.evaluate('e=>{let n=0,b=e.querySelector("[data-anim-next]");while(!b.disabled&&n<400){b.click();n++}return n+1}')
-    assert not card.locator('[role=alert]').count(), (aid,card.inner_text())
-    assert states>1,(aid,states)
-    card.locator('[data-anim-prev]').click();card.locator('[data-anim-reset]').click()
-    assert card.locator('[data-anim-step]').inner_text().startswith('1 /'),aid
-    variants=card.evaluate('e=>{let changed=0;for(const x of e.querySelectorAll(".anim-inputs input,.anim-inputs select")){if(x.tagName==="SELECT"){x.selectedIndex=(x.selectedIndex+1)%x.options.length}else if(x.type==="checkbox")x.checked=!x.checked;else{x.value=x.min||x.value}x.dispatchEvent(new Event("change",{bubbles:true}));if(e.querySelector("[role=alert]"))throw Error(e.querySelector("[role=alert]").textContent);changed++}let b=e.querySelector("[data-anim-next]"),n=0;while(!b.disabled&&n<400){b.click();n++}return changed}')
-    assert not card.locator('[role=alert]').count(),aid
-    card.locator('[data-anim-reset]').click()
-    overflow=page.evaluate('document.documentElement.scrollWidth>innerWidth+1')
-    assert not overflow,(width,aid,page.evaluate('document.documentElement.scrollWidth'))
-    results.append({'viewport':[width,height],'id':aid,'default_states':states,'parameter_variants':variants,'controls':'PASS','overflow':False})
-   if unit in ['T05','T18','T25','T34','T40']:
-    page.screenshot(path=str(out/f'{unit}-{width}.png'),full_page=True)
-  # switching pages stops old timers and does not mutate the new concept.
-  page.evaluate('EDAAnimations.mount(document.querySelector("main"),"T25")')
-  page.locator('[data-anim-play]').click()
-  page.evaluate('EDAAnimations.mount(document.querySelector("main"),"T40")')
-  before=page.locator('[data-animation]').inner_text();page.wait_for_timeout(1200)
-  assert page.locator('[data-animation]').inner_text()==before
-  # Numeric empty-state recovery is explicit and does not destroy controls.
-  page.evaluate('EDAAnimations.mount(document.querySelector("main"),"T18")')
-  box=page.locator('.anim-inputs input[type=number]').first;box.fill('');box.dispatch_event('change')
-  assert page.locator('[role=alert]').count()==1
-  page.locator('[data-anim-reset]').click();assert page.locator('[role=alert]').count()==0
-  assert not errors,errors
-  page.close()
- b.close()
-(out/'browser-matrix.json').write_text(json.dumps({'checks':results,'status':'PASS'},ensure_ascii=False,indent=2))
-print(json.dumps({'status':'PASS','animation_viewport_cases':len(results),'output':str(out)},ensure_ascii=False))
+import hashlib, json, os, traceback
+
+BASE=os.environ.get('BASE_URL','http://127.0.0.1:8765/microcourses/eda/')
+OUT=Path(os.environ.get('EDA_ANIMATION_QA_DIR','test-results/animations'));OUT.mkdir(parents=True,exist_ok=True)
+REPORT={'base_url':BASE,'status':'RUNNING','checks':[],'errors':[]}
+
+def write():
+ (OUT/'browser-matrix.json').write_text(json.dumps(REPORT,ensure_ascii=False,indent=2))
+
+def go(page,unit):
+ page.goto(BASE+'#lesson='+unit,wait_until='domcontentloaded')
+ page.wait_for_function('(id)=>document.querySelector(".full-lesson h1")?.textContent.startsWith(id)',arg=unit)
+ page.locator('[data-animations="'+unit+'"]').wait_for(state='visible')
+
+def trace(card,require_multiple=True):
+ # Exercise every DOM next-button handler, not the model function directly.
+ states=card.evaluate('''e=>{const out=[e.querySelector('.anim-stage').innerHTML];const next=e.querySelector('[data-anim-next]');let n=0;while(!next.disabled){if(n++>=2000)throw Error('Animation did not terminate');next.click();if(e.querySelector('[role=alert]'))throw Error(e.querySelector('[role=alert]').textContent);out.push(e.querySelector('.anim-stage').innerHTML)}return out}''')
+ assert len(states)>=1,card.get_attribute('data-animation')
+ if require_multiple:
+  assert len(states)>1,card.get_attribute('data-animation')
+  assert len(set(states))>1,'Frames never explain a changed state: '+card.get_attribute('data-animation')
+ return len(states),hashlib.sha256('\n'.join(states).encode()).hexdigest()
+
+def alternative(control):
+ return control.evaluate('''x=>{if(x.tagName==='SELECT')return x.options.length>1?x.options[(x.selectedIndex+1)%x.options.length].value:null;if(x.type==='checkbox')return !x.checked;const v=Number(x.value),step=Number(x.step)||1,min=x.min===''?v-step:Number(x.min),max=x.max===''?v+step:Number(x.max);return max!==v?String(max):min!==v?String(min):null}''')
+
+def main():
+ with sync_playwright() as p:
+  launch={'headless':True}
+  if os.environ.get('CHROMIUM_EXECUTABLE'):launch['executable_path']=os.environ['CHROMIUM_EXECUTABLE']
+  browser=p.chromium.launch(**launch)
+  for width,height in [(390,844),(768,1024),(1024,768)]:
+   page=browser.new_page(viewport={'width':width,'height':height},has_touch=True,reduced_motion='reduce')
+   page.set_default_timeout(15000)
+   errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+   page.on('response',lambda r:errors.append('HTTP '+str(r.status)+' '+r.url) if r.status>=400 else None)
+   page.goto(BASE,wait_until='networkidle')
+   models=page.evaluate('EDAAnimations.registry.map(x=>({id:x.id,unit:x.unit}))')
+   assert len(models)>=103,'Previously completed concept models disappeared'
+   assert len({m['id'] for m in models})==len(models)
+   for unit in dict.fromkeys(m['unit'] for m in models):
+    go(page,unit)
+    expected=[m['id'] for m in models if m['unit']==unit]
+    assert page.locator('[data-animation]').count()==len(expected),(unit,'missing or duplicate cards')
+    for aid in expected:
+     card=page.locator('[data-animation="'+aid+'"]')
+     assert not card.locator('[role=alert]').count(),(aid,card.inner_text())
+     default_states,fingerprint=trace(card)
+     card.locator('[data-anim-prev]').click()
+     assert card.locator('[data-anim-step]').inner_text().startswith(str(default_states-1)+' /'),aid
+     card.locator('[data-anim-reset]').click()
+     assert card.locator('[data-anim-step]').inner_text().startswith('1 /'),aid
+     # Actual Playwright clicks and timer tick, scoped to exactly one model.
+     card.locator('[data-anim-play]').click()
+     page.wait_for_function('(id)=>!document.querySelector(`[data-animation="${id}"] [data-anim-step]`).textContent.startsWith("1 /")',arg=aid,timeout=5000)
+     if card.locator('[data-anim-play]').inner_text()=='暂停':card.locator('[data-anim-play]').click()
+     paused=card.locator('[data-anim-step]').inner_text();page.wait_for_timeout(100)
+     assert card.locator('[data-anim-step]').inner_text()==paused,aid
+     card.locator('[data-anim-reset]').click()
+     controls=card.locator('.anim-inputs input,.anim-inputs select');variants=[]
+     for n in range(controls.count()):
+      card.locator('[data-anim-reset]').click()
+      control=controls.nth(n);value=alternative(control)
+      assert value is not None,(aid,'parameter has no alternate value',n)
+      name=control.get_attribute('name')
+      if control.evaluate('x=>x.tagName')=='SELECT':control.select_option(value)
+      elif control.get_attribute('type')=='checkbox':control.set_checked(value)
+      else:control.fill(value);control.dispatch_event('change')
+      assert not card.locator('[role=alert]').count(),(aid,name,card.inner_text())
+      count,changed=trace(card,require_multiple=False)
+      changed=changed!=fingerprint
+      if aid=='rvv-stripmine-mask-tail' and name=='tail':assert changed,'Tail policy is computed but never shown'
+      variants.append({'parameter':name,'value':value,'states':count,'changed':changed})
+     assert any(v['changed'] for v in variants),(aid,'no parameter affects any rendered state')
+     card.locator('[data-anim-reset]').click()
+     assert trace(card)==(default_states,fingerprint),(aid,'reset failed to restore the complete original model trace')
+     card.locator('[data-anim-reset]').click()
+     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),(width,aid,page.evaluate('document.documentElement.scrollWidth'))
+     REPORT['checks'].append({'viewport':[width,height],'id':aid,'default_states':default_states,'parameter_variants':variants,'play_pause_reset':'PASS','overflow':False})
+     write()
+    if unit in ['T05','T18','T25','T34','T40','G06','G16','G19','L12']:
+     page.screenshot(path=str(OUT/f'{unit}-{width}.png'),full_page=True)
+   # Retain a detached old card: route cleanup must actually stop its interval.
+   go(page,'T25');old=page.locator('[data-animation]').first.element_handle()
+   old.query_selector('[data-anim-play]').click()
+   go(page,'T40');old_text=old.inner_text();new_text=page.locator('[data-animations]').inner_text()
+   page.wait_for_timeout(1250)
+   assert old.inner_text()==old_text,'Detached route kept its animation timer alive'
+   assert page.locator('[data-animations]').inner_text()==new_text,'Old timer mutated the new route'
+   # T18 has multiple models; reset only the card whose input is invalid.
+   go(page,'T18');box=page.locator('.anim-inputs input[type=number]').first
+   card=box.locator('xpath=ancestor::*[@data-animation][1]')
+   box.fill('');box.dispatch_event('change')
+   assert card.locator('[role=alert]').count()==1
+   card.locator('[data-anim-reset]').click();assert card.locator('[role=alert]').count()==0
+   assert not errors,errors
+   page.close()
+  browser.close()
+ REPORT['status']='PASS';write()
+ print(json.dumps({'status':'PASS','animation_viewport_cases':len(REPORT['checks']),'output':str(OUT)},ensure_ascii=False))
+
+try:main()
+except Exception as exc:
+ REPORT['status']='FAIL';REPORT['errors'].append({'message':str(exc),'traceback':traceback.format_exc()});write();raise
