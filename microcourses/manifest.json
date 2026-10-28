@@ -799,12 +799,34 @@
         "dual-ascent",
         "convex-optimization"
       ]
+    },
+    {
+      "id": "ai-009",
+      "track": "ai",
+      "number": 9,
+      "date": "2026-10-28",
+      "week": 2,
+      "title": "SGD 为什么会波动？Mini-batch 方差、收敛与系统吞吐",
+      "abstract": "从有限数据集抽样推导mini-batch梯度无偏性与方差，证明期望下降和非凸SGD驻点界，并区分batch size、更新步数、梯度累积和GPU吞吐。",
+      "file": "lessons/ai-009.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "SGD",
+        "mini-batch",
+        "gradient-variance",
+        "batch-size",
+        "convergence",
+        "gradient-accumulation",
+        "throughput",
+        "optimization"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-009"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
