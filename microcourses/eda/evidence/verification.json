@@ -41,14 +41,37 @@
       "chromiumCourse85x3": "PASS",
       "chromiumAssessment": "PASS",
       "chromiumAnimations": "FAIL: occupancy input/blur/reset fix confirmed; two constant renderers identified and replaced by staged geometric derivations; full rerun pending"
+    },
+    {
+      "commit": "2d7f3abcf7c31956b11d7be251372ec97a21f01f",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40700368959",
+      "content": "PASS",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAssessment": "PASS",
+      "chromiumAnimations104x3": "PASS",
+      "deployed": "SKIPPED: feature branch, not a deployment"
     }
   ],
-  "finalRelease": "not_yet_verified",
+  "finalRelease": "candidate_browser_verified_waiting_for_main_pages",
   "notRun": [
     "physical iPad Safari",
     "real CUDA lab execution",
     "course platform grader",
     "production EDA tools"
   ],
-  "scope": "Local DOM/model checks are not real browser results. Use the exact commit's completed GitHub Actions and artifacts; a pending snapshot is not a pass."
+  "scope": "Local DOM/model checks are not real browser results. Use the exact commit's completed GitHub Actions and artifacts; a pending snapshot is not a pass.",
+  "testedApplicationCommit": "2d7f3abcf7c31956b11d7be251372ec97a21f01f",
+  "independentGeometryAudit": {
+    "gordianConfigurations": 145,
+    "densityConfigurations": 968,
+    "status": "PASS",
+    "method": "independent area enumeration and coordinate/constraint checks"
+  },
+  "preservedMain": {
+    "commit": "af592bfc598c4944b05fdabf0726fdda11ce1020",
+    "isAncestor": true,
+    "deletedFiles": 0,
+    "outsideCourseTestWorkflowChanges": 0,
+    "dailyCoursesSharedEntryAndAssets": "identical"
+  }
 }
