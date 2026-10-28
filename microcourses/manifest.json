@@ -776,12 +776,34 @@
         "expectation",
         "load-factor"
       ]
+    },
+    {
+      "id": "opt-009",
+      "track": "opt",
+      "number": 9,
+      "date": "2026-10-28",
+      "week": 2,
+      "title": "第 9 课｜拉格朗日对偶：下界、对偶函数、强对偶与乘子迭代",
+      "abstract": "从弱对偶的不等式出发推导对偶函数的凹性，手算一个二次规划的原始—对偶解与投影对偶上升；区分强对偶、对偶达到与 KKT 乘子存在。",
+      "file": "lessons/opt-009.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "lagrangian-duality",
+        "weak-duality",
+        "strong-duality",
+        "Slater",
+        "KKT",
+        "dual-ascent",
+        "convex-optimization"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-009",
     "ai-009"
   ],
   "orphanQuizzes": []
