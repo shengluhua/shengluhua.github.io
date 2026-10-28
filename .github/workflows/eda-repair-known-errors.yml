@@ -1,0 +1,52 @@
+name: Repair identified EDA authoring errors
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/eda-repair-known-errors.yml'
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply exact, reviewed changes; refuse unexpected source versions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, subprocess
+          changes={
+            'full-synthesis-representation.js':('ccc5f3c39d783db0925bcf58cd36b0fb8d9f1e9b',[
+              ("don't-care","don’t-care"),
+              ('课件将ab∨ac改为a(b∨c)，可在孤立情形从三个AND表示节点降到两个。但如果ab和ac已被其他输出使用，旧节点不能删除；若候选的b∨c也不存在，就不能只比较局部截图中的节点数。','原课件的AND子图将(ab)(ac)改为a(bc)，利用a²=a把三个AND降到两个。若ab、ac已被其他输出使用，反方向复用它们也可能更省新增节点。ab∨ac与a(b∨c)是另一个独立的分配律例，不应与原图的纯AND节点混同。'),
+              ('课件紧接着给出反方向的例子：当ab、ac已在网络别处存在时，使用分配式ab∨ac可能只新增一个合并节点，而因式式a(b∨c)需新增两个。','课件紧接着给出反方向的例子：当ab、ac已在网络别处存在时，使用(ab)(ac)可能只新增一个合并AND，而a(bc)在bc尚不存在时需新增两个。')]),
+            'full-synthesis-algorithms.js':('9fe7c0217f63701bcbc6846a9787632283791e16',[
+              ('给出一个可行三门实现并解释为何仅有该实现还不能证明三门最优。','给出一个合法的二输入门实现并准确计数；解释为何一个可行实现本身不能证明门数最优。'),
+              ('多数函数可写成MUX：a选择b∨c或bc。','可用t1=a⊕b、t2=ab、t3=c·t1、M=t2∨t3；每个二输入运算单独计门。'),
+              ('可行实现：t1=a⊕b，t2=a∧b，M=t2∨(c∧t1)实际含四个二输入简单门，不能误称三门；在任意二输入门模型下需要重新搜索或给合法三门拓扑，而不能用三输入MUX冒充一个二输入门。对本题D，若证明所提“三门”不合法并清楚指出扇入/门数问题也可得分；完整三门可行性应由编码核验，不预设未经证明的结论。','可行实现t1=a⊕b、t2=a∧b、t3=c∧t1、M=t2∨t3，共四个二输入门。a=b时由t2决定，a≠b时输出c，故等于多数函数。这个构造提供四门上界；若要证明最小，必须排除所有较小合法拓扑，不能用三输入MUX冒充一个二输入门。')])
+          }
+          for name,(expected,replacements) in changes.items():
+              p=Path('microcourses/eda')/name
+              raw=p.read_bytes(); sha=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+              if sha!=expected:
+                  raise SystemExit(f'Refusing to overwrite changed source: {name}: {sha} != {expected}')
+              text=raw.decode()
+              for old,new in replacements:
+                  if old not in text: raise SystemExit(f'Missing exact patch target in {name}')
+                  text=text.replace(old,new)
+              p.write_text(text,encoding='utf-8')
+              subprocess.run(['node','--check',str(p)],check=True)
+          PY
+      - name: Commit only the two reviewed course files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add microcourses/eda/full-synthesis-representation.js microcourses/eda/full-synthesis-algorithms.js
+          git diff --cached --check
+          git commit -m 'Fix quoted source text, align AIG examples and remove unsupported gate-count premise'
+          git pull --rebase origin main
+          git push origin HEAD:main
