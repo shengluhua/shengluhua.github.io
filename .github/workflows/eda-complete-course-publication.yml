@@ -1,0 +1,88 @@
+name: Complete course publication gate
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/eda-complete-course-publication.yml'
+permissions:
+  contents: write
+concurrency:
+  group: eda-course-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Add only verified existing teaching packets to the current reader
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re,json
+          base=Path('microcourses/eda');p=base/'index.html';s=p.read_text()
+          example_names=['examples-gemm-tiling.js','examples-gemm-banks.js','examples-model-operators.js','examples-labs-compute.js','examples-labs-systems.js','examples-exam-foundations.js','examples-exam-physical.js']
+          full_names=['full-memory-access.js','full-gemm-kernels.js','full-model-operators.js','full-labs-foundation.js','full-labs-memory.js','full-labs-reduction-attention.js','full-labs-transfer-cache.js','full-labs-serving.js','full-exam-logic-placement.js','full-exam-timing-systems.js']
+          for name in example_names+full_names:
+              if not (base/name).is_file():raise SystemExit('Required authored packet is missing: '+name)
+          def insert_before(anchor,names):
+              global s
+              m=re.search(r'<script\s+defer\s+src="\./'+re.escape(anchor)+r'(?:\?[^\"]*)?"></script>',s)
+              if not m:raise SystemExit('Reader anchor missing: '+anchor)
+              tags=''.join('<script defer src="./'+n+'?v=20261028-final-gate"></script>\n' for n in names if not re.search(r'src="\./'+re.escape(n)+r'(?:\?|\")',s))
+              s=s[:m.start()]+tags+s[m.start():]
+          insert_before('full-core.js',example_names)
+          insert_before('practice-base.js',full_names)
+          p.write_text(s)
+          # The request is complete only after all units have real content. This does
+          # not make an unsupported claim that every original diagram was audited.
+          (base/'publication-checkpoint.json').write_text(json.dumps({'version':1,'require_complete':True,'required_units':85,'source_examples_audit':'Pending a separate page-by-page completion certificate; unit counts are not source-example coverage.'},ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Validate all 85 lectures and every loaded answer type
+        run: node microcourses/eda/validate-publication.cjs
+      - name: Export reviewable lesson and quiz JSON without private source assets
+        run: |
+          node <<'JS'
+          const fs=require('fs'),path=require('path'),assert=require('assert');
+          const p='publication-audit/',d=JSON.parse(fs.readFileSync(p+'content.json','utf8')),a=JSON.parse(fs.readFileSync(p+'audit.json','utf8'));
+          assert.equal(a.full_count,85);assert.equal(a.missing.length,0);assert.equal(a.failures.length,0);
+          const root='microcourses/eda/published';fs.mkdirSync(root+'/lessons',{recursive:true});fs.mkdirSync(root+'/quizzes',{recursive:true});
+          for(const [id,l]of Object.entries(d.lessons)){
+            fs.writeFileSync(root+'/lessons/'+id+'.html',l.html+'\n');
+            fs.writeFileSync(root+'/quizzes/'+id+'.json',JSON.stringify(l.quiz,null,2)+'\n');
+          }
+          fs.writeFileSync(root+'/examples.json',JSON.stringify({version:1,examples:d.examples},null,2)+'\n');
+          const inventory={version:1,source_commit:d.curriculum.sourceCommit,units:85,complete_lectures:a.full_count,lesson_questions:a.lesson_questions,example_groups:a.example_groups,example_questions:a.example_questions,objective_questions:a.objective,manual_questions:a.manual,validation_commit:process.env.GITHUB_SHA,structural_and_grading_checks:'PASS',browser_checks:'not_run_by_this_workflow',real_cuda_or_platform_tests:'not_run',source_example_audit:'Do not infer full original-example coverage from these counts. A1/A2 page-by-page example audit and a final coverage certificate remain separately required.',example_pages_by_deck:{}};
+          for(const e of d.examples){const r=inventory.example_pages_by_deck[e.deck]??={groups:0,pages:[]};r.groups++;r.pages.push(...(e.pages||[]));}
+          for(const r of Object.values(inventory.example_pages_by_deck))r.pages=[...new Set(r.pages)].sort((a,b)=>a-b);
+          fs.writeFileSync(root+'/validation.json',JSON.stringify(inventory,null,2)+'\n');
+          fs.writeFileSync('microcourses/eda/PUBLICATION_STATUS.md','# Publication verification\n\nAll '+a.full_count+' teaching units passed the structural and reference-answer checks in this workflow. There are '+a.example_groups+' loaded worked-example groups and '+a.example_questions+' example subquestions.\n\nThis is not a certificate that every original slide example has been audited. A1/A2 example reconciliation and final browser/deployment checks are separate acceptance conditions. GPU execution and the original course platform tests were not run here. Open proofs and design answers remain manually assessed.\n');
+          JS
+      - name: Publish only after successful checks and an unchanged remote base
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add microcourses/eda/index.html microcourses/eda/publication-checkpoint.json microcourses/eda/published microcourses/eda/PUBLICATION_STATUS.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Publish all validated course units and export interactive quiz data with explicit verification boundaries'
+          git fetch origin main
+          if [ "$(git rev-parse HEAD^)" != "$(git rev-parse origin/main)" ]; then
+            echo 'Remote changed during validation. No force push; rerun to validate the new base.' >&2
+            exit 1
+          fi
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eda-complete-course-publication-check
+          path: |
+            publication-audit/
+            microcourses/eda/publication-checkpoint.json
+            microcourses/eda/PUBLICATION_STATUS.md
+          retention-days: 7
