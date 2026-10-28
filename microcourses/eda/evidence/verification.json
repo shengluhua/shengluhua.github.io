@@ -50,12 +50,30 @@
       "chromiumAssessment": "PASS",
       "chromiumAnimations104x3": "PASS",
       "deployed": "SKIPPED: feature branch, not a deployment"
+    },
+    {
+      "commit": "20ade7e040d07f99ab495fd3e87d9d25d52bbd6b",
+      "run": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40702426725",
+      "content": "PASS",
+      "chromiumCourse85x3": "PASS",
+      "chromiumAssessment": "PASS",
+      "chromiumAnimations104x3": "PASS",
+      "publicChromiumCourse85x3": "PASS"
     }
   ],
-  "finalRelease": "candidate_browser_verified_waiting_for_main_pages",
+  "finalRelease": {
+    "status": "PASS",
+    "applicationCommit": "2d7f3abcf7c31956b11d7be251372ec97a21f01f",
+    "deployedCommit": "20ade7e040d07f99ab495fd3e87d9d25d52bbd6b",
+    "pagesRun": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40702425224",
+    "courseAndPublicBrowserRun": "https://github.com/shengluhua/shengluhua.github.io/actions/runs/40702426725",
+    "independentPublicSha256Files": 137,
+    "publicBase": "https://shengluhua.github.io/microcourses/eda/",
+    "scope": "All application assets and evidence matched the deployed commit. Later evidence-only commits do not change the tested application; consult their own Actions for exact current-head status."
+  },
   "notRun": [
     "physical iPad Safari",
-    "real CUDA lab execution",
+    "L01–L16 real CUDA/GPU execution",
     "course platform grader",
     "production EDA tools"
   ],
@@ -73,5 +91,19 @@
     "deletedFiles": 0,
     "outsideCourseTestWorkflowChanges": 0,
     "dailyCoursesSharedEntryAndAssets": "identical"
+  },
+  "visualReview": {
+    "viewports": [
+      "390x844",
+      "768x1024",
+      "1024x768"
+    ],
+    "reviewed": [
+      "phone home and GEMM reading",
+      "phone bank-mapping diagram and controls",
+      "tablet pipeline and four-level check",
+      "phone saved proof draft and per-item manual rubric"
+    ],
+    "privateOriginalDocumentsInScreenshots": false
   }
 }

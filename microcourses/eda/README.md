@@ -37,3 +37,7 @@ python tests/animations-browser.py
 ## 整合边界
 
 原四门每日微课及其自然日编号不修改。`scripts/eda-active-lessons.json`明确列出启用讲义，防止相同单元的历史包重复注册。为保留并行写者贡献，旧reader/grader与旧讲义文件保留在Git历史/仓库中，但不与新 `assessment-engine.js` 同时加载；错误旧实验合同不作为当前教学入口。所有有效原题入口保留，修正内容有来源说明。旧发布工作流改为只读验收入口，避免两个发布者再次重写同一索引。
+
+## 已核实发布证据
+
+教学应用 `2d7f3abc`、首次完整发布 `20ade7e` 已通过[课程与公网Chromium验收](https://github.com/shengluhua/shengluhua.github.io/actions/runs/40702426725)及[Pages构建部署](https://github.com/shengluhua/shengluhua.github.io/actions/runs/40702425224)。另独立下载137个公开文件，与部署Git对象逐字节SHA-256相符；不是只看HTTP 200。后续仅证据归档提交仍运行同一套CI，当前精确提交状态以Actions为准。L01–L16均完成教程与网页模型整理，但未在真实GPU/课程平台上执行，不将网页通过当成实验作业通过。
