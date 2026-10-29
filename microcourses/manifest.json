@@ -871,12 +871,33 @@
         "墓碑删除",
         "期望分析"
       ]
+    },
+    {
+      "id": "opt-010",
+      "track": "opt",
+      "number": 10,
+      "date": "2026-10-29",
+      "week": 2,
+      "title": "第10课：拉格朗日鞍点、原始—对偶间隙与可验证停止准则",
+      "abstract": "建立鞍点与KKT的对应关系，分解原始—对偶间隙，用一维二次规划推导可验证证书与对偶迭代收敛。",
+      "file": "lessons/opt-010.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "拉格朗日鞍点",
+        "KKT",
+        "强对偶",
+        "原始对偶间隙",
+        "收敛"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-29",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-010",
     "ai-010"
   ],
   "orphanQuizzes": []
