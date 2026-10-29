@@ -893,12 +893,34 @@
         "原始对偶间隙",
         "收敛"
       ]
+    },
+    {
+      "id": "ai-010",
+      "track": "ai",
+      "number": 10,
+      "date": "2026-10-29",
+      "week": 2,
+      "title": "Momentum、Nesterov 与 Adam：梯度为什么需要记忆？",
+      "abstract": "从病态曲率和随机梯度噪声出发，推导动量、Nesterov 预测梯度、Adam 一二阶矩与偏差修正，解释 AdamW 解耦权重衰减及其系统成本和理论边界。",
+      "file": "lessons/ai-010.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "momentum",
+        "nesterov",
+        "adam",
+        "adamw",
+        "bias-correction",
+        "condition-number",
+        "weight-decay",
+        "optimizer"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-29",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-010"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
