@@ -823,10 +823,40 @@
         "throughput",
         "optimization"
       ]
+    },
+    {
+      "id": "arch-010",
+      "track": "arch",
+      "number": 10,
+      "date": "2026-10-29",
+      "week": 2,
+      "title": "第10课｜ROB、旧物理寄存器回收与投机恢复",
+      "abstract": "从乱序完成与按序退休的矛盾出发，推导ROB精确异常不变量、stale pdst释放时机、RAT分支检查点和Free List回收，逐步分析误预测与错误路径异常。",
+      "file": "lessons/arch-010.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "ILP",
+        "OoO",
+        "ROB",
+        "Free-List",
+        "RAT",
+        "stale-pdst",
+        "branch-checkpoint",
+        "precise-exception",
+        "squash",
+        "store-buffer"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-10-28",
+  "indexVerifiedOn": "2026-10-29",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-010",
+    "opt-010",
+    "ai-010"
+  ],
   "orphanQuizzes": []
 }
