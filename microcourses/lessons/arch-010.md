@@ -52,11 +52,11 @@ flowchart LR
 
 | 符号 | 意义 | 更新时机 |
 | --- | --- | --- |
-| (RAT[a]) | 架构寄存器 (a) 当前**投机**映射到的物理版本 | 按序Rename |
-| (AMT[a]) | 已**退休**架构状态对应的物理版本；有的实现用提交映射表 | Commit |
-| (pdst_i) | 第 (i) 条写目的的**新**物理寄存器 | Rename分配 |
-| (stale_i) | 该条指令重命名前，目的架构名映射的**旧**物理寄存器 | Rename记录 |
-| (Free) | 可供下一次Rename分配、当前不再需要的物理寄存器集合 | 分配、提交回收、回滚 |
+| \(\mathrm{RAT}[a]\) | 架构寄存器 (a) 当前**投机**映射到的物理版本 | 按序Rename |
+| \(\mathrm{AMT}[a]\) | 已**退休**架构状态对应的物理版本；有的实现用提交映射表 | Commit |
+| \(pdst_i\) | 第 (i) 条写目的的**新**物理寄存器 | Rename分配 |
+| \(stale_i\) | 该条指令重命名前，目的架构名映射的**旧**物理寄存器 | Rename记录 |
+| \(\mathrm{Free}\) | 可供下一次Rename分配、当前不再需要的物理寄存器集合 | 分配、提交回收、回滚 |
 | ROB head/tail | 最老可退休候选/新指令加入位置 | Dispatch/Retire |
 
 **最重要的两个不变量：**
@@ -68,7 +68,7 @@ flowchart LR
 
 ## 3. 为什么 stale pdst 不能在 Rename 或 Writeback 就释放？（2分钟）
 
-假设初始 (R1	o P1)，老指令 A 已绑定 (P1) 作为源；年轻指令 B 写 (R1)，获得新目标 (P20)，并记录 (stale_B=P1)：
+假设初始 R1→P1，老指令 A 已绑定 P1 作为源；年轻指令 B 写 R1，获得新目标 P20，并记录 stale_B=P1：
 
 ~~~text
 老A: READ R1      -> 绑定源P1（可能尚在等另一个操作数）
@@ -81,24 +81,29 @@ flowchart LR
 
 分配与回收的简化守恒式是：
 
-[
-|Free_{m after}|=|Free_{m before}|
--#	ext{成功分配新pdst}
-+#	ext{正常退休释放stale}
-+#	ext{回滚释放的投机分配}.
-]
+\[
+\begin{aligned}
+|\mathrm{Free}_{\mathrm{after}}|
+=&\,|\mathrm{Free}_{\mathrm{before}}|\\
+&-\#\mathrm{Allocations}\\
+&+\#\mathrm{CommittedStaleReleases}\\
+&+\#\mathrm{SquashedAllocationsReturned}.
+\end{aligned}
+\]
+
+三项分别是**成功分配新pdst**、**正常退休释放stale**、**回滚返还的错误路径新分配**；同一物理版本绝不能重复入Free。
 
 **注意**三项集合必须互斥，不能把同一个物理寄存器回收两次；真实硬件需要跟踪精确所有权，而非只维护一个数字。
 
 ## 4. 完整数值例：重命名、旧值与 Free List（3分钟）
 
-初始 (R1	o P1, R2	o P2, R3	o P3)，空闲池是 (P20ldots P26)，共 **7** 个。依程序顺序重命名：
+初始 R1→P1、R2→P2、R3→P3，空闲池是 P20…P26，共 **7** 个。依程序顺序重命名：
 
 | 指令 | 逻辑操作 | 新pdst | stale pdst | Rename之后与之相关的RAT |
 | --- | --- | --- | --- | --- |
-| J1 | (R1leftarrow R2+1) | P20 | P1 | R1→P20 |
-| J2 | (R2leftarrow R1+2) | P21 | P2 | R2→P21；J2源R1仍指P20 |
-| J3 | (R1leftarrow R2+3) | P22 | P20 | R1→P22；J3源R2指P21 |
+| J1 | R1 ← R2+1 | P20 | P1 | R1→P20 |
+| J2 | R2 ← R1+2 | P21 | P2 | R2→P21；J2源R1仍指P20 |
+| J3 | R1 ← R2+3 | P22 | P20 | R1→P22；J3源R2指P21 |
 
 三个新目的占用三格，所以单看Rename后的Free池为 7−3=4。**J3 的 stale 是 P20，不是 P1**：因为它覆盖的是 J1 版本。这一点不能通过仅看初始架构映射得到，必须按序追踪 RAT。
 
@@ -138,7 +143,7 @@ B被判误预测：
 
 ## 7. 两条恢复路径：快照与 ROB rollback（1分钟）
 
-如果维护AMT，发生全流水线冲刷时可将投机RAT恢复为提交映射，代价是额外状态存储与写入。若不维护，可从ROB尾部逆序撤销写入，依次把每条目的 (stale_i) 恢复为RAT中对应逻辑目的；代价是恢复可能需要多个周期。分支独立checkpoint有助于局部误预测的快速恢复。
+如果维护AMT，发生全流水线冲刷时可将投机RAT恢复为提交映射，代价是额外状态存储与写入。若不维护，可从ROB尾部逆序撤销写入，依次把每条目的 \(stale_i\) 恢复为RAT中对应逻辑目的；代价是恢复可能需要多个周期。分支独立checkpoint有助于局部误预测的快速恢复。
 
 **两者的共同正确性条件**不是“用了哪种电路”，而是恢复后所有活跃源标签、映射、Free池和ROB有效条目彼此一致，不能把仍有活跃消费者的物理版本回收。BOOM文档分别说明了提交映射表复位、逐行回滚和分支检查点。
 
@@ -198,7 +203,7 @@ D. 只要出现分支checkpoint，P1自动变成Free。
 
 ### Lv2｜多次覆盖与延期回收的计数（20分 · 数值 · 预计4分钟）
 
-初始 (R4\to P4,R5\to P5,R7\to P7)，Free List 只有 (P40,\ldots,P48)，共9个。依次重命名四条写寄存器指令：
+初始 R4→P4、R5→P5、R7→P7，Free List 只有 P40…P48，共9个。依次重命名四条写寄存器指令：
 
 ~~~text
 K1: 写R4，分配P40
@@ -237,7 +242,7 @@ E. 在允许Store Buffer的实现中，Store可能已从ROB按序退休，却尚
 
 ### Lv4｜误预测恢复、错误路径异常与资源守恒（40分 · 开放推导 · 预计10分钟）
 
-初始 (R1	o P1,R2	o P2,R3	o P3)，Free Pool仅 (P10,ldots,P16) 七个物理寄存器，旧 (P1,P2,P3) 不在Free中。按序重命名：
+初始 R1→P1、R2→P2、R3→P3，Free Pool仅 P10…P16 七个物理寄存器，旧 P1、P2、P3 不在Free中。按序重命名：
 
 ~~~text
 I1: ADD R1 <- R2 + 1       # 分配P10
