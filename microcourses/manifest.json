@@ -966,12 +966,35 @@
         "Double Hashing",
         "Robin Hood Hashing"
       ]
+    },
+    {
+      "id": "opt-011",
+      "track": "opt",
+      "number": 11,
+      "date": "2026-10-30",
+      "week": 2,
+      "title": "第11课：拉格朗日乘子的影子价格、最优值灵敏度与活跃集切换",
+      "abstract": "推导右端项扰动下的影子价格和最优值函数子梯度，辨析活跃约束与乘子、可微与折点，结合对偶梯度迭代与反例理解局部预测范围。",
+      "file": "lessons/opt-011.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "KKT",
+        "拉格朗日对偶",
+        "影子价格",
+        "灵敏度分析",
+        "子梯度",
+        "活跃集",
+        "收敛"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-30",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-011",
     "ai-011"
   ],
   "orphanQuizzes": []
