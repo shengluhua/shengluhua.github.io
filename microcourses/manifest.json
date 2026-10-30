@@ -990,12 +990,35 @@
         "活跃集",
         "收敛"
       ]
+    },
+    {
+      "id": "ai-011",
+      "track": "ai",
+      "number": 11,
+      "date": "2026-10-30",
+      "week": 2,
+      "title": "初始化与梯度传播：Xavier、He 和深层网络的信号方差",
+      "abstract": "从线性层前向二阶矩和反向梯度传播推导 Xavier/He 初始化，区分二阶矩、方差与 Jacobian 奇异值，并说明残差及归一化的作用与边界。",
+      "file": "lessons/ai-011.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "initialization",
+        "xavier",
+        "he",
+        "relu",
+        "gradient-flow",
+        "vanishing-gradient",
+        "exploding-gradient",
+        "jacobian",
+        "dynamical-isometry"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-30",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-011"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
