@@ -917,10 +917,42 @@
         "weight-decay",
         "optimizer"
       ]
+    },
+    {
+      "id": "arch-011",
+      "track": "arch",
+      "number": 11,
+      "date": "2026-10-30",
+      "week": 2,
+      "title": "第11课｜Load/Store Queue、内存依赖预测与Replay",
+      "abstract": "从未知Store地址下的Load投机出发，推导LSQ、Store-to-Load Forwarding、内存顺序违例检测、Replay和预测收益阈值，并严格区分微架构执行、ROB退休与跨核全局可见性。",
+      "file": "lessons/arch-011.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "ILP",
+        "OoO",
+        "LSU",
+        "LSQ",
+        "LDQ",
+        "STQ",
+        "memory-disambiguation",
+        "forwarding",
+        "replay",
+        "store-buffer",
+        "RVWMO",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-10-29",
+  "indexVerifiedOn": "2026-10-30",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-011",
+    "opt-011",
+    "ai-011"
+  ],
   "orphanQuizzes": []
 }
