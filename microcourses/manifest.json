@@ -945,12 +945,32 @@
         "RVWMO",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-011",
+      "track": "algo",
+      "number": 11,
+      "date": "2026-10-30",
+      "week": 2,
+      "title": "第11课｜双重哈希与 Robin Hood Hashing：如何控制聚集和探测距离",
+      "abstract": "学习 Double Hashing 完整周期条件、Robin Hood 位移交换与提前终止不变量，以及后移删除和复杂度边界。",
+      "file": "lessons/algo-011.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "算法与数据结构",
+        "随机化",
+        "开放寻址",
+        "Double Hashing",
+        "Robin Hood Hashing"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-30",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-011",
     "opt-011",
     "ai-011"
   ],
