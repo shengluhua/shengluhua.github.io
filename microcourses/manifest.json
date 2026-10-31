@@ -1043,12 +1043,32 @@
         "CPI",
         "ROB"
       ]
+    },
+    {
+      "id": "algo-012",
+      "track": "algo",
+      "number": 12,
+      "date": "2026-10-31",
+      "week": 2,
+      "title": "第12课｜动态哈希表：扩缩容、摊还重建与对抗输入",
+      "abstract": "以动态链地址哈希表为例，证明扩缩容重建的摊还线性总成本，并辨析通用哈希期望界与自适应对抗输入。",
+      "file": "lessons/algo-012.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "随机化",
+        "哈希表",
+        "动态扩缩容",
+        "摊还分析",
+        "对抗输入"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-31",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-012",
     "opt-012",
     "ai-012"
   ],
