@@ -1086,12 +1086,35 @@
         "KKT",
         "收敛分析"
       ]
+    },
+    {
+      "id": "ai-012",
+      "track": "ai",
+      "number": 12,
+      "date": "2026-10-31",
+      "week": 2,
+      "title": "BatchNorm、LayerNorm、RMSNorm 与 Pre-/Post-Norm：归一化怎样改变梯度路径",
+      "abstract": "推导 BN/LN 的统计轴与反向传播，比较 RMSNorm、训练/推理差异，并用残差 Jacobian 分析 Pre-Norm 与 Post-Norm 的稳定性和系统开销。",
+      "file": "lessons/ai-012.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": false,
+      "diagram": "mermaid",
+      "tags": [
+        "batchnorm",
+        "layernorm",
+        "rmsnorm",
+        "normalization",
+        "backward",
+        "residual",
+        "pre-norm",
+        "post-norm",
+        "transformer"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-10-31",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-012"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
