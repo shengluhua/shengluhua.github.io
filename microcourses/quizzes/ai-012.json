@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-012",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "对于输入形状为 B×T×D 的序列模型，采用“每个 token 沿 D 个特征归一化”的 LayerNorm，以及“训练时按 batch 维估计特征统计量”的 BatchNorm。下列哪项最准确？",
+      "options": [
+        "单独执行这些归一化算子时，训练模式 BN 的样本输出可能依赖同批其他样本；LN 的归一化统计量只依赖该 token 自身的 D 维特征。",
+        "LN 的均值和方差必须跨 batch 估计，因此 batch size 为 1 时无法使用。",
+        "标准 BN 在训练和推理阶段始终使用当前 batch 的统计量，因此无需运行均值、运行方差。",
+        "只要把 Transformer 改成 Pre-Norm，无论残差分支参数怎样变化，端到端 Jacobian 的全部奇异值都必为 1。"
+      ],
+      "answer": 0,
+      "hint": "先区分“统计量沿哪个维度算”与“整个网络是否包含注意力等跨 token 计算”；再比较 BN 的训练模式和标准推理模式。",
+      "explanation": "训练模式的 BN 按指定批量/空间轴为每个通道估计均值方差，因此同批成员变化会影响一个样本的标准化输出。LN 在常见序列实现里沿每个 token 的 D 维特征计算统计量，不依赖其他样本/位置的归一化统计量；但整个 Transformer 仍可通过注意力发生跨 token 依赖。标准 BN 推理模式通常使用预先累计的 running statistics。Pre-Norm 的单块 Jacobian 含 I 项，却不保证整体等距。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "对单个 token 的向量 x=(2,4,6) 做 LayerNorm。使用总体方差 v=(1/3)Σᵢ(xᵢ−μ)²，令 ε=0、γ=(1,1,3)、β=(0,0,1)。计算第三个输出坐标 y₃=γ₃(x₃−μ)/√v+β₃，填写小数（至少保留 4 位）。",
+      "answer": 4.674234614,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先算三个分量的平均值，再用 1/3 而不是 1/2 算方差；最后别忘了第三坐标的 γ、β。",
+      "explanation": "μ=(2+4+6)/3=4，v=[(−2)²+0²+2²]/3=8/3。第三坐标标准化值为 2/√(8/3)=√(3/2)，因此 y₃=3√(3/2)+1≈4.674234614。题目 ε=0 且 v>0，不存在零除问题；真实实现一般取 ε>0。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "输入为 B×T×D，F 表示可微残差分支，N 表示归一化；忽略 dropout 等额外操作。关于常见 LayerNorm、RMSNorm 和 Pre-/Post-Norm，选择所有正确项。",
+      "options": [
+        "每个 token 沿 D 维执行 LN 时，计算均值、方差和逐元素标准化的算术复杂度为 O(BTD)，不因 LN 算子本身引入跨 token 的二次复杂度。",
+        "对 Pre-Norm 块 y=x+F(N(x))，其 Jacobian 是 J=I+J_F(N(x))J_N(x)，因此具有一条显式的单位映射导数路径。",
+        "对 Post-Norm 块 y=N(x+F(x))，其 Jacobian 总是 I+J_F(x)J_N(x)，与 Pre-Norm 完全相同。",
+        "标准 RMSNorm 对任意常数平移 x↦x+c·1 严格不变，因为它也会减去均值。",
+        "只要 ε>0，LN 在任意正尺度缩放 x↦ax（a>0）下仍严格保持输出不变，不需要其他条件。",
+        "标准 BN 的推理模式使用固定 running statistics 时，一条样本的归一化输出不会因同 batch 的其他样本数值改变而改变。"
+      ],
+      "answer": [
+        0,
+        1,
+        5
+      ],
+      "hint": "分别写出 LN 的统计量循环量级、两种残差块的链式法则，以及 RMSNorm 有无中心化；注意 ε 是否破坏精确尺度不变性。",
+      "explanation": "A 对 B×T 个 token 各做 D 维约简和标准化，规模为 O(BTD)，LN 本身不做 T×T 注意力。B 由 y=x+F(N(x)) 的链式法则得 I+J_F J_N。C 的正确 Post-Norm Jacobian 是 J_N(x+F(x))(I+J_F(x))。D 错在 RMSNorm 不减均值。E 错在 ε>0 时分母 √(a²v+ε) 与 a√(v+ε) 不严格相等（除退化情况）。F 描述的是标准 BN eval() 使用固定 running mean/var 的行为，而非 train()。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "综合研究题（40 分）。A（12 分）：对一个 D 维 token，令 μ=(1/D)Σxᵢ，v=(1/D)Σ(xᵢ−μ)²，s=√(v+ε)，zᵢ=(xᵢ−μ)/s，yᵢ=γᵢzᵢ+βᵢ。设上游梯度 aᵢ=∂L/∂yᵢ、gᵢ=aᵢγᵢ，推导 ∂L/∂xᵢ 的简化表达，并写出 ∂L/∂γᵢ、∂L/∂βᵢ（单 token）。\nB（10 分）：分别写出 Pre-Norm y=x+F(N(x)) 与 Post-Norm y=N(x+F(x)) 的 Jacobian，解释为什么 Pre-Norm 有显式 identity 梯度路径，但不能保证整个深网络梯度永不爆炸/消失。\nC（10 分）：设计一个对照实验，比较 BN、LN、RMSNorm 在 batch size=1/32、不同序列长度 T 下的训练/推理表现；说明哪些变量必须固定，哪些指标要记录，并解释为何 BN 的训练与推理模式必须分开测。\nD（8 分）：利用 x=(1,3)、ε=1、γ=(1,1)、β=(0,0) 举出“LN 对正比例放大总是精确不变”的反例。计算 LN(x) 与 LN(2x)，指出在 ε→0 且非零方差时如何变化。",
+      "hint": "A 从 dx−dμ 和 ds=dv/(2s) 出发收集上游梯度；B 用链式法则观察 I 在哪里；C 区分精度、吞吐、显存、数值稳定性与统计量来源；D 注意 √(v+ε)。",
+      "rubric": [
+        "A（12分）：正确说明 μ、v、s 的导数关系（4分）；推得 ∂L/∂xᵢ=[gᵢ−mean(g)−zᵢ mean(gz)]/s（6分）；给出 ∂L/∂γᵢ=aᵢzᵢ、∂L/∂βᵢ=aᵢ（2分）。",
+        "B（10分）：Pre Jacobian I+J_F J_N（4分）；Post Jacobian J_N(I+J_F)（4分）；指出多层乘积、分支过大与 LN Jacobian 不保证全局稳定（2分）。",
+        "C（10分）：公平控制网络/优化器/种子/精度/硬件等（3分）；训练与 eval 模式统计行为正确（3分）；同时测质量、时延/吞吐、峰值显存、梯度范数及各长度/批量的稳定性（4分）。",
+        "D（8分）：LN(1,3)=(-1/√2,1/√2)、LN(2,6)=(-2/√5,2/√5)（5分）；解释 ε 固定导致缩放不精确不变、ε→0 且方差非零时正比例缩放不改变标准化结果（3分）。"
+      ],
+      "model_answer": "A：dμ=(1/D)Σdx；dv=(2/D)Σ(xᵢ−μ)dxᵢ，ds=dv/(2s)。置 zᵢ=(xᵢ−μ)/s、gᵢ=aᵢγᵢ。链式展开 dL=Σgᵢ[(dxᵢ−dμ)/s−(xᵢ−μ)ds/s²]，整理 ∂L/∂xᵢ=(gᵢ−mean(g)−zᵢmean(gz))/s。单 token ∂L/∂γᵢ=aᵢzᵢ，∂L/∂βᵢ=aᵢ；共享参数在多个 token 上需对 token 求和。B：Pre J=I+J_F(N(x))J_N(x)；Post J=J_N(x+F(x))(I+J_F(x))。Pre 的单块具有 I 路径，但多层乘积仍可能病态。C：固定网络尺寸/训练数据/初始化方案/优化器和调参预算/硬件/精度，分别在 B=1、32 和不同 T 下测 loss、梯度 RMS、梯度爆炸、samples/s、tokens/s、显存、推理延迟，多种随机种子。BN 的 train() 用当前批统计且更新 running stats，eval() 通常用冻结的 running stats；LN/RMSNorm 常规模式不依赖跨 batch 的 running stats。D：x=(1,3) 的 μ=2、v=1，LN(x)=(-1/√2,1/√2)；2x=(2,6) 的 μ=4、v=4，LN(2x)=(-2/√5,2/√5)，两者不同。固定 ε>0 破坏精确正缩放不变性；ε→0 时两者均趋于(-1,1)。"
+    }
+  ]
+}
