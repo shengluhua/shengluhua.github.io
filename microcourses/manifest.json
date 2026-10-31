@@ -1098,7 +1098,7 @@
       "file": "lessons/ai-012.md",
       "minutes": 18,
       "kind": "full",
-      "quiz": false,
+      "quiz": true,
       "diagram": "mermaid",
       "tags": [
         "batchnorm",
