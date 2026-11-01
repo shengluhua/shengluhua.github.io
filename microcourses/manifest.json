@@ -1141,12 +1141,34 @@
         "CPI",
         "MPKI"
       ]
+    },
+    {
+      "id": "algo-013",
+      "track": "algo",
+      "number": 13,
+      "date": "2026-11-01",
+      "week": 2,
+      "title": "算法与数据结构第13课：随机化与哈希系统综合复习",
+      "abstract": "复习随机选择、通用哈希、开放寻址、Robin Hood与动态重建，区分正确性、期望、摊还和最坏保证。",
+      "file": "lessons/algo-013.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "随机化",
+        "Las-Vegas",
+        "通用哈希",
+        "线性探测",
+        "Robin-Hood",
+        "摊还分析",
+        "复习"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-01",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-013",
     "opt-013",
     "ai-013"
   ],
