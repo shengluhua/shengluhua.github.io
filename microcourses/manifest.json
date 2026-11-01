@@ -1164,12 +1164,33 @@
         "摊还分析",
         "复习"
       ]
+    },
+    {
+      "id": "opt-013",
+      "track": "opt",
+      "number": 13,
+      "date": "2026-11-01",
+      "week": 2,
+      "title": "数学优化理论第13课：对偶分解、原始解恢复与增广拉格朗日",
+      "abstract": "从共享约束的对偶分解出发，证明分解结构、原始可行恢复及上下界证书，分析对偶梯度的收敛条件与增广罚项引入的耦合。",
+      "file": "lessons/opt-013.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "拉格朗日对偶",
+        "对偶分解",
+        "原始解恢复",
+        "KKT",
+        "增广拉格朗日"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-01",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-013",
     "ai-013"
   ],
   "orphanQuizzes": []
