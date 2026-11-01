@@ -1111,10 +1111,44 @@
         "post-norm",
         "transformer"
       ]
+    },
+    {
+      "id": "arch-013",
+      "track": "arch",
+      "number": 13,
+      "date": "2026-11-01",
+      "week": 2,
+      "title": "第13课｜前端—后端协同：Fetch宽度、ROB窗口、LSQ与分支恢复如何共同限制IPC",
+      "abstract": "从取指供给、执行宽度、按序退休和在途资源的背压出发，以Little定律推导ROB/Load Queue的稳态吞吐上限，区分分支恢复空泡与其他停顿的重叠，并设计端到端性能诊断。",
+      "file": "lessons/arch-013.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": false,
+      "diagram": "mermaid",
+      "tags": [
+        "ILP",
+        "fetch",
+        "decode",
+        "rename",
+        "issue",
+        "commit",
+        "ROB",
+        "LSQ",
+        "branch-recovery",
+        "pipeline-backpressure",
+        "Little-law",
+        "IPC",
+        "CPI",
+        "MPKI"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-10-31",
+  "indexVerifiedOn": "2026-11-01",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-013",
+    "opt-013",
+    "ai-013"
+  ],
   "orphanQuizzes": []
 }
