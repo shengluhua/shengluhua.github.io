@@ -1186,12 +1186,34 @@
         "KKT",
         "增广拉格朗日"
       ]
+    },
+    {
+      "id": "ai-013",
+      "track": "ai",
+      "number": 13,
+      "date": "2026-11-01",
+      "week": 2,
+      "title": "残差网络的梯度动力学：深度缩放、零初始化与 Pre-Norm 稳定性",
+      "abstract": "从残差 Jacobian 连乘推导深度梯度动力学，区分均方意义的 1/√L 缩放与最坏情况的 1/L 界，分析零初始化、Pre-Norm 与实际训练实验。",
+      "file": "lessons/ai-013.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "residual",
+        "resnet",
+        "transformer",
+        "pre-norm",
+        "jacobian",
+        "gradient",
+        "initialization",
+        "depth-scaling"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-01",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-013"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
