@@ -1240,12 +1240,34 @@
         "store-buffer",
         "IPC"
       ]
+    },
+    {
+      "id": "algo-014",
+      "track": "algo",
+      "number": 14,
+      "date": "2026-11-02",
+      "week": 2,
+      "title": "算法与数据结构第14课：AVL平衡树与旋转不变量",
+      "abstract": "从BST退化问题出发，推导AVL的旋转不变量、插入修复策略与Fibonacci型高度上界。",
+      "file": "lessons/algo-014.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "二叉搜索树",
+        "AVL",
+        "树旋转",
+        "平衡因子",
+        "递归不变量",
+        "Fibonacci",
+        "最坏复杂度"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-02",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-014",
     "opt-014",
     "ai-014"
   ],
