@@ -1289,12 +1289,35 @@
         "收敛",
         "周复盘"
       ]
+    },
+    {
+      "id": "ai-014",
+      "track": "ai",
+      "number": 14,
+      "date": "2026-11-02",
+      "week": 2,
+      "title": "第二周复盘：从梯度噪声到百层网络稳定性",
+      "abstract": "综合复盘梯度下降、SGD 方差、Momentum/AdamW、Xavier/He、BN/LN/RMSNorm、Pre-Norm 与残差 Jacobian，并构建训练稳定性诊断框架。",
+      "file": "lessons/ai-014.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "sgd",
+        "momentum",
+        "adamw",
+        "initialization",
+        "normalization",
+        "residual",
+        "jacobian",
+        "review"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-02",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-014"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
