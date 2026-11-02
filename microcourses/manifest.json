@@ -1263,12 +1263,37 @@
         "Fibonacci",
         "最坏复杂度"
       ]
+    },
+    {
+      "id": "opt-014",
+      "track": "opt",
+      "number": 14,
+      "date": "2026-11-02",
+      "week": 2,
+      "title": "数学优化理论 · 第14课：第二周复盘——KKT、对偶与最优性证书",
+      "abstract": "通过一个冗余活跃约束的二次规划，系统复盘资格条件、KKT、强对偶、乘子非唯一性、对偶梯度迭代、原始—对偶证书与典型反例。",
+      "file": "lessons/opt-014.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "凸优化",
+        "KKT",
+        "LICQ",
+        "MFCQ",
+        "Slater",
+        "对偶",
+        "乘子",
+        "互补松弛",
+        "收敛",
+        "周复盘"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-02",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-014",
     "ai-014"
   ],
   "orphanQuizzes": []
