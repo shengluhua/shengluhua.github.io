@@ -1210,10 +1210,44 @@
         "initialization",
         "depth-scaling"
       ]
+    },
+    {
+      "id": "arch-014",
+      "track": "arch",
+      "number": 14,
+      "date": "2026-11-02",
+      "week": 2,
+      "title": "第14课｜第2周复盘：从Rename、LSQ到ROB与预测恢复的完整执行闭环",
+      "abstract": "第2周综合复盘：通过逐指令追踪物理寄存器、Store-to-Load转发、分支误预测、ROB提交及GHR恢复，建立与IPC容量和TSO全局可见性一致的执行模型。",
+      "file": "lessons/arch-014.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "ILP",
+        "review",
+        "out-of-order",
+        "rename",
+        "ROB",
+        "LSQ",
+        "load-forwarding",
+        "branch-recovery",
+        "GHR",
+        "free-list",
+        "precise-exception",
+        "TSO",
+        "store-buffer",
+        "IPC"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-01",
+  "indexVerifiedOn": "2026-11-02",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-014",
+    "opt-014",
+    "ai-014"
+  ],
   "orphanQuizzes": []
 }
