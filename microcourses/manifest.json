@@ -1385,12 +1385,32 @@
         "convergence",
         "descent-lemma"
       ]
+    },
+    {
+      "id": "ai-015",
+      "track": "ai",
+      "number": 15,
+      "date": "2026-11-03",
+      "week": 3,
+      "title": "第15课：从信息检索到缩放点积 Attention",
+      "abstract": "从Q/K/V软检索推导缩放点积注意力、Softmax梯度、causal mask及二次复杂度，含四级自测。",
+      "file": "lessons/ai-015.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "transformer",
+        "attention",
+        "query-key-value",
+        "softmax",
+        "causal-mask",
+        "complexity"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-03",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-015"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
