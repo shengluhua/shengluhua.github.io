@@ -1314,10 +1314,41 @@
         "jacobian",
         "review"
       ]
+    },
+    {
+      "id": "arch-015",
+      "track": "arch",
+      "number": 15,
+      "date": "2026-11-03",
+      "week": 3,
+      "title": "第15课｜精确异常之外：错误路径的微架构痕迹与推测执行安全",
+      "abstract": "区分架构状态与微架构状态，解释错误路径被Squash后为何可能留下Cache痕迹；以Spectre v1为案例建立侧信道威胁模型、缓存集合映射、软件缓解与性能成本模型，并与TSO Store Buffering严格区分。",
+      "file": "lessons/arch-015.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "speculation",
+        "transient-execution",
+        "Spectre",
+        "branch-prediction",
+        "ROB",
+        "precise-exception",
+        "cache-side-channel",
+        "LFENCE",
+        "bounds-clipping",
+        "microarchitectural-state",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-02",
+  "indexVerifiedOn": "2026-11-03",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-015",
+    "opt-015",
+    "ai-015"
+  ],
   "orphanQuizzes": []
 }
