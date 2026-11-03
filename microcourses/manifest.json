@@ -1363,12 +1363,33 @@
         "rank",
         "rotation"
       ]
+    },
+    {
+      "id": "opt-015",
+      "track": "opt",
+      "number": 15,
+      "date": "2026-11-03",
+      "week": 3,
+      "title": "数学优化理论·第15课：梯度下降的下降引理与收敛速度",
+      "abstract": "推导下降引理、非凸梯度范数界、凸 GD 的 O(1/K) 界及强凸线性收敛；辨析步长、误差度量与反例。",
+      "file": "lessons/opt-015.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "gradient-descent",
+        "smoothness",
+        "convexity",
+        "strong-convexity",
+        "convergence",
+        "descent-lemma"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-03",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-015",
     "ai-015"
   ],
   "orphanQuizzes": []
