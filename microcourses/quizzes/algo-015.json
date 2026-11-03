@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "lesson_id": "algo-015",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "在一棵每个节点都正确维护 size(v)=1+size(left)+size(right) 的 AVL 树中，SELECT(k) 走到节点 v，设 L=size(v.left)。若 k>L+1，下列哪种处理正确？",
+      "options": [
+        "进入左子树，保持 k 不变。",
+        "进入右子树，令 k←k−(L+1)。",
+        "直接返回 v.key，因为右边还有元素。",
+        "进入右子树，保持 k 不变。"
+      ],
+      "answer": 1,
+      "hint": "把左子树的 L 个键和当前根的 1 个键看成已经越过的有序前缀。",
+      "explanation": "当前子树中左侧 L 个键和根自身共 L+1 个键都严格小于右子树任何键。若 k>L+1，只能进入右子树并减掉这 L+1 个已越过的名次。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "single",
+      "points": 20,
+      "prompt": "从空 AVL 树依次插入互异键 [50,20,40,10,30,60,70]，每次插入后立即再平衡并更新 size。最终树根、SELECT(6) 返回的键值、RANK(50)（已存键的 1-based 排名）分别是什么？",
+      "options": [
+        "根 40，SELECT(6)=60，RANK(50)=5。",
+        "根 50，SELECT(6)=60，RANK(50)=5。",
+        "根 40，SELECT(6)=50，RANK(50)=5。",
+        "根 40，SELECT(6)=60，RANK(50)=6。"
+      ],
+      "answer": 0,
+      "hint": "前三次插入检查 LR；最后插入 70 时检查以 50 为根的局部子树。然后依次按左子树大小做排名跳转。",
+      "explanation": "插入 50、20、40 后在 50 发生 LR 双旋，根成为 40，左子 20、右子 50。插入 10、30 后左子 20 的孩子为 10、30；插入 60、70 后，50 处发生 RR，对 50 左旋，右子树根 60，左右为 50、70。最终根 40，升序为 10,20,30,40,50,60,70。第 6 小是 60，50 的排名是 5。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "关于带子树大小的 AVL / BST，下面哪些判断成立？（多选，选出全部正确项）",
+      "options": [
+        "即使所有 size 都正确，未平衡的普通 BST 上 SELECT 仍可能花费 Θ(n) 时间。",
+        "左旋后只需更新上升的新根的 size，下降的旧根 size 一定保持原值。",
+        "若重复键压缩在节点的 cnt 中，令 size=cnt+size(left)+size(right)，并把本节点占据的排名区间视为 (L,L+cnt]，仍可支持多重集合 SELECT。",
+        "删除一个节点后，即使不需要旋转，也可能必须更新其祖先的 size，才能保证后续 RANK / SELECT 正确。"
+      ],
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "hint": "size 是计数信息，不会自动降低树高；旋转可能改变单个节点所管的子树；删除会减少若干祖先子树中的键数。",
+      "explanation": "A 成立：size 只能告诉每层排名，BST 退化链长 n 时仍需 Θ(n) 层。B 错：旋转改变旧根所覆盖的子树，因此必须先 PULL(旧根) 再 PULL(新根)。C 成立：一个出现 cnt 次的键占据 L+1 到 L+cnt 的排名区间。D 成立：删除会使其所有相关祖先的子树大小减一，即便不旋转也必须维护 size。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设计一个同时支持 INSERT、SELECT(k)、RANK(x) 的 AVL 秩统计树，键互异，空子树 size=0、height=−1，RANK(x) 只对已存在的键返回从 1 开始的排名，不存在时返回 NOT_FOUND。要求：(a)（12 分）给出 size 不变量和 SELECT、RANK 的伪代码，包含 k 越界处理；(b)（12 分）给出 AVL INSERT 与左旋（右旋对称）时 size、height 的维护顺序，并证明旋转保序且只需 O(1) 次局部信息更新；(c)（10 分）证明 SELECT、RANK 的正确性和最坏 O(log n) 时间，说明 INSERT 的时间、整树与递归栈空间；(d)（6 分）说明将重复键改成节点计数 cnt 时应如何修改 size 与 SELECT，以及删除一个键时为何必须沿路径更新 size。",
+      "hint": "先写 size=1+size(left)+size(right)，再考察节点把当前区间排名切为左侧 L 个、根 1 个和右侧；旋转后先更新下降的旧根，再更新上升的新根。",
+      "rubric": [
+        "12 分：给出准确 size 不变量，SELECT 三种排名分支及越界，RANK 累计右转跳过数量与缺失处理。",
+        "12 分：INSERT 递归更新 size/height 与 AVL 四种旋转；左旋局部保序，先更新旧根再新根，局部 O(1)。",
+        "10 分：SELECT 的局部 k 归纳与 RANK 的 passed 循环不变量；借 AVL 高度证明查询/插入最坏 O(log n)，说明 O(n) 节点空间与递归栈 O(log n)。",
+        "6 分：频数 cnt 版本中 size 和 SELECT 区间正确调整；删除或频数减少时维护祖先 size，必要时 AVL 再平衡。"
+      ],
+      "model_answer": "(a) size(null)=0，size(v)=1+size(left)+size(right)；SELECT 以 L=size(left) 比较 k，k≤L 左转，k=L+1 返回本键，k>L+1 右转并减 L+1；k 越界返回 INVALID。RANK 从根查 x，累计 passed=0，向右加 L+1，向左不加；命中返回 passed+L+1，缺失返回 NOT_FOUND。(b) AVL_INSERT 按键值递归插入，再 pull(v) 计算 size/height；BF>1 视左孩子 BF 决定 LL/LR，BF<−1 视右孩子 BF 决定 RR/RL。左旋前中序 A,x,B,y,C，后不变；先 pull(x)，再 pull(y)，每次 O(1)，右旋对称；双旋由两次基本旋转构成。只对插入路径上的祖先更新计数，旋转本身不改变转后局部子树整体键数。(c) SELECT 用 BST 分段顺序对当前子树大小归纳；RANK 的 passed 记录已经剔除且小于 x 的节点，返回时加当前左侧与根；AVL 高度 O(log n)，两查询每层常数工作，插入沿一路径更新并有限次旋转，最坏 O(log n)。节点 O(n)，递归栈 O(log n)，迭代 RANK O(1) 额外空间。(d) 重复键使用 cnt≥1，size=cnt+size(left)+size(right)；当 L<k≤L+cnt 返回当前键，右转减 L+cnt；删除一个副本或整个节点都会使沿途 size 改变，完整节点删除还可能触发 AVL 旋转。"
+    }
+  ]
+}
