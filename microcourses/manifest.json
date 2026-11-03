@@ -1341,12 +1341,33 @@
         "microarchitectural-state",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-015",
+      "track": "algo",
+      "number": 15,
+      "date": "2026-11-03",
+      "week": 3,
+      "title": "算法与数据结构第15课：秩统计树——用子树大小支持第 k 小与排名",
+      "abstract": "在 AVL 树上维护 size，设计 SELECT 与 RANK，证明旋转后的局部信息更新及最坏对数复杂度。",
+      "file": "lessons/algo-015.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "AVL",
+        "order-statistic-tree",
+        "subtree-size",
+        "select",
+        "rank",
+        "rotation"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-03",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-015",
     "opt-015",
     "ai-015"
   ],
