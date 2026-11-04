@@ -1455,12 +1455,34 @@
         "versioning",
         "structural-sharing"
       ]
+    },
+    {
+      "id": "opt-016",
+      "track": "opt",
+      "number": 16,
+      "date": "2026-11-04",
+      "week": 3,
+      "title": "数学优化理论·第16课：Nesterov 加速梯度法与 O(1/k²) 收敛",
+      "abstract": "讲解凸 Smooth 优化中 Nesterov 三序列 AGD，构造可望远镜求和的势函数，严格证明最后一步 O(1/k²) 收敛，分析数值迭代与错误动量反例。",
+      "file": "lessons/opt-016.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "nesterov",
+        "accelerated-gradient",
+        "convexity",
+        "smoothness",
+        "potential-function",
+        "convergence"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-04",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-016",
     "ai-016"
   ],
   "orphanQuizzes": []
