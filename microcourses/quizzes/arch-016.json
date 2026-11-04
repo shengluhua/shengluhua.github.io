@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "arch-016",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某条间接跳转的真实寄存器目标直到执行阶段才知道，前端此前预测了另一个PC。哪一项最严谨？",
+      "options": [
+        "既然间接跳转方向已确定为Taken，目标预测必然正确。",
+        "可以暂沿预测目标取指；当真实目标不一致时，必须恢复错误年轻路径，不允许其产生不正确的架构提交。",
+        "返回地址预测栈RSB能保证任意间接JMP的目标绝对正确。",
+        "错误路径的指令只要写回物理寄存器，就必须视为已退休。"
+      ],
+      "answer": 1,
+      "hint": "把“能提前Fetch”与“允许最终Commit”分成两个判断，再区分间接JMP和RET。",
+      "explanation": "方向Taken并不能给出运行时目标；目标不一致时要Squash错误年轻路径并重定向，ROB保证架构提交正确。RSB主要为RET服务，Writeback不等于Retire。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "教学模型CALL均为4字节、RSB容量至少4且初始空；正确路径CALL A位于0x410、A内CALL B位于0x728、B内错误路径投机CALL C位于0xA10后被Squash，RSB在Squash时完整恢复。B执行RET，预测返回PC转换成十进制是多少？",
+      "answer": 1836,
+      "tolerance": 0,
+      "unit": "十进制PC",
+      "hint": "每个CALL把下一指令地址入栈；错误路径那次入栈撤销后取正确栈顶。",
+      "explanation": "两次有效CALL依次压入0x414和0x72C；错误路径0xA14被恢复撤销。因此B的RET预测0x72C，即7×256+2×16+12=1836。此处4B CALL仅为教学模型。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "根据本课教学模型与官方硬件/内核缓解文档，哪些陈述正确？",
+      "options": [
+        "间接CALL的目标可来自寄存器或内存，前端可以利用目标预测器提前获得候选下一PC。",
+        "两个分支PC落入BTB同组，已经足以证明跨安全域的秘密泄漏真实存在。",
+        "RSB对于正常嵌套CALL/RET很有用；错误路径CALL的预测状态及下溢行为都需要考虑。",
+        "Retpoline在满足相关微架构前提时通过捕获RET的投机目标限制适用间接分支投机；不能因此保证所有Spectre变种已解决。",
+        "enhanced IBRS保证所有CPU、所有配置和所有Spectre v1/v2/BHI变体均无需其他分析。",
+        "IBPB与STIBP面对的隔离情形不同：前者强调屏障前后预测影响，后者涉及同物理核Sibling线程。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        5
+      ],
+      "hint": "检查同组冲突到秘密泄漏所缺的条件；再分别核对RSB、Retpoline及IBPB/STIBP所约束的对象。",
+      "explanation": "A/C/D/F成立。BTB同组不等于跨域注入能力、瞬态秘密依赖与可观察通道均成立。Retpoline有RSB下溢和硬件适用性限制，eIBRS也不是所有Spectre及BHI威胁的无条件完美证明。IBPB面向前后执行影响的屏障，STIBP面向同核Sibling线程影响。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "完成四部分：A(12) BTB 4组2路LRU、初始空、set=(PC>>2) mod4，A=0x100,B=0x110,C=0x120，按A→B→A→C→B→A查询，列Hit/Miss、替换、总Miss并解释冲突≠泄漏。B(10) 4B CALL正确路径0x400、0x700，错误路径0x900后Squash，恢复RSB并连续两个RET，列预测PC及下溢边界。C(10) 多租户间接调用BTI风险条件、Retpoline适用范围与v1区别，以及IBPB/STIBP隔离场景。D(8) 200000指令，10%间接；A目标Miss5%、12周期独立代价、基线CPI1；B按题设有效缓解后不再计A的Miss代价，但每间接分支独立加1.5周期；分别算总周期/CPI，解释性能≠安全。",
+      "hint": "BTB按组内LRU逐步更新，RSB只留下正确CALL历史；两配置分别计算额外周期，不把已替代的预测机制代价重复加上。",
+      "rubric": [
+        "A(12)：同组/Tag判断、逐项LRU踪迹和正确Miss数（9）；说明性能冲突不证明威胁链与秘密泄漏（3）。",
+        "B(10)：错误CALL状态被撤销；正确的两级返回地址顺序（6）；RSB下溢/替代预测与不同硬件限制（4）。",
+        "C(10)：至少三类风险必要条件如影响预测、可达瞬态路径、秘密依赖、可观察通道/信任边界（5）；Retpoline不是v1保护且有CPU前提（3）；IBPB/STIBP区分（2）。",
+        "D(8)：A与B两份独立周期账本及CPI正确（6）；明确速度不能替代缓解有效性证据（2）。"
+      ],
+      "model_answer": "A：三PC均映射set0，查询A miss填A，B miss填B，A hit使B成为LRU，C miss替换B，B miss替换A，A miss替换C，共5次miss；同组仅说明容量竞争，需要预测影响、秘密相关路径和观测才能讨论泄漏。B：真实CALL压0x404和0x704；错误路径0x904撤销。先返回0x704，再返回0x404；下溢时某些处理器可能改用其他预测，不能普遍保证。C：至少区分跨域影响能力、受害间接调用与瞬态代码、受保护信息依赖和可观测侧信道；Retpoline在有效RSB模型下限制适用间接CALL/JMP目标，不能取代条件分支v1的边界修复。IBPB隔离屏障前后间接预测影响，STIBP限制同物理核Sibling线程影响。D：A有200000×0.1×0.05=1000次miss，额外12000周期，总212000，CPI1.06。B有20000间接×1.5=30000额外周期，总230000，CPI1.15。两配置代价口径是题设反事实；真实Retpoline成本、风险及适用性均需独立核验。"
+    }
+  ]
+}
