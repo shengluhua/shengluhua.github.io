@@ -1407,10 +1407,41 @@
         "causal-mask",
         "complexity"
       ]
+    },
+    {
+      "id": "arch-016",
+      "track": "arch",
+      "number": 16,
+      "date": "2026-11-04",
+      "week": 3,
+      "title": "第16课｜间接分支预测的信任边界：BTB、RSB与Retpoline",
+      "abstract": "区分间接分支真实目标与预测目标、BTB与返回地址栈；推导组相联BTB的冲突与性能成本，解释Spectre v2目标注入、Retpoline的工作机理、RSB下溢边界，以及eIBRS/IBPB/STIBP的不同作用。",
+      "file": "lessons/arch-016.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "indirect-branch",
+        "BTB",
+        "RSB",
+        "branch-target-injection",
+        "Spectre-v2",
+        "retpoline",
+        "eIBRS",
+        "IBPB",
+        "STIBP",
+        "speculative-execution",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-03",
+  "indexVerifiedOn": "2026-11-04",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-016",
+    "opt-016",
+    "ai-016"
+  ],
   "orphanQuizzes": []
 }
