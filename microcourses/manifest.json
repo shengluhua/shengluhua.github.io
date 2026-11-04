@@ -1478,12 +1478,32 @@
         "potential-function",
         "convergence"
       ]
+    },
+    {
+      "id": "ai-016",
+      "track": "ai",
+      "number": 16,
+      "date": "2026-11-04",
+      "week": 3,
+      "title": "人工智能：理论、算法与系统 · 第16课｜Multi-Head Attention 与 Transformer Block",
+      "abstract": "从单头注意力推导多头投影、Concat、输出投影、参数与 FLOPs，组装 Pre-Norm Decoder Block 并比较 MHA/GQA 的 KV Cache。",
+      "file": "lessons/ai-016.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "人工智能",
+        "Transformer",
+        "MultiHeadAttention",
+        "FFN",
+        "PreNorm",
+        "GQA"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-04",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-016"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
