@@ -1434,12 +1434,32 @@
         "speculative-execution",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-016",
+      "track": "algo",
+      "number": 16,
+      "date": "2026-11-04",
+      "week": 3,
+      "title": "算法与数据结构第16课：持久化线段树——路径复制与历史版本区间和",
+      "abstract": "以区间求和线段树为基础，用路径复制保存历史版本，证明单点更新、区间查询及结构共享的正确性与复杂度。",
+      "file": "lessons/algo-016.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "persistent-segment-tree",
+        "path-copying",
+        "range-sum",
+        "versioning",
+        "structural-sharing"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-04",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-016",
     "opt-016",
     "ai-016"
   ],
