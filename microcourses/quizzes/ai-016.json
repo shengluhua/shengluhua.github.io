@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "ai-016",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "固定模型宽度 d、总 Q/K/V 投影宽度均为 d，考虑标准 Multi-Head Self-Attention（MHA）。以下哪项机制解释最准确？",
+      "options": [
+        "每个 Head 被人工指定一个固定的语法功能，训练时功能不会变化。",
+        "拆成 H 个 Head 之后，所有 Head 必须共用完全相同的 Softmax 权重，否则无法拼接。",
+        "不同 Head 可用不同 Q/K/V 投影产生不同的注意力分布；拼接后用可学习的输出投影混合信息，但更多 Head 不保证质量一定更好。",
+        "只要把 Head 数 H 翻倍，MHA 的 Q/K/V 与输出投影参数量就必然翻倍，即使总投影宽度 d 不变。"
+      ],
+      "answer": 2,
+      "hint": "把“各 Head 的权重是否共享”“输出如何恢复 d 维”“参数量是否与 H 直接成正比”分开判断。",
+      "explanation": "标准 MHA 为每个 Head 学习不同投影并分别执行注意力，再 Concat 和 W_O；固定 d、d_h=d/H 时 Q/K/V 与 W_O 的权重总数约 4d²，与 H 无直接线性关系。分头是表示与优化上的归纳偏置，不保证必然更优。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个含两个 Head 的注意力模块处理两个 token。我们只计算第 2 个 token 的输出，两个位置对它均合法。Head 1 的 scaled logits 为 (\\ln 3,0)，对应两个二维 Value 为 (2,0)、(0,4)；Head 2 的 scaled logits 为 (0,\\ln 3)，对应两个二维 Value 为 (0,6)、(2,0)。每个 Head 分别 Softmax、加权求和，再按 Head 1、Head 2 顺序拼接成四维行向量 c。输出投影 W_O 的第一列为 (1,2,-1,1)^\\top。求最终输出的第 1 个坐标 (cW_O)_1，填写十进制数。",
+      "answer": 3.5,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先分别由 e^{ln3}=3 得到每个 Head 的两项权重，再计算两个二维向量，最后拼接并与 W_O 第一列做点积。",
+      "explanation": "Head 1 权重 (3/4,1/4)，输出 (3/2,1)；Head 2 权重 (1/4,3/4)，输出 (3/2,3/2)。因此 c=(1.5,1,1.5,1.5)，投影首坐标为 1.5+2×1−1.5+1.5=3.5。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "对标准密集 MHA，假定 d=Hd_h、Q/K/V 总宽度均为 d、FFN 中间宽度 d_ff=4d、忽略 bias/Norm。输入为 [B,T,d]，且用常规稠密投影。下列哪些判断成立？（多选）",
+      "options": [
+        "Q、K、V 与输出投影 W_O 的总权重参数量为 4d²，不会仅因为固定 d 时更改 H 就自动改变。",
+        "若朴素实现显式物化所有 Head 的 T×T 注意力权重，则其元素数为 BHT²。",
+        "因为拆成 H 个 Head，固定 d 时注意力 QKᵀ 和 PV 的总算术量必然从 Θ(BT²d) 增加到 Θ(BHT²d)。",
+        "两层常规位置独立 FFN 的权重参数量为 8d²，而这两个线性变换不会直接让不同 token 相互混合。",
+        "添加因果掩码后，任何注意力实现的渐近算术复杂度都会从 T² 严格降到 T。",
+        "即使改用分块的精确 Attention 而不把完整权重矩阵落到 HBM，标准密集 Attention 的两两交互算术量仍为二次量级。"
+      ],
+      "answer": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "hint": "令 d_h=d/H，将每个 Head 的 Θ(T²d_h) 乘以 H；把 FFN 的两个矩阵形状写出来；区分算术次数与中间矩阵是否写入 HBM。",
+      "explanation": "QKV+W_O 各 d×d 共 4d²；显式注意力权重是 BHT²；H×Θ(BT²d/H)=Θ(BT²d)；FFN d→4d→d 两矩阵共 8d² 且逐 token 执行。Causal mask 不自动消除二次交互；FlashAttention 类分块精确实现主要优化 IO 与物化方式。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设计一个宽度为 d、H 个 Query Head、每头维度 d_h=d/H 的 Pre-Norm Decoder Transformer Block，输入 X∈ℝ^{B×T×d}，采用标准 MHA 与 d_ff=4d 的两层 FFN。\n\nA（12 分）：写出从 X 到每个 Head 的 Q/K/V、含因果 Mask 的 scaled softmax、Concat 与 W_O 的全套公式和张量形状，解释为什么 Softmax 必须在每个 Head 内对 Key 位置计算。\n\nB（10 分）：在忽略 bias 和 Norm 参数的前提下，推导该 Block 的注意力与 FFN 权重参数量，以及投影、Attention 两两交互和 FFN 的主要算术复杂度；固定 d 时说明 H 改变对理论算术量与实际 GPU 性能的不同影响。\n\nC（10 分）：写出 Pre-Norm 的两个残差更新，解释 identity 梯度路径及其边界；提出一个反例或受控比较，说明多头并不保证一定优于单头。\n\nD（8 分）：设计 MHA（H 个 Q/K/V Head）与 GQA（H 个 Query Head、G 个 KV Head，其中 G 整除 H）在自回归推理中的公平对照实验。推导单层 KV Cache 元素数，说明如何测量 prefill、逐 token decode、峰值显存和质量，并给出至少两项需要控制的变量。",
+      "hint": "A 跟踪 [B,H,T,d_h] 与 [B,H,T,T]；B 分别数矩阵乘法与矩阵元素；C 区分单块显式 I 与端到端谱；D 用缓存 K 和 V 两份、KV Head 数 G 建立公式。",
+      "rubric": [
+        "A（12分）：完整写出 Q/K/V、因果 Mask、各 Head softmax、Concat/W_O 的正确公式与形状，并说明行归一化。",
+        "B（10分）：正确推导 MHA 4d²、FFN 8d²、投影/FFN Θ(BTd²) 与注意力 Θ(BT²d)，区分 H 与实际 Kernel 开销。",
+        "C（10分）：准确描述 Pre-Norm 双残差结构、Jacobian identity 路径及局限，提出不保证多头优势的合理反例/对照。",
+        "D（8分）：写出 MHA KV=2BTHd_h、GQA KV=2BTGd_h（元素/层），有合理的固定条件与质量/延迟/内存评估。"
+      ],
+      "model_answer": "设 X 为 B×T×d，W_Q/W_K/W_V∈R^{d×d}。投影并 reshape 到 B×H×T×d_h；每头 A_h=softmax_key(Q_h K_h^T/√d_h+M)，O_h=A_h V_h；Concat(O_h)∈R^{B×T×d}，再乘 W_O∈R^{d×d}。W_Q/W_K/W_V/W_O 共 4d²，FFN W_1∈R^{d×4d},W_2∈R^{4d×d} 共 8d²；投影/FFN Θ(BTd²)，交互 Θ(BT²d)。PreNorm: U=X+MHA(N_1(X)),Y=U+FFN(N_2(U))；J=I+分支导数，不给最小奇异值保证。例如复制相同 Head 且 W_O 合并为同一个输出，或将所有 Head 输出权重设零，头数增加无保证。MHA 单层缓存元素为 2BTHd_h，GQA 为 2BTGd_h，按相同序列、batch、精度、模型预算与质量阈值测 prefill/decode、吞吐、HBM、质量；比较时说明 GQA 训练/转换方案可能影响质量。"
+    }
+  ]
+}
