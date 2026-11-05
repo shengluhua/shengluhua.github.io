@@ -1573,12 +1573,33 @@
         "restart",
         "potential-function"
       ]
+    },
+    {
+      "id": "ai-017",
+      "track": "ai",
+      "number": 17,
+      "date": "2026-11-05",
+      "week": 3,
+      "title": "人工智能：理论、算法与系统 · 第17课｜位置编码、置换等变性与 RoPE",
+      "abstract": "证明无位置 Self-Attention 的置换等变性，推导绝对正弦位置编码与 RoPE 的相对旋转点积，分析 causal mask、KV Cache 与长上下文外推边界。",
+      "file": "lessons/ai-017.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "人工智能",
+        "Transformer",
+        "PositionalEncoding",
+        "RoPE",
+        "Attention",
+        "CausalMask",
+        "LongContext"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-05",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-017"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
