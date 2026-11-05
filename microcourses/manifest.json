@@ -1500,10 +1500,42 @@
         "PreNorm",
         "GQA"
       ]
+    },
+    {
+      "id": "arch-017",
+      "track": "arch",
+      "number": 17,
+      "date": "2026-11-05",
+      "week": 3,
+      "title": "第17课｜控制流完整性与瞬态执行：CET-IBT、Shadow Stack与预测器隔离",
+      "abstract": "从合法控制流集合出发，区分CET间接分支跟踪IBT、返回地址Shadow Stack、微架构RSB和Spectre目标预测隔离；推导控制保护与性能开销，设计跨层验证。",
+      "file": "lessons/arch-017.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "CET",
+        "IBT",
+        "ENDBR64",
+        "shadow-stack",
+        "RSB",
+        "CFI",
+        "Spectre-v2",
+        "BHI",
+        "eIBRS",
+        "IBPB",
+        "speculative-execution",
+        "control-protection"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-04",
+  "indexVerifiedOn": "2026-11-05",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-017",
+    "opt-017",
+    "ai-017"
+  ],
   "orphanQuizzes": []
 }
