@@ -1550,12 +1550,34 @@
         "invariant",
         "persistence"
       ]
+    },
+    {
+      "id": "opt-017",
+      "track": "opt",
+      "number": 17,
+      "date": "2026-11-05",
+      "week": 3,
+      "title": "数学优化理论·第17课：强凸 Nesterov 加速、条件数与可证明重启",
+      "abstract": "证明强凸三序列 AGD 的势函数几何收缩，比较 GD 与 AGD 的条件数复杂度，给出有保证的周期重启、两轮数值计算和目标值非单调反例。",
+      "file": "lessons/opt-017.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "strong-convexity",
+        "nesterov",
+        "accelerated-gradient",
+        "condition-number",
+        "restart",
+        "potential-function"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-05",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-017",
     "ai-017"
   ],
   "orphanQuizzes": []
