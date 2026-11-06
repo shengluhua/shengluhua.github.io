@@ -1668,12 +1668,33 @@
         "convergence",
         "strong-convexity"
       ]
+    },
+    {
+      "id": "ai-018",
+      "track": "ai",
+      "number": 18,
+      "date": "2026-11-06",
+      "week": 3,
+      "title": "人工智能：理论、算法与系统 · 第18课｜Decoder-only 自回归目标与 Teacher Forcing",
+      "abstract": "从 token id 到 causal Decoder、LM head 和 token 交叉熵，推导自回归概率、标签移位、Softmax 梯度，理解 teacher forcing 并行训练与 KV Cache 增量推理边界。",
+      "file": "lessons/ai-018.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "人工智能",
+        "Transformer",
+        "DecoderOnly",
+        "TeacherForcing",
+        "CrossEntropy",
+        "Autoregressive",
+        "KVCache"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-06",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-018"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
