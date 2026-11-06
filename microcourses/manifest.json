@@ -1644,12 +1644,35 @@
         "offline-dynamic-connectivity",
         "persistence"
       ]
+    },
+    {
+      "id": "opt-018",
+      "track": "opt",
+      "number": 18,
+      "date": "2026-11-06",
+      "week": 3,
+      "title": "数学优化理论·第18课：Armijo 回溯线搜索与未知 Smooth 常数",
+      "abstract": "从下降引理推导 Armijo 充分下降与 Backtracking 有限终止；证明统一正步长下界、非凸近似驻点和强凸几何收敛；通过二维二次函数数值回溯与反例辨析线搜索与 AGD。",
+      "file": "lessons/opt-018.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "gradient-descent",
+        "armijo",
+        "backtracking",
+        "line-search",
+        "smoothness",
+        "convergence",
+        "strong-convexity"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-06",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-018",
     "ai-018"
   ],
   "orphanQuizzes": []
