@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "ai-018",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "在 Decoder-only 自回归语言模型中，关于 teacher forcing、causal mask 和真实生成过程，哪项说法最准确？",
+      "options": [
+        "因为训练时已经知道整句目标，teacher forcing 不必使用 causal mask，也不会发生目标泄漏。",
+        "位置 t 的训练输入直接包含目标 x_(t+1)，因此预测它不算信息泄漏。",
+        "Teacher forcing 用真实历史 token 作输入，可在正确因果掩码下并行计算多个位置的条件分布；自回归生成仍必须按已生成前缀逐步确定新 token。",
+        "LM head 对所有位置必然输出相同的概率分布，因此能并行计算并无实际意义。"
+      ],
+      "answer": 2,
+      "hint": "区分“已知整段训练数据”“每个位置合法可见的前缀”和“生成时尚未确定的未来 token”。",
+      "explanation": "自回归因子分解要求位置 t 预测下一个 token 时仅依赖已知前缀。Teacher forcing 在输入端使用真实前缀，因此可以一次前向算所有位置的预测分布；causal mask 保证较早位置看不到后面的输入 token。生成时下一个输入依赖刚生成的 token，存在跨步依赖。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "词表大小 V=3（索引 0、1、2）。一个样本的三个位置的目标索引依次为 [1,2,忽略]，有效掩码 m=[1,1,0]。前两个位置的 logits 分别为 (0,ln 2,0) 与 (0,0,ln 3)，第三位置任意。使用自然对数、按有效 token 数平均的交叉熵 L=−Σ_t m_t log p_t(y_t)/Σ_t m_t。求 L 的十进制数值（至少四位小数）。",
+      "answer": 0.6019864021629681,
+      "tolerance": 0.0001,
+      "unit": "",
+      "hint": "分别指数化得到两行正确标签概率；第三行不计入分子和分母，分母不是序列长度 3。",
+      "explanation": "第一行 exp logits=(1,2,1)，正确索引 1 的概率 2/4=1/2；第二行=(1,1,3)，正确索引 2 的概率 3/5；最后一行忽略。L=[−ln(1/2)−ln(3/5)]/2=ln(10/3)/2≈0.6019864，容差 1e−4。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "设输入形状 [B,T,d]，H 个 Head，标准密集 causal Self-Attention，词表大小 V，训练使用正确移位标签；在推理阶段采用标准 KV Cache。以下哪些判断成立？（多选）",
+      "options": [
+        "一个训练前向中，虽然位置 t 不能看到未来 token，仍能在同一层并行计算多个位置的 Query 及注意力输出；朴素的全部头得分张量有 BHT² 个元素。",
+        "用输入位置 t 的 logits 预测同一位置的输入 token x_t，总能构成正确的 next-token 训练目标。",
+        "KV Cache 允许增量 decode 复用历史 K/V，避免为已处理 token 反复进行全部层的 K/V 投影，但新 Query 通常仍需与允许的历史 Key 做交互。",
+        "若显式保存每位置的全词表 logits，其张量元素数为 BTV，输出头密集乘法的典型算术量级为 Θ(BTdV)。",
+        "使用因果三角 mask 后，任意密集精确 Attention 的训练计算量都严格从 Θ(T²) 变成 Θ(T)。",
+        "使用真实前缀的 teacher forcing，可以一次前向获得序列各有效位置的 next-token 条件分布，而不需要先采样前一个预测 token。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        5
+      ],
+      "hint": "将训练同层的矩阵计算、标签移位、逐步生成的时间依赖、KV Cache 的复用范围，以及显式 logits 的形状分别判断。",
+      "explanation": "A 正确：同层位置可并行，朴素 score 形状 [B,H,T,T]；B 错：应预测下一 token，而非直接复述本位置已知输入；C 正确：缓存历史 K/V 仍要对过去 Key 计算新 token 的注意力；D 正确：全 logits 形状和矩阵计算量如述；E 错：causal mask 并不把密集两两交互自动降到线性；F 正确：teacher forcing 已有真实前缀，同时 causal mask 防止跨位置泄漏。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "综合推导题（40 分）。A（12 分）：给定 BOS、真实 token x₁…x_T 及 EOS，写出自回归联合概率的链式分解，构造训练输入/移位标签，并证明在每层仅使用 causal Attention、逐 token Norm/FFN 和残差的条件下，位置 t 的 logits 不会依赖未来输入。B（10 分）：从 logits z∈R^V 推导单 token 交叉熵 ℓ=−log softmax(z)_y 的 log-sum-exp 形式和对 z_k 的梯度；写出含忽略位置掩码的全批损失。C（10 分）：解释为何一次 teacher-forcing 前向可并行计算多个位置，而自回归采样必须跨步顺序依赖；分别给出单层密集训练注意力 O(T²d)、缓存增量 decode 第 t 步 O(t d)（只计主要注意力两两交互）、长度 T 的 KV 存储量表达式并注明假设。D（8 分）：设计两个验证实验：未来 token 扰动不应改变较早位置 logits；正确 KV Cache 与全前缀重算在 eval、固定位置 id 下应数值接近。说明控制变量及检查指标。",
+      "hint": "A 从 p(x₁,…,EOS|BOS) 的链式法则和逐层归纳入手；B 用 −z_y+logΣe^z；C 区分同层位置并行与跨生成步依赖；D 先固定 dropout、mask、位置索引再比较 logits。",
+      "rubric": [
+        "A（12分）：链式分解含 EOS 与 BOS 条件 4 分；shifted inputs/labels 对齐 4 分；利用 causal mask 与位置独立操作逐层归纳说明无未来泄漏 4 分。",
+        "B（10分）：交叉熵 log-sum-exp 形式 3 分；准确推导 p_k−1[k=y] 4 分；有效 token 掩码归一化损失 3 分。",
+        "C（10分）：teacher forcing 同层并行但生成跨步依赖 4 分；明确训练 O(T²d) 与增量第 t 步 O(td) 的关注范围 3 分；单层缓存 2 B T H_kv d_h 元素及假设 3 分。",
+        "D（8分）：未来扰动的前缀 logits 不变测试 4 分；KV Cache 与全前缀复算的一致性测试且控制 eval/mask/position ids/精度 4 分。"
+      ],
+      "model_answer": "设输入 [BOS,x₁,…,x_T]，目标 [x₁,…,x_T,EOS]，则 p(x₁,…,x_T,EOS|BOS)=∏_{t=1}^{T+1}p(x_t|BOS,x₁,…,x_{t−1})，令 x_{T+1}=EOS。归纳：输入位置 t 只含第 t 个已知 token，因果 Attention 限制读取位置 ≤t；Norm、FFN 与残差若逐 token 运算不引入未来依赖，故所有层第 t 行隐藏态和 logits 仅依赖输入前缀 ≤t。ℓ(z,y)=−z_y+logΣ_j e^{z_j}，∂ℓ/∂z_k=softmax(z)_k−1[k=y]。批量掩码损失 L=−(Σ_{b,t}m_{bt}log pθ(y_{bt}|合法前缀))/(Σ_{b,t}m_{bt})。Teacher forcing 真实输入完整、因果掩码保证合法，位置可在同层并行；生成下一步输入需上一 token 的选择，不能跨生成步同样并行。单层密集 Attention 前向交互 Θ(T²d)，缓存 decode 单 Query 对 t Keys Θ(td)，单层 KV 量 2BTH_kv d_h 元素（K/V Head 相同维度，无额外存储开销）。测试：固定相同前缀，改变其后的 token，比较前缀 logits 应数值不变；固定 eval、token ids、position ids、mask、精度，把缓存增量生成逐步 logits 与全前缀复算 logits 对比最大绝对/相对差及输出 token，一致性容差考虑浮点运算差异。"
+    }
+  ]
+}
