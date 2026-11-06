@@ -46,7 +46,7 @@ FIND(x):
 UNION(x,y):
     a=FIND(x); b=FIND(y)
     if a==b: return false
-    if size[a] > size[b]: swap(a,b)
+    if size[a] >= size[b]: swap(a,b)
     # 此时 a 的集合不大于 b
     parent[a]=b
     size[b]+=size[a]
@@ -75,7 +75,7 @@ FIND(x):                            # 绝不做路径压缩
 UNION(x,y):
     a=FIND(x); b=FIND(y)
     if a==b: return false           # 无修改，不压栈
-    if size[a]>size[b]: swap(a,b)
+    if size[a]>=size[b]: swap(a,b)
     history.push((a,b,size[b]))     # 修改前记录旧值
     parent[a]=b
     size[b]+=size[a]
@@ -100,7 +100,7 @@ ROLLBACK(s):                        # s 必须是当前分支的有效祖先快�
 
 ### 五、完整 Trace：合并、快照、撤销、再分叉（约 3 分钟）
 
-设 n=6。为了让父指针易读，两个集合大小相等时约定“第一个 FIND 得到的根做父根”（等价于只在 size[a]<size[b] 时交换实现）；不影响集合划分与复杂度。
+设 n=6。为了让父指针易读，两个集合大小相等时约定“第一个 FIND 得到的根做父根”（上述伪代码在 size[a]>=size[b] 时交换，保证相等时原先第一个根成为父根）；不影响集合划分与复杂度。
 
 | 步骤 | 操作 | history 长度 | components | 连通块 |
 |---|---|---:|---:|---|
