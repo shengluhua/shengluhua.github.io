@@ -1596,12 +1596,40 @@
         "CausalMask",
         "LongContext"
       ]
+    },
+    {
+      "id": "arch-018",
+      "track": "arch",
+      "number": 18,
+      "date": "2026-11-06",
+      "week": 3,
+      "title": "第18课｜投机窗口与关键路径：分支解析延迟、ROB容量和安全检查放置",
+      "abstract": "用事件时间线与资源约束推导分支投机窗口、错误路径可分配年轻指令上界；比较缩短分支关键路径、检查后投机屏障及安全地址约束的安全/性能权衡。",
+      "file": "lessons/arch-018.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "speculation-window",
+        "branch-resolution",
+        "ROB",
+        "critical-path",
+        "LFENCE",
+        "bounds-check",
+        "Spectre-v1",
+        "out-of-order",
+        "performance",
+        "memory-model"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-06",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
-  "orphanQuizzes": [
-    "arch-018"
-  ]
+  "missingLessons": [
+    "algo-018",
+    "opt-018",
+    "ai-018"
+  ],
+  "orphanQuizzes": []
 }
