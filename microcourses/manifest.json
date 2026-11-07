@@ -1761,12 +1761,34 @@
         "zoutendijk",
         "convergence"
       ]
+    },
+    {
+      "id": "ai-019",
+      "track": "ai",
+      "number": 19,
+      "date": "2026-11-07",
+      "week": 3,
+      "title": "人工智能：理论、算法与系统 · 第19课｜Encoder-only、Decoder-only 与 Encoder–Decoder",
+      "abstract": "比较 BERT 式双向 Encoder、GPT 式因果 Decoder 和 T5 式 Encoder–Decoder，推导 MLM/条件生成、Cross-Attention Mask、计算复杂度及缓存机制。",
+      "file": "lessons/ai-019.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "人工智能",
+        "Transformer",
+        "BERT",
+        "GPT",
+        "T5",
+        "MLM",
+        "CrossAttention",
+        "EncoderDecoder"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-07",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-019"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
