@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "lesson_id": "ai-019",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "关于 BERT-style MLM、Decoder-only 自回归训练和 T5-style Encoder–Decoder，以下哪项机制判断最准确？",
+      "options": [
+        "MLM 使用双向注意力，所以直接将全部未扰动原文送入 Encoder 并预测原词，也天然不会发生目标泄漏。",
+        "原始 BERT 先选择 MLM 监督位置，再对这些位置实施输入扰动；选中位置不一定全部替换为 [MASK]。标准 Decoder-only 的 Next-Token 目标则用移位标签和因果可见性。",
+        "Decoder-only 的下三角因果 Mask 允许位置 i 读取 i+1 的真实输入，因而与双向 Encoder 可见性相同。",
+        "Encoder–Decoder 已能通过 Cross-Attention 读取源序列，Decoder 的 Self-Attention 因而无需因果 Mask。"
+      ],
+      "answer": 1,
+      "hint": "辨别监督位置、输入是否被扰动、Decoder 对未来目标是否可见这三件事。",
+      "explanation": "原始 BERT 约选择 15% 的 token 位置作为监督，其中 80% 换为 [MASK]、10% 随机替换、10% 保持原样；监督集合不等同于实际 [MASK] 集合。Next-Token 的 Decoder 通过移位和下三角 Mask 避免读取未来输入。即使 Decoder 可以读取完整源序列，内部仍不能读取未来目标。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个单头 Cross-Attention 的 Decoder Query 为 q=(√2,0)，Encoder 的三个 Key 依次为 k₁=(ln2,0)、k₂=(0,0)、k₃=(ln3,0)，d_k=2；对应的标量 Value 为 v₁=1、v₂=4、v₃=7，所有源位置均合法。计算 o=softmax(qKᵀ/√d_k)V，填写十进制数。",
+      "answer": 4.5,
+      "tolerance": 0.000001,
+      "unit": "",
+      "hint": "先求缩放后的三个 logits；求指数、逐行归一化，再对三个 Value 加权求和。",
+      "explanation": "缩放 logits=(ln2,0,ln3)，指数为 (2,1,3)，Softmax 权重为 (2/6,1/6,3/6)，输出 (2×1+1×4+3×7)/6=27/6=4.5，允许绝对误差 10⁻⁶。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "源长 S、目标长 U、批量 B、Head 合计宽度 d，假定标准稠密注意力且只统计 QKᵀ 与 AV 两两交互，不计投影。Encoder–Decoder 的 Encoder 双向、Decoder 因果，Cross-Attention 由 Decoder Query 读取 Encoder K/V；Decoder-only 把源和目标前缀拼成长度 S+U 的因果序列。下列哪些陈述成立？（多选）",
+      "options": [
+        "Encoder Self-Attention、Decoder Self-Attention 和 Cross-Attention 的主要交互复杂度分别为 Θ(BS²d)、Θ(BU²d)、Θ(BUSd)。",
+        "Cross-Attention logits 一定为 U×U，因为它的 Q/K/V 全部来自 Decoder。",
+        "若缓存 Encoder 输出与投影后的 Cross K/V，生成一个新目标 token 的单层 Cross-Attention 仍需约 Θ(BSd) 的两两交互。",
+        "Decoder-only 将源和目标串联后，注意力成本严格是 Θ(B(S²+U²)d)，不存在目标访问源位置的交互项。",
+        "只在选中位置求和的 MLM 损失不能直接等同于标准左到右整句联合分布的负对数似然。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "先写每个 QKᵀ 的行列长度；再区分仅监督部分位置的条件预测与对完整序列的自回归链式分解。",
+      "explanation": "A 正确：源 Self 为 S×S，目标 Self 为 U×U，Cross 为 U×S。B 错：Cross 的 Query 来自 Decoder，Key/Value 来自 Encoder，logits 是 U×S。C 正确：单个新 Query 仍须读取 S 个源位置的 K/V。D 错：目标对源的访问存在 SU 规模交互，整段还涉及 (S+U)² 尺度。E 正确：MLM 是条件重建选中位置，并非直接定义标准自回归联合概率。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "综合推导与实验（40 分）。A（12 分）：源长 3、目标 Decoder 输入长 2，分别写出 Encoder 双向 Self-Attention、Decoder 因果 Self-Attention、Decoder→Encoder Cross-Attention 的可见性矩阵（用 0 和 −∞ 表示），并写出 Cross-Attention 的 Q/K/V 来源及尺寸。B（10 分）：推导 BERT-style MLM 对选中集合 M 的条件交叉熵，以及给定源 x 的 Seq2seq 在 Teacher Forcing 下对目标 y₁…y_U 与 EOS 的概率分解；指出两者为何不是同一种联合生成目标。C（10 分）：求三类注意力两两交互的复杂度，并解释在自回归 Decode 时 Encoder 输出及 Cross K/V 缓存的收益和仍存在的成本。D（8 分）：设计在分类、翻译、单词/片段填空上比较三架构的公平实验，给出标签泄漏检查、预算控制、质量与显存/延迟指标，并识别架构和训练目标的混杂因素。",
+      "hint": "A：矩阵行是 Query、列是 Key；B：先明确 MLM 只对选中位置算损失；C：Cross 的 Query 长 U、Key 长 S；D：不能用现成不同规模的 BERT/GPT/T5 直接证明架构优劣。",
+      "rubric": [
+        "A（12 分）：Encoder 3×3 全可见 4 分；Decoder 2×2 因果下三角 4 分；Cross 2×3 全源可见及 Q/K/V 来源 4 分。",
+        "B（10 分）：MLM 扰动输入及在 M 上的平均条件 NLL 4 分；Seq2seq 带 EOS 的自回归条件联合概率、Teacher Forcing 移位 4 分；说明两目标不同 2 分。",
+        "C（10 分）：分别给出 Θ(BS²d)、Θ(BU²d)、Θ(BUSd) 6 分；说明源仅编码一次、Cross K/V 可缓存、仍需每步读取 S 个源 Key/Value 4 分。",
+        "D（8 分）：固定/匹配数据与 tokenizer、参数或 FLOPs、预算及调参机会 3 分；分类/翻译/填空指标匹配 2 分；mask 泄漏检查、多种子、延迟/显存与架构—目标混杂分析 3 分。"
+      ],
+      "model_answer": "A：M_enc=[[0,0,0],[0,0,0],[0,0,0]]；M_dec=[[0,−∞],[0,0]]；M_cross=[[0,0,0],[0,0,0]]。Cross 的 Q 来自 Decoder 当前状态投影，形状 [B,2,d_k]；K/V 来自 Encoder 输出投影，形状 [B,3,d_k] 与 [B,3,d_v]；Logits [B,2,3]。B：令 x̃ 为扰动输入，L_MLM=−(1/|M|)∑_{i∈M}log pθ(x_i|x̃)；Seq2seq pθ(y₁,…,y_U,EOS|x)=∏_{t=1}^{U+1}pθ(y_t|y_<t,x)，训练时 Decoder 输入 [BOS,y₁,…,y_U]、目标 [y₁,…,y_U,EOS]。MLM 不直接提供左到右联合概率。C：三种交互量分别为 Θ(BS²d)、Θ(BU²d)、Θ(BUSd)。源编码可复用，Cross K/V 可跨生成步缓存；新 Query 仍须与 S 个源 Key 交互，Decoder 也有历史 KV Cache。D：同数据集划分/输入长度、尽量匹配参数及计算、等训练 token 和等墙钟双预算、多个种子与合理调参，按任务报告分类准确率/F1、翻译 chrF/BLEU、填空 token/跨度准确率，并单独记录峰值显存、首 token 和后续 Decode 延迟；未来目标扰动应不改变较早 Decoder logits，Cross padding 权重应为 0，MLM 只在选中位置计损失；注意不同架构常伴随不同预训练目标与语料。"
+    }
+  ]
+}
