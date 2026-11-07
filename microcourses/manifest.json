@@ -1737,12 +1737,35 @@
         "segment-tree-over-time",
         "dynamic-graph"
       ]
+    },
+    {
+      "id": "opt-019",
+      "track": "opt",
+      "number": 19,
+      "date": "2026-11-07",
+      "week": 3,
+      "title": "数学优化理论·第19课：Wolfe 条件、曲率控制与非精确线搜索",
+      "abstract": "从 Armijo 扩展到弱 Wolfe 与 Strong Wolfe；证明曲率条件保证 BFGS 的 sᵀy>0，推导 Wolfe 下降方向的梯度收敛界，并用二次函数与非凸反例解释线搜索的边界。",
+      "file": "lessons/opt-019.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "line-search",
+        "wolfe-conditions",
+        "strong-wolfe",
+        "bfgs",
+        "curvature",
+        "z​​outendijk",
+        "convergence"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-07",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-019",
     "ai-019"
   ],
   "orphanQuizzes": []
