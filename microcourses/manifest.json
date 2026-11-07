@@ -1691,10 +1691,40 @@
         "Autoregressive",
         "KVCache"
       ]
+    },
+    {
+      "id": "arch-019",
+      "track": "arch",
+      "number": 19,
+      "date": "2026-11-07",
+      "week": 3,
+      "title": "第19课｜投机执行的性能与安全验证：错误路径回滚、微架构观测与反事实实验",
+      "abstract": "区分架构正确性、微架构可观察性与保密性，用事件日志、不变量、正负控制、统计分布及反事实性能实验检验投机执行与防护。",
+      "file": "lessons/arch-019.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "speculation",
+        "ROB",
+        "checkpoint",
+        "rollback",
+        "cache-side-channel",
+        "noninterference",
+        "experimental-method",
+        "ablation",
+        "CPI",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-06",
+  "indexVerifiedOn": "2026-11-07",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-019",
+    "opt-019",
+    "ai-019"
+  ],
   "orphanQuizzes": []
 }
