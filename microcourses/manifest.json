@@ -1717,12 +1717,31 @@
         "CPI",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-019",
+      "track": "algo",
+      "number": 19,
+      "date": "2026-11-07",
+      "week": 3,
+      "title": "算法与数据结构第19课：离线动态连通性——时间线段树与回滚并查集",
+      "abstract": "将边的生存期映射到时间线段树，通过 DFS 和回滚并查集回答离线加边、删边与连通性查询。",
+      "file": "lessons/algo-019.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "offline-dynamic-connectivity",
+        "rollback-dsu",
+        "segment-tree-over-time",
+        "dynamic-graph"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-07",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-019",
     "opt-019",
     "ai-019"
   ],
