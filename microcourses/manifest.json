@@ -1785,10 +1785,40 @@
         "CrossAttention",
         "EncoderDecoder"
       ]
+    },
+    {
+      "id": "arch-020",
+      "track": "arch",
+      "number": 20,
+      "date": "2026-11-08",
+      "week": 3,
+      "title": "第20课｜预测器隔离与系统级代价：上下文切换、SMT共享资源与安全性能取舍",
+      "abstract": "区分同一逻辑CPU的跨时间预测历史与SMT兄弟线程并发影响，推导IBPB/STIBP/调度的性能账本，建立可信的安全与性能验证方法。",
+      "file": "lessons/arch-020.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "branch-prediction",
+        "Spectre-v2",
+        "IBPB",
+        "STIBP",
+        "eIBRS",
+        "SMT",
+        "context-switch",
+        "scheduling",
+        "performance",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-07",
+  "indexVerifiedOn": "2026-11-08",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-020",
+    "opt-020",
+    "ai-020"
+  ],
   "orphanQuizzes": []
 }
