@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "lesson_id": "ai-020",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "对无dropout、每行至少有一个合法Key的缩放点积Attention，令P=softmax_row(S)、O=PV。关于反向传播，哪项描述最严谨？",
+      "options": [
+        "Softmax的Jacobian是对角矩阵，因此每个概率只依赖对应logit。",
+        "反向传播时，每个score的梯度需要减去该行概率加权的上游梯度均值；固定mask禁用位置在理想Softmax中得到零score梯度。",
+        "由于前向输出由V决定，损失对Q和K的梯度始终为零。",
+        "只要使用1/√d_k缩放，Softmax对score的梯度就永远不会变小。"
+      ],
+      "answer": 1,
+      "hint": "比较Softmax分母对不同logit的耦合；同时检查被禁位置的概率是否为零。",
+      "explanation": "对单行有∂p_j/∂s_k=p_j(δ_jk−p_k)，故∂L/∂s_k=p_k(∂L/∂p_k−Σ_jp_j∂L/∂p_j)。固定加性−∞ mask使禁用项p=0、score梯度也为0（非全屏蔽行）。Q/K梯度通常不为零。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一行单头Attention：d_k=2，q=(ln3,0)，k_1=(√2,0)，k_2=(0,0)；标量Value为v_1=1、v_2=5，无mask。分数s_j=q·k_j/√d_k，p=softmax(s)，o=Σ_jp_jv_j，损失L=o。求∂L/∂q_1，填写十进制数（允许负值）。",
+      "answer": -0.75,
+      "tolerance": 0.0001,
+      "unit": "",
+      "hint": "先由两个scaled logits求p与o，再用行Softmax的反向公式；最后乘上score对q_1的导数。",
+      "explanation": "s=(ln3,0)，p=(3/4,1/4)，o=2，G=1。∂L/∂s_1=p_1(v_1−o)=(3/4)(1−2)=−3/4；∂s_1/∂q_1=(√2)/√2=1，第二个score对此坐标导数为0，因此∂L/∂q_1=−0.75。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "设B=2、H=8、T=2048，一份完整Attention概率矩阵P按FP16保存。考虑标准密集精确Attention和分块IO-aware实现。以下哪些判断成立？（多选）",
+      "options": [
+        "单独保存一份P需要2×8×2048²×2字节，即128 MiB（1 MiB=2²⁰字节）。",
+        "由于在线Softmax不保存完整P，因此密集Attention的Q/K主要两两交互一定由Θ(T²d)降为Θ(Td)。",
+        "数学上可以逐块维护行最大值、指数和、加权Value和；反向可重算局部score/概率块，以减少HBM中间物化。",
+        "只要O=PV，dV就等于GVᵀ，且与注意力概率P无关。",
+        "对固定causal mask，禁用的Query-Key配对在理想Softmax里score梯度为零，但合法Key仍可能累加多个Query贡献。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别计算P元素数、区分算术复杂度与HBM写回，并对O=PV写出矩阵微分。",
+      "explanation": "A：2×8×2048²×2=134217728 bytes=128 MiB。C：在线归一化块合并实数数学上等价，分块反向可重算局部P。E：禁用项P=0、dS=0，合法项从多个Query行累加。B错误：密集Attention仍是二次交互。D错误：dV=PᵀG，GVᵀ为dP。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "研究/推导题（40分）。A（16分）：在单头、无dropout、每行至少一个合法Key、mask固定时，给定S=QKᵀ/√d_k+M、P=softmax_row(S)、O=PV、G=∂L/∂O，用矩阵微分和Softmax Jacobian推导dV、dP、dS、dQ、dK，证明D_i=Σ_jP_ij(dP)_ij=G_i·O_i。B（14分）：将一行Key划为A、B两块；各块保存最大logit m_A/m_B、指数和ℓ_A/ℓ_B、未归一化加权Value和a_A/a_B。推导合并后的m、ℓ、a、输出o，解释为什么可不物化P；用logits(0,ln2,ln3)、Value(1,4,7)核对。C（10分）：设计显式Attention与IO-aware分块精确Attention的公平前向+反向实验，比较峰值显存、HBM流量、wall-clock、输出/梯度误差；解释重算为何可能提速但不改变密集二次算术阶，指出至少两个加速比例不能直接泛化的因素。",
+      "hint": "A按照O=PV、Softmax、S=QKᵀ/√d_k逆序回传；B将两块指数权重统一到新最大值；C分开算术、HBM与墙钟时间。",
+      "rubric": [
+        "A（16分）：dV=PᵀG与dP=GVᵀ正确（4分）；dS=P⊙(dP−D)正确（4分）；证明D_i=G_i·O_i（4分）；dQ=dS K/√d_k、dK=dSᵀQ/√d_k和固定mask边界（4分）。",
+        "B（14分）：m=max(m_A,m_B)（2分）；ℓ与a的指数重缩放合并式（6分）；o=a/ℓ和不物化P的解释（3分）；示例结果为5（3分）。",
+        "C（10分）：固定硬件和shape、dtype、mask并测前向+反向（3分）；显存/带宽/时间/参考误差指标（3分）；重算与密集O(T²d)的关系（2分）；两项硬件/长度/head维/kernel/块大小差异（2分）。"
+      ],
+      "model_answer": "A：dV=PᵀG，dP=GVᵀ；D_i=Σ_jP_ij(G_i·V_j)=G_i·O_i；dS_ij=P_ij(dP_ij−D_i)；dQ=dS K/√d_k，dK=dSᵀQ/√d_k。B：m=max(m_A,m_B)，ℓ=e^(m_A−m)ℓ_A+e^(m_B−m)ℓ_B，a=e^(m_A−m)a_A+e^(m_B−m)a_B，o=a/ℓ=(1+8+21)/6=5。C：固定Q/K/V、dtype、mask、GPU测前向反向、峰值显存、HBM流量与对高精度参考的O/dQ/dK/dV误差；分块重算降低HBM物化而仍需二次交互；不同序列长度、head维、GPU与kernel性能不同。"
+    }
+  ]
+}
