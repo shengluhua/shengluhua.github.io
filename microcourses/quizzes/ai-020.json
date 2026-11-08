@@ -56,14 +56,14 @@
       "level": 4,
       "type": "open",
       "points": 40,
-      "prompt": "研究/推导题（40分）。A（16分）：在单头、无dropout、每行至少一个合法Key、mask固定时，给定S=QKᵀ/√d_k+M、P=softmax_row(S)、O=PV、G=∂L/∂O，用矩阵微分和Softmax Jacobian推导dV、dP、dS、dQ、dK，证明D_i=Σ_jP_ij(dP)_ij=G_i·O_i。B（14分）：将一行Key划为A、B两块；各块保存最大logit m_A/m_B、指数和ℓ_A/ℓ_B、未归一化加权Value和a_A/a_B。推导合并后的m、ℓ、a、输出o，解释为什么可不物化P；用logits(0,ln2,ln3)、Value(1,4,7)核对。C（10分）：设计显式Attention与IO-aware分块精确Attention的公平前向+反向实验，比较峰值显存、HBM流量、wall-clock、输出/梯度误差；解释重算为何可能提速但不改变密集二次算术阶，指出至少两个加速比例不能直接泛化的因素。",
+      "prompt": "研究/推导题（40分）。A（16分）：在单头、无dropout、每行至少一个合法Key、mask固定时，给定S=QKᵀ/√d_k+M、P=softmax_row(S)、O=PV、G=∂L/∂O，用矩阵微分和Softmax Jacobian推导dV、dP、dS、dQ、dK，证明D_i=Σ_jP_ij(dP)_ij=G_i·O_i。B（14分）：将一行Key划为A、B两块；各块保存最大logit m_A/m_B、指数和ℓ_A/ℓ_B、未归一化加权Value和a_A/a_B。推导合并后的m、ℓ、a、输出o，解释为什么可不物化P；用logits(0,ln3,ln4)、Value(2,5,8)核对。C（10分）：设计显式Attention与IO-aware分块精确Attention的公平前向+反向实验，比较峰值显存、HBM流量、wall-clock、输出/梯度误差；解释重算为何可能提速但不改变密集二次算术阶，指出至少两个加速比例不能直接泛化的因素。",
       "hint": "A按照O=PV、Softmax、S=QKᵀ/√d_k逆序回传；B将两块指数权重统一到新最大值；C分开算术、HBM与墙钟时间。",
       "rubric": [
         "A（16分）：dV=PᵀG与dP=GVᵀ正确（4分）；dS=P⊙(dP−D)正确（4分）；证明D_i=G_i·O_i（4分）；dQ=dS K/√d_k、dK=dSᵀQ/√d_k和固定mask边界（4分）。",
-        "B（14分）：m=max(m_A,m_B)（2分）；ℓ与a的指数重缩放合并式（6分）；o=a/ℓ和不物化P的解释（3分）；示例结果为5（3分）。",
+        "B（14分）：m=max(m_A,m_B)（2分）；ℓ与a的指数重缩放合并式（6分）；o=a/ℓ和不物化P的解释（3分）；示例结果为6.125（3分）。",
         "C（10分）：固定硬件和shape、dtype、mask并测前向+反向（3分）；显存/带宽/时间/参考误差指标（3分）；重算与密集O(T²d)的关系（2分）；两项硬件/长度/head维/kernel/块大小差异（2分）。"
       ],
-      "model_answer": "A：dV=PᵀG，dP=GVᵀ；D_i=Σ_jP_ij(G_i·V_j)=G_i·O_i；dS_ij=P_ij(dP_ij−D_i)；dQ=dS K/√d_k，dK=dSᵀQ/√d_k。B：m=max(m_A,m_B)，ℓ=e^(m_A−m)ℓ_A+e^(m_B−m)ℓ_B，a=e^(m_A−m)a_A+e^(m_B−m)a_B，o=a/ℓ=(1+8+21)/6=5。C：固定Q/K/V、dtype、mask、GPU测前向反向、峰值显存、HBM流量与对高精度参考的O/dQ/dK/dV误差；分块重算降低HBM物化而仍需二次交互；不同序列长度、head维、GPU与kernel性能不同。"
+      "model_answer": "A：dV=PᵀG，dP=GVᵀ；D_i=Σ_jP_ij(G_i·V_j)=G_i·O_i；dS_ij=P_ij(dP_ij−D_i)；dQ=dS K/√d_k，dK=dSᵀQ/√d_k。B：m=max(m_A,m_B)，ℓ=e^(m_A−m)ℓ_A+e^(m_B−m)ℓ_B，a=e^(m_A−m)a_A+e^(m_B−m)a_B，o=a/ℓ=(2+15+32)/8=6.125。C：固定Q/K/V、dtype、mask、GPU测前向反向、峰值显存、HBM流量与对高精度参考的O/dQ/dK/dV误差；分块重算降低HBM物化而仍需二次交互；不同序列长度、head维、GPU与kernel性能不同。"
     }
   ]
 }
