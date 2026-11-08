@@ -1834,12 +1834,34 @@
         "rollback-dsu",
         "offline-dynamic-connectivity"
       ]
+    },
+    {
+      "id": "opt-020",
+      "track": "opt",
+      "number": 20,
+      "date": "2026-11-08",
+      "week": 3,
+      "title": "第20课｜PL条件：非强凸甚至非凸函数为何也可能线性收敛",
+      "abstract": "用下降引理和Polyak–Łojasiewicz不等式证明梯度下降的几何收敛，比较强凸、PL、凸性与KKT，并给出秩亏二次函数及非凸PL反例。",
+      "file": "lessons/opt-020.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "PL条件",
+        "梯度主导",
+        "梯度下降",
+        "强凸",
+        "非凸优化",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-08",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-020",
     "ai-020"
   ],
   "orphanQuizzes": []
