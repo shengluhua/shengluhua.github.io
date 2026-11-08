@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "lesson_id": "algo-020",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "比较持久化线段树、Lazy Segment Tree 与 Rollback DSU，哪一项同时正确？",
+      "options": [
+        "路径复制可以原地修改旧版本共享的叶子，只要旧根指针不变。",
+        "Rollback DSU 的 SNAPSHOT 必须复制整个 parent 数组，否则不能回滚。",
+        "持久化线段树用不可变节点与新根保存可并存版本；标准 Lazy Segment Tree 延迟更新孩子但不自动保存版本；Rollback DSU 沿当前执行分支逆序撤销日志。",
+        "只要按大小合并，Rollback DSU 就能安全使用不记日志的路径压缩。"
+      ],
+      "answer": 2,
+      "hint": "分别想想：旧版本是否仍可直接查询？PUSH 会不会改写节点？回滚允许撤销哪个时间顺序的修改？",
+      "explanation": "路径复制通过新建修改路径并共享不可变子树保留旧根；普通 lazy 的 PUSH/APPLY 可原地写孩子而非自动持久化；Rollback DSU 只维护当前状态，日志遵循 LIFO。不记日志的路径压缩会损害回滚。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "初始 A=[2,1,3,4,5,6,7,8]，从 v0 单点赋值 A[4]←10 得到 v1；另从 v0（不是 v1）赋值 A[1]←9 得到 v2。现在仅从 v1 复制出一份独立的可变数组 B，在 B 上执行 ADD([1,5),+2)，区间均为半开。计算 SUM_B([2,6)) + SUM_v2([0,3)) 的数值。",
+      "answer": 43,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "v1 和 v2 是兄弟版本；B 的更新不改变 v1/v2。先列出 B 中下标 2、3、4、5 的当前值。",
+      "explanation": "v1=[2,1,3,4,10,6,7,8]；B 对下标1..4各加2后变为 [2,3,5,6,12,6,7,8]，B[2:6] 和为5+6+12+6=29。v2=[2,9,3,4,5,6,7,8]，v2[0:3] 和为2+9+3=14；合计43。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "关于第 14–19 课的数据结构，下列哪些判断成立？（多选，选出全部正确项）",
+      "options": [
+        "AVL 树同时维护正确 size 时，SELECT 和 RANK 的最坏时间为 O(log n)；只有正确 size 而不平衡则不能保证这个界。",
+        "若持久化树的旧根对象不变，就允许直接改写旧根共享的后代叶子，旧版本结果仍一定不变。",
+        "标准可变 Lazy Segment Tree 对完整覆盖区间执行 APPLY(δ) 时，同时令 sum+=δ·len、lazy+=δ；部分访问孩子前可通过 PUSH 传递增量。",
+        "离线动态连通性中，将每条边活跃区间作互不重叠的规范节点分解后，边在时刻 t 活跃当且仅当根到叶 t 的路径上恰有一个对应 bucket 含该边。"
+      ],
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "hint": "把树高保证与摘要正确性分开；再问旧根之外的共享对象能否变动；最后检查一个半开活跃区间如何覆盖一个时间叶。",
+      "explanation": "A 真：AVL 高度对数，size 支持每层 O(1) 排名跳转，非平衡 BST 可退化。B 假：共享旧叶改写会污染旧版本。C 真：APPLY 同步调整当前 sum 与待下推 lazy。D 真：无重叠规范覆盖保证任一覆盖叶的根路径上恰有一次存储。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设计并证明两个互不混淆的系统：(a)（10 分）在 AVL 节点维护 size，给出 SELECT(k) 与 RANK(x) 的核心决策，并说明旋转后应更新哪些节点的信息，证明最坏 O(log n)；(b)（10 分）分别写出单点赋值持久化线段树的路径复制不变量，以及可变 Lazy Segment Tree 的 sum/lazy 不变量，说明两者怎样安全地支持历史版本（或为何普通 PUSH 不能直接复用）；(c)（14 分）对预先给定的 T 次无向图 ADD/REMOVE/ASK，写出“半开活跃区间→时间线段树规范覆盖→DFS 中 Rollback DSU”的关键步骤，证明叶 t 的连通性正确；(d)（6 分）给出上述三类查询或更新的主要时间与空间界，说明一个不记日志的路径压缩或共享节点原地修改导致错误的具体反例。",
+      "hint": "按三种不变量分别组织证明：BST 左子树大小、版本节点不可变与区间摘要、根到时间叶路径上的有效边集合。反例要指出哪次写入没有被正确隔离或撤销。",
+      "rubric": [
+        "(a) 10 分：SELECT/RANK 的排名跳转与累计量 5 分；旋转旧根→新根更新 size/height、AVL 高度与 O(log n) 5 分。",
+        "(b) 10 分：路径复制的区间和与旧节点不可变 5 分；lazy 的 sum=left.sum+right.sum+lazy·len、APPLY/PUSH 及可变/持久化边界 5 分。",
+        "(c) 14 分：按 ADD/REMOVE 配半开区间与 O(log T) 规范分解 4 分；DFS snapshot/union/rollback 5 分；边活跃当且仅当根到叶有一个 bucket、归纳证明连通性 5 分。",
+        "(d) 6 分：AVL O(log n)、持久化线段树 O(log n) 新节点、Lazy O(log n)、离线 O(T+K log T log n+Q log n) 及空间表达 4 分；可复现反例 2 分。"
+      ],
+      "model_answer": "(a) SELECT：L=size(left)，k≤L 进入左，k=L+1 返回根，k>L+1 进入右并减去 L+1；RANK：右转累计 L+1，命中返回累计量+L+1。旋转后先更新下降旧根，再更新上升新根的 height/size；旋转保持中序，AVL 高度 O(log n)，故两查询最坏 O(log n)。(b) 持久化节点覆盖 [L,R)，sum 等于该版本区间真实和；更新只复制目标叶至根的祖先节点，未命中孩子指针共享但不可变，旧根不污染；每次更新 O(log n) 新节点。Lazy 可变树内部 sum=left.sum+right.sum+lazy*len；APPLY(v,d) 同时修改 sum、lazy，PUSH 给孩子 APPLY 并清父 lazy，父 sum 保持不变。若要与持久化结合，必须复制所有拟写节点（包括 PUSH 触达的孩子）或只读携带标记，不得写共享节点。(c) 扫描操作，将 ADD 时刻作为 l、REMOVE 时刻作为开右端 r，剩余活跃边截止 T；把 [l,r) 放到时间线段树互不重叠的规范节点桶。DFS 每节点先记录 snapshot，再 union 本桶边；到叶回答 ASK；退出 rollback。因为边 e 的规范覆盖区间不交，t 落在 e 的活跃区间当且仅当根到 t 的路径上恰有一个节点桶含 e；DSU 始终表示该路径所加边产生的连通性，rollback 保证兄弟区间隔离，所以答案正确。(d) AVL 秩查询最坏 O(log n) 且空间 O(n)；单点持久化更新/区间和最坏 O(log n)、t 次更新总空间 O(n+t log n)（小 n 用 1+log）；可变 Lazy 区间加/查询最坏 O(log n)、O(n) 存储；离线动态连通性用 K 个边生存区间、T 个时刻、Q 个查询、n 个顶点时为 O(T+K log T log n+Q log n) 时间、O(T+K log T+n) 空间。反例：UNION(1,2)、UNION(3,4)、SNAPSHOT、UNION(1,3)、带路径压缩 FIND(4)、只回滚 UNION(1,3)，parent[4] 仍指向 1；或旧根和新根共享叶而直接改叶，使旧版本 SUM 错误。"
+    }
+  ]
+}
