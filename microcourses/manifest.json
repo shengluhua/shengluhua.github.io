@@ -1880,10 +1880,42 @@
         "GPU",
         "IO"
       ]
+    },
+    {
+      "id": "arch-021",
+      "track": "arch",
+      "number": 21,
+      "date": "2026-11-09",
+      "week": 3,
+      "title": "第21课｜第3周综合复盘：从错误路径恢复到跨核可见性的四层验证",
+      "abstract": "将分支/GHR、ROB/RAT/LSQ恢复、CET与推测执行安全、SMT预测器隔离和SC/TSO可见性串成同一条验证链，练习精确时间线与性能反事实。",
+      "file": "lessons/arch-021.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "review",
+        "branch-prediction",
+        "GHR",
+        "ROB",
+        "LSQ",
+        "replay",
+        "Spectre",
+        "CET",
+        "IBPB",
+        "STIBP",
+        "TSO",
+        "performance"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-08",
+  "indexVerifiedOn": "2026-11-09",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-021",
+    "opt-021",
+    "ai-021"
+  ],
   "orphanQuizzes": []
 }
