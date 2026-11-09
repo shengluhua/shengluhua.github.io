@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "lesson_id": "opt-021",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "对无约束可微优化，下列哪项**一定正确**？",
+      "options": [
+        "只要函数是全局 $L$-Smooth，梯度下降便保证收敛到全局最优值。",
+        "若函数满足 $L$-Smooth 与正的 PL 条件，采用步长 $1/L$ 的 GD 可使函数值误差几何收敛；不必额外假设凸性或唯一最优点。",
+        "某条不等式约束在最优点活跃，KKT 乘子就必须严格为正。",
+        "只要使用 Nesterov 加速，目标函数值就必定每步单调下降。"
+      ],
+      "answer": 1,
+      "hint": "分别检查 Smooth、PL、KKT 互补松弛和 AGD 势函数控制的是哪一种量。",
+      "explanation": "Smooth 单独只能控制合法步长的下降而不保证非凸全局最优；PL 给出梯度平方与函数值误差的关系，结合下降引理得到 $f(x_k)-f^*\\le(1-\\mu/L)^k(f(x_0)-f^*)$；活跃约束可有零乘子；AGD 不保证逐步函数值单调。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "给定 $f(t)=\\tfrac12(t-4)^2$，在 $t_0=0$ 沿负梯度方向进行 Armijo 回溯。取 $c=0.25$、初始试探步长 $\\alpha_0=3$、缩步因子 $\\beta=0.5$，按 $3,1.5,0.75,\\ldots$ 依次检查。求**首次接受的步长 $\\alpha$**（保留三位小数，仅填写数值）。",
+      "answer": 1.5,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "计算 $f(0)$、$g=f'(0)$，依次检查 $f(0-\\alpha g)\\le f(0)-c\\alpha g^2$；等号也算通过。",
+      "explanation": "$f(0)=8,g=-4$。$\\alpha=3$ 时 $t=12,f=32$，Armijo 右侧 $8-0.25\\cdot3\\cdot16=-4$，拒绝。$\\alpha=1.5$ 时 $t=6,f=2$，右侧 $8-0.25\\cdot1.5\\cdot16=2$，等号通过。故答案 $1.500$。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "single",
+      "points": 25,
+      "prompt": "对 $f(t)=\\tfrac12t^2$，从 $t_0=2$ 取方向 $p=-2$，定义 $\\phi(\\alpha)=f(2-2\\alpha)$。设 $c_1=0.1,c_2=0.4$，比较候选步长 $\\alpha=0.25,0.75,1.6$。哪一项正确？",
+      "options": [
+        "$\\alpha=0.25$ 同时满足 Armijo 与弱 Wolfe。",
+        "$\\alpha=0.75$ 满足 Strong Wolfe；$\\alpha=1.6$ 满足弱 Wolfe 但不满足 Strong Wolfe。",
+        "$\\alpha=1.6$ 因为过冲，所以连 Armijo 也不满足。",
+        "$\\alpha=0.75$ 满足 Armijo，但由于方向导数仍为负，故不满足弱 Wolfe。"
+      ],
+      "answer": 1,
+      "hint": "先求 $\\phi(\\alpha)=2(1-\\alpha)^2$ 和 $\\phi'(\\alpha)=-4+4\\alpha$，把三个条件化为各自的步长区间。",
+      "explanation": "Armijo 的可行区间为 $0<\\alpha\\le1.8$；弱 Wolfe 为 $\\alpha\\ge0.6$，二者交集 $[0.6,1.8]$；Strong Wolfe 再限制 $|\\phi'(\\alpha)|\\le0.4|\\phi'(0)|$，得 $[0.6,1.4]$。因此 $0.75$ 满足 Strong Wolfe，$1.6$ 只满足弱 Wolfe（同时满足 Armijo）。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "完成以下四个彼此相关但假设不同的任务，必须明确各自结论所需的条件。\n\n**A（12 分）凸 GD：** 设 $f:\\mathbb R^n\\to\\mathbb R$ 凸且 $L$-Smooth，最优点 $x^*$ 存在。对 $x_{k+1}=x_k-\\nabla f(x_k)/L$，从下降引理、凸函数一阶不等式与平方距离恒等式推导\n$$f(x_K)-f^*\\le\\frac{L\\|x_0-x^*\\|^2}{2K},\\quad K\\ge1.$$\n\n**B（10 分）PL 与非强凸：** 在 $L$-Smooth、$\\mu$-PL（$0<\\mu\\le L$）下，推导 GD 的函数值几何收敛。再用 $F(u,v,w)=\\tfrac12(u^2+4v^2)$ 说明 PL 不意味着强凸或最优点唯一。\n\n**C（10 分）Wolfe 与反例：** 对严格下降方向 $p$、正步长 $\\alpha$ 和 $0<c_1<c_2<1$，证明弱 Wolfe 曲率条件推出 $s^Ty>0$（$s=\\alpha p,y=\\nabla f(x+\\alpha p)-\\nabla f(x)$）。再举一个 Armijo 成立但 $s^Ty<0$ 的具体例子，说明只有充分下降为何不够。\n\n**D（8 分）KKT 回顾：** 求解 $\\min_{x\\le1}\\tfrac12(x-2)^2$，给出最优点、活跃约束、乘子、驻点与互补松弛。再举一个**约束活跃却乘子为零**的凸问题。解释为何约束最优点不必满足 $\\nabla f=0$。",
+      "hint": "A 将函数值差写成相邻平方距离之差后求和；B 用 PL 控制梯度平方；C 由新旧方向导数之差推出正曲率，可参照双井函数；D 在边界点用乘子平衡非零梯度。",
+      "rubric": [
+        "A（12分）：下降引理与凸性各 3 分；平方距离恒等式 3 分；望远镜求和与末步界 3 分。",
+        "B（10分）：PL 代入充分下降、递推收缩 6 分；秩亏 Hessian 与无穷多最优解、合法 PL 常数 4 分。",
+        "C（10分）：弱 Wolfe 推出严格正曲率的符号论证 6 分；明确数值 Armijo 通过且 sᵀy<0 的反例 4 分。",
+        "D（8分）：最优点和 λ=1 的完整 KKT 检查 5 分；活跃零乘子反例与边界最优解释 3 分。"
+      ],
+      "model_answer": "A：记 $g_k=\\nabla f(x_k)$。下降引理得 $f(x_{k+1})\\le f(x_k)-\\|g_k\\|^2/(2L)$；凸性得 $f(x_k)-f^*\\le g_k^T(x_k-x^*)$。结合\n$\\|x_{k+1}-x^*\\|^2=\\|x_k-x^*\\|^2-2g_k^T(x_k-x^*)/L+\\|g_k\\|^2/L^2$，\n可得 $f(x_{k+1})-f^*\\le\\tfrac L2(\\|x_k-x^*\\|^2-\\|x_{k+1}-x^*\\|^2)$。求和并使用函数值单调，得 $K(f(x_K)-f^*)\\le L\\|x_0-x^*\\|^2/2$。\nB：$f(x_{k+1})\\le f(x_k)-\\|g_k\\|^2/(2L)\\le f(x_k)-(\\mu/L)(f(x_k)-f^*)$，故 $\\Delta_k\\le(1-\\mu/L)^k\\Delta_0$，不需凸性。对 $F$，Hessian 为 diag$(1,4,0)$，不强凸，$\\nabla F=(u,4v,0)$，$\\frac12\\|\\nabla F\\|^2=\\frac12(u^2+16v^2)\\ge F$，故 1-PL；最优解集合为 $(0,0,w)$。\nC：弱 Wolfe 为 $g_+^Tp\\ge c_2g^Tp$，故 $s^Ty=\\alpha(g_+-g)^Tp\\ge\\alpha(c_2-1)g^Tp=\\alpha(1-c_2)(-g^Tp)>0$。反例取 $f(t)=(t^2-1)^2$，$t_0=0.1,t_1=0.2$。$g_0=-0.396,g_1=-0.768,s=0.1,y=-0.372$，因此 $sy=-0.0372<0$；取 $p=0.396,\\alpha=0.1/0.396,c_1=0.1$，函数从 $0.9801$ 降到 $0.9216$，Armijo 上界为 $0.97614$，故 Armijo 通过。\nD：原问题最优 $x^*=1$、$g(x^*)=x^*-1=0$，乘子 $\\lambda^*=1$，因为 $f'(1)=-1$ 与 $g'(1)=1$，驻点 $-1+\\lambda^*=0$，且 $\\lambda^*\\ge0,\\lambda^*(x^*-1)=0$。活跃零乘子反例：$\\min_{x\\le0}\\tfrac12 x^2$，最优 $x^*=0$，乘子 $\\lambda^*=0$。边界驻点满足 $\\nabla f+\\lambda\\nabla g=0$ 而不必满足 $\\nabla f=0$。"
+    }
+  ]
+}
