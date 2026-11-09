@@ -1954,12 +1954,34 @@
         "Wolfe",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-021",
+      "track": "ai",
+      "number": 21,
+      "date": "2026-11-09",
+      "week": 3,
+      "title": "第21课｜第三周复盘：把 Transformer 的数学、训练与 GPU 执行串起来",
+      "abstract": "第三周复盘：从可见性、注意力与位置编码到自回归交叉熵、反向梯度和 FlashAttention，建立统一的数学及系统诊断框架。",
+      "file": "lessons/ai-021.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "Transformer",
+        "Attention",
+        "RoPE",
+        "Causal LM",
+        "Cross-Attention",
+        "FlashAttention",
+        "反向传播",
+        "周复盘"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-09",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-021"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
