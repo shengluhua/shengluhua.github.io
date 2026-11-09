@@ -1930,12 +1930,35 @@
         "negative-cycle",
         "dynamic-programming"
       ]
+    },
+    {
+      "id": "opt-021",
+      "track": "opt",
+      "number": 21,
+      "date": "2026-11-09",
+      "week": 3,
+      "title": "数学优化理论 第21课：第三周复盘——GD、AGD、PL与线搜索的统一框架",
+      "abstract": "复盘下降引理、非凸驻点界、凸 GD、PL 线性收敛、Nesterov 势函数、Armijo 与 Wolfe，并用数值迭代和 KKT 反例辨析保证边界。",
+      "file": "lessons/opt-021.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "第三周复盘",
+        "梯度下降",
+        "Nesterov",
+        "PL条件",
+        "Armijo",
+        "Wolfe",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-09",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-021",
     "ai-021"
   ],
   "orphanQuizzes": []
