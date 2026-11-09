@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "lesson_id": "ai-021",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "对一个使用 RoPE 的标准 Decoder-only Causal Transformer，以下哪一项机制判断最准确？",
+      "options": [
+        "训练时既然给出了完整真实序列，就不需要 Causal Mask；Teacher Forcing 自然不会泄漏未来标签。",
+        "Causal Mask 等价于 RoPE，因而只要是下三角可见性，就已经具有相同的相对旋转点积分数。",
+        "训练时可使用移位标签、Teacher Forcing 与正确的 Causal Mask 并行计算各位置条件分布；自由生成的后续 token 仍依赖此前实际生成的 token。",
+        "Attention 输出只由 Value 决定，因此损失梯度无法传播到 Query 和 Key。"
+      ],
+      "answer": 2,
+      "hint": "把训练时的真实前缀、允许访问的 Key 和自由生成时尚未选出的未来 token 分开考虑。",
+      "explanation": "正确移位和因果遮挡令每个位置只预测下一 token；训练时真实前缀已知，位置可并行计算；自由生成前缀未知，跨步依赖仍在。其他说法混淆了泄漏、RoPE 与 Mask、以及 Q/K 对权重的影响。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个 Query 对三个合法 Key 的 scaled logits 为 \\(s=(\\ln2,\\ln3,0)\\)，对应三个标量 Value 为 \\(v=(1,5,9)\\)。令 \\(p=\\mathrm{softmax}(s)\\)、\\(o=\\sum_jp_jv_j\\)，并令损失 \\(\\mathcal L=o\\)。求第二个 logit 的梯度 \\(\\partial\\mathcal L/\\partial s_2\\)（使用自然对数，填写小数，至少保留四位）。",
+      "answer": 0.3333333333333333,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先用指数权重 2、3、1 求概率及输出，再用该行 Softmax 的梯度公式；不要将 Value 当成最终梯度。",
+      "explanation": "p=(1/3,1/2,1/6)，o=(2×1+3×5+1×9)/6=26/6=13/3。损失 L=o，因此 dL/ds2=p2(v2−o)=(1/2)(5−13/3)=1/3≈0.333333。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "下列哪些陈述成立？（多选；假定标准密集精确 Attention、固定总宽度 d=Hd_h，忽略投影及其他层时只讨论 QKᵀ 与 PV 的算术量。）",
+      "options": [
+        "标准多头 Self-Attention 的主要两两交互算术量为 Θ(BT²d)；朴素实现显式保存每头全部注意力概率时，其元素数为 BHT²。",
+        "RoPE 之后，任意两个 token 的注意力 score 只由它们的相对位置决定，与 Q/K 内容无关。",
+        "Encoder–Decoder Cross-Attention 的 Query 长为 U、Key 长为 S 时，score 尺寸为 U×S；固定源的编码输出及其 Cross K/V 可以在生成中缓存复用。",
+        "使用 Causal Mask 就能让任意稠密精确 Attention Kernel 的总算术量从 Θ(T²d) 自动降为 Θ(Td)。",
+        "分块在线 Softmax 可以避免将完整概率矩阵写入 HBM，并在反向时重算局部概率；这不意味着标准密集 Attention 的主要两两交互变为线性。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别判断算术量与物化存储、Content 与 Position、以及源长和目标长；不要把减少 HBM 读写理解为消除全部两两交互。",
+      "explanation": "A：H 个头各有 T²d_h 工作量，合计 T²d；显式概率 BHT²。C：Cross score 是 U×S，源表示固定可复用。E：在线归约及反向重算减少中间 HBM 物化，但密集二次交互仍在。B 错在忽略 Q/K 内容；D 将三角稀疏结构与任意实现的实际工作量混淆。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "综合研究/推导题（40 分）。设 Decoder-only 输入 \\(X\\in\\mathbb R^{B\\times T\\times d}\\)，采用 \\(H\\) 头、\\(d_h=d/H\\)，使用 RoPE、因果 Attention、Pre-Norm 和 \\(4d\\) 宽度的两层 FFN。\n\n**A（10 分）**：写出一个 Block 的 Q/K/V 形状、每头 scaled score、Causal Mask、Softmax/Concat/\\(W_O\\)、两次 Pre-Norm 残差更新；说明训练移位标签与真实前缀如何配合避免未来泄漏。\n\n**B（12 分）**：对 \\(S=QK^\\top/\\sqrt{d_h}+M\\)、\\(P=\\operatorname{softmax}_{row}(S)\\)、\\(O=PV\\)，给定上游 \\(G=\\partial\\mathcal L/\\partial O\\)，推导 \\(\\bar V,\\bar P,\\bar S,\\bar Q,\\bar K\\)，并证明 \\(D_i=G_i^\\top O_i\\)。\n\n**C（10 分）**：推导密集 MHA 主要两两交互算术量、显式概率张量大小与 FP16 字节数；给出两块 Online Softmax 的合并式，解释为什么反向局部重算可能减少 HBM 流量却不能将密集算术量变成线性。\n\n**D（8 分）**：设计两个可复现实验：①未来 token 扰动的因果性检查；②朴素 Attention 与分块精确实现的前向/梯度数值一致性及 latency、peak memory、HBM traffic 评测。写出固定条件、比较指标与可能混杂因素。",
+      "hint": "A 注意位置是 Query 行、Key 列；B 逆序从 O=PV 开始；C 区分 HBM 物化与算术量；D 使用 Eval 模式和固定 position IDs。",
+      "rubric": [
+        "A（10分）：正确的 Q/K/V 及 score 形状（3），Mask+RoPE 与 Head 拼接（3），Pre-Norm 两次残差（2），Shifted Labels/Teacher Forcing 的无泄漏解释（2）。",
+        "B（12分）：dV=PᵀG、dP=GVᵀ（3），Softmax 行归约和 dS 公式（4），D_i=G_iᵀO_i 证明（2），dQ/dK 及缩放（3）。",
+        "C（10分）：Θ(BT²d) 和 BHT²、FP16 字节数（4），在线 Softmax m/ℓ/a 合并（4），重计算对 HBM 与算术阶的区分（2）。",
+        "D（8分）：未来扰动只测试合法前缀（3），输出与梯度误差及显存/延迟/HBM 指标（3），固定精度、Mask、position IDs、dropout、硬件等控制（2）。"
+      ],
+      "model_answer": "A：每头 Q/K/V：[B,T,d_h]，score [B,T,T]，\\(S_h=Q_hK_h^\\top/\\sqrt{d_h}+M\\)，\\(M_{ij}=-\\infty\\) 当 j>i；在 Q/K 投影后按位置旋转，逐头按 Key 维 Softmax，\\(O_h=P_hV_h\\)；Concat 后乘 \\(W_O\\)，形成 \\(U=X+\\mathrm{MHA}(\\mathrm{Norm}_1 X)\\)，\\(Y=U+\\mathrm{FFN}(\\mathrm{Norm}_2U)\\)。训练输入 [BOS,x1,…] 与标签 [x1,…,EOS] 错开一位，Causal Mask 保障早期 logit 无未来依赖。B：\\(\\bar V=P^\\top G,\\bar P=GV^\\top,D_i=\\sum_jP_{ij}\\bar P_{ij}=G_i^\\top O_i,\\bar S_{ij}=P_{ij}(\\bar P_{ij}-D_i),\\bar Q=\\bar SK/\\sqrt{d_h},\\bar K=\\bar S^\\top Q/\\sqrt{d_h}\\)。C：主算术量 \\(\\Theta(BT^2d)\\)，完整 P 为 BHT² 元素、FP16 需 2BHT² bytes。令 m=max(mA,mB)，ℓ=exp(mA−m)ℓA+exp(mB−m)ℓB，a=exp(mA−m)aA+exp(mB−m)aB，o=a/ℓ。分块重算局部 P 可省全局物化，仍是密集交互。D：固定相同合法前缀，扰动其后的 token，比较前缀 logits；对同一 Q/K/V 比较朴素与分块前向 O 及 Q/K/V 梯度误差，并采集同步延迟、峰值显存与 HBM 访问量。固定模型权重、seed、dtype、mask、position IDs、dropout、GPU、输入形状及 warmup。"
+    }
+  ]
+}
