@@ -2051,12 +2051,33 @@
         "proximal-gradient",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-022",
+      "track": "ai",
+      "number": 22,
+      "date": "2026-11-10",
+      "week": 4,
+      "title": "第22课｜Tokenization 与 BPE：为什么文本长度不等于 Token 数",
+      "abstract": "理解字符、词、字节和子词分词；手推 BPE 合并、比较 WordPiece 和 Unigram，并分析词表、预训练目标与 GPU 计算的取舍。",
+      "file": "lessons/ai-022.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "tokenization",
+        "BPE",
+        "byte-level",
+        "WordPiece",
+        "Unigram",
+        "pretraining",
+        "scaling"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-10",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-022"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
