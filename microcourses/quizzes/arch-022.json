@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "arch-022",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某物理地址映射到组相联Cache的Set 5，但Set 5内已有一条有效缓存行。以下哪项最准确？",
+      "options": [
+        "只要Set Index相同，新地址必然Hit。",
+        "仍须在Set内检查有效路的Tag；不同Tag的块可以在不同Way共存，直到该Set容量不足。",
+        "Offset决定Cache总Set数，而Tag仅决定相联度。",
+        "Set相同意味着两个地址一定属于同一条物理Cache Line。"
+      ],
+      "answer": 1,
+      "hint": "找到哪一组与这一组里是否已经有我需要的块，是两项不同判断。",
+      "explanation": "组索引只确定被查的Set；Hit还需Valid和Tag匹配。同一组不同Tag对应不同Block，可占不同Way。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一台PIPT教学Cache的数据容量为64KiB、4-way、每行64B，Set索引采用连续物理地址低位，组号从0开始。访问物理地址0x35C0。求十进制Set Index（只填整数）。",
+      "answer": 215,
+      "tolerance": 0,
+      "unit": "",
+      "hint": "先计算总Set数，将物理地址右移6位得到行号，再对Set数取模。",
+      "explanation": "Set数=65536/(4×64)=256；0x35C0>>6=0xD7=215；215 mod 256=215。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "教学系统统计2000次L1读访问，其中160次L1 Miss且均访问L2；这些L2请求中32次L2 Miss。所有统计口径一致。选择所有正确说法。",
+      "options": [
+        "L1 Miss Rate是8%。",
+        "L2局部Miss Rate是1.6%。",
+        "以全部L1请求为分母的L2全局Miss Rate是1.6%。",
+        "L2 Hit请求数量为128。",
+        "若一种新L1的Miss Rate下降但Hit Time明显增长，其AMAT仍可能变差。",
+        "将Cache Line大小翻倍必然使DRAM传输字节数减半。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "hint": "明确每个Miss Rate的分母：全部L1请求还是仅L1 Miss后进入L2的请求？",
+      "explanation": "L1 Miss=160/2000=8%；L2局部Miss=32/160=20%，全局=32/2000=1.6%；L2 Hit=160-32=128。命中时间增加可能使AMAT恶化。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "使用以下统一教学模型完成A—D，写出关键公式与执行过程。\n\nA（12分）：PIPT L1使用48位物理地址、32KiB数据容量、4-way、64B行、连续低位组索引。求Set数，Offset/Index/Tag位数，以及地址0x6000的Set、Tag与Offset。\n\nB（10分）：上述Cache初始为空、组内真LRU。定义块地址A=0x0000、B=0x2000、C=0x4000、D=0x6000、E=0x8000。依次访问A→B→C→D→A→E→B。逐项列出Hit/Miss与替换的Victim，求总Miss次数，并解释为何竞争同一Set。\n\nC（10分）：另一个两级Cache延迟模型有H1=3周期、m1=6%、H2=14周期、L2局部m2=20%、DRAM额外代价180周期。求AMAT与L2全局Miss Rate。若L1 Hit Time变成5周期、m1降至4%，其余不变，比较新旧AMAT。\n\nD（8分）：解释(i) AMAT为何不能直接当作CPU的CPI，(ii) 32KiB 8-way 64B L1为何适合用4KiB页内偏移解释简单VIPT索引，(iii) Store从ROB退休为何不等于立即对其他核可见。",
+      "hint": "先算S=C/(AB)和位宽；LRU只在同组中更新；AMAT按H1+m1(H2+m2×PM)计算；边界分析考虑MLP、页内偏移与Store Buffer。",
+      "rubric": [
+        "A：组数与Offset/Index/Tag位数（6分），具体地址的字段（6分）。",
+        "B：同组原因（3分），逐项LRU/Hit/Miss与Victim（7分）。",
+        "C：原始AMAT、全局Miss率（5分），修改后的AMAT和解释（5分）。",
+        "D：MLP/重叠与CPI（3分），VIPT页偏移约束（3分），Store Buffer跨核可见（2分）。"
+      ],
+      "model_answer": "A：S=32768/(4×64)=128；b=6，s=7，t=48−6−7=35；0x6000>>6=384，Set=384 mod128=0；Tag=0x6000>>13=3；Offset=0。\nB：五个块地址每次差0x2000=8192=128×64，均映射Set0。序列A Miss，B Miss，C Miss，D Miss，A Hit（A成MRU），E Miss驱逐B，B Miss驱逐C；总6次Miss、1次Hit。\nC：L1 Miss后的额外服务=14+0.20×180=50；旧AMAT=3+0.06×50=6.00周期；L2全局Miss=0.06×0.20=1.2%；新AMAT=5+0.04×50=7.00周期，尽管Miss减少，Hit延迟增加导致AMAT上升。\nD：AMAT是请求平均延迟，CPU可通过乱序、MSHR/MLP、并行指令等隐藏时延，不能直接换算CPI；32KiB/(8×64)=64组，b+s=6+6=12恰为4KiB页内Offset位数；Store即使已经ROB退休，也可能在Store Buffer中尚未对其他核可见。"
+    }
+  ]
+}
