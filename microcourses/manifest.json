@@ -1978,10 +1978,41 @@
         "反向传播",
         "周复盘"
       ]
+    },
+    {
+      "id": "arch-022",
+      "track": "arch",
+      "number": 22,
+      "date": "2026-11-10",
+      "week": 4,
+      "title": "第22课｜Cache地址分解与多级层次：Tag、Index、Offset与AMAT",
+      "abstract": "用组相联地址映射与多级AMAT解释Cache的命中、冲突、局部和全局Miss Rate及实际CPU性能边界。",
+      "file": "lessons/arch-022.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "cache",
+        "hierarchy",
+        "tag",
+        "index",
+        "offset",
+        "associativity",
+        "LRU",
+        "AMAT",
+        "locality",
+        "VIPT",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-09",
+  "indexVerifiedOn": "2026-11-10",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-022",
+    "opt-022",
+    "ai-022"
+  ],
   "orphanQuizzes": []
 }
