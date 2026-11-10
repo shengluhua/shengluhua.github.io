@@ -2027,12 +2027,35 @@
         "nonnegative-weights",
         "correctness-proof"
       ]
+    },
+    {
+      "id": "opt-022",
+      "track": "opt",
+      "number": 22,
+      "date": "2026-11-10",
+      "week": 4,
+      "title": "第22课｜投影与近端算子：从 KKT 到非光滑优化",
+      "abstract": "从欧氏投影的变分不等式和法锥出发，推导 prox 与软阈值、近端梯度迭代及凸复合优化的 O(1/K) 收敛界，并连接 KKT。",
+      "file": "lessons/opt-022.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "optimization",
+        "convex-analysis",
+        "projection",
+        "normal-cone",
+        "proximal-operator",
+        "soft-thresholding",
+        "proximal-gradient",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-10",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-022",
     "ai-022"
   ],
   "orphanQuizzes": []
