@@ -2005,12 +2005,33 @@
         "VIPT",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-022",
+      "track": "algo",
+      "number": 22,
+      "date": "2026-11-10",
+      "week": 4,
+      "title": "算法与数据结构第22课：Dijkstra——非负权为何允许最小距离永久定型",
+      "abstract": "理解 Dijkstra 的松弛、最小堆与定型集合不变量，追踪过期堆条目，证明非负权正确性并分析负边反例与复杂度。",
+      "file": "lessons/algo-022.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "shortest-path",
+        "dijkstra",
+        "priority-queue",
+        "relaxation",
+        "nonnegative-weights",
+        "correctness-proof"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-10",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-022",
     "opt-022",
     "ai-022"
   ],
