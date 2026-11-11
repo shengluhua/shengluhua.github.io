@@ -2124,12 +2124,34 @@
         "potential",
         "all-pairs"
       ]
+    },
+    {
+      "id": "opt-023",
+      "track": "opt",
+      "number": 23,
+      "date": "2026-11-11",
+      "week": 4,
+      "title": "第23课：Moreau Envelope 与 Moreau 分解",
+      "abstract": "推导 Moreau 包络的可微性、梯度 Lipschitz 界、Moreau 原始—对偶分解与近端点算法收敛，并用 L1、投影及非凸反例解释边界。",
+      "file": "lessons/opt-023.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "优化理论",
+        "Moreau",
+        "Prox",
+        "凸共轭",
+        "近端点算法",
+        "次梯度",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-11",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-023",
     "ai-023"
   ],
   "orphanQuizzes": []
