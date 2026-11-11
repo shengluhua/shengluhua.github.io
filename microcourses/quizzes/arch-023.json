@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "arch-023",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "一个Load使用合法VA，当前DTLB找不到映射，但页表里确有有效、允许读取的PTE。哪种判断最严谨？",
+      "options": [
+        "只要DTLB Miss，就必须产生不可恢复的Page Fault。",
+        "CPU可以通过下一层TLB或Page Walk找到翻译，并在权限合法时继续访问；TLB Miss不等于Page Fault。",
+        "若目标数据恰好L1 Hit，便可完全不验证当前虚拟映射的权限。",
+        "只要Cache使用物理Tag，TLB中的地址空间标识和失效机制就不再需要。"
+      ],
+      "answer": 1,
+      "hint": "区分“最近翻译条目不存在”和“页表/权限判定该访问不合法”。",
+      "explanation": "TLB Miss只是翻译缓存中没有所需条目；有效且授权的PTE可以经下一层TLB或Page Walk取得。Page Fault对应未映射、权限或其他架构翻译条件，不等同于缓存Miss。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "教学处理器：4KiB页，VIPT L1数据容量32KiB、8-way、64B Line，连续低位索引。某VA为0x12A80，且TLB命中，映射合法。该Load访问的十进制Cache Set Index是多少？仅填整数。",
+      "answer": 42,
+      "tolerance": 0,
+      "unit": "set",
+      "hint": "先求Set数量；把VA右移Line Offset位数，再对Set数量取模。不要把VPN当作Set Index。",
+      "explanation": "Set数=32768/(8×64)=64；Line Offset=6bit。VA 0x12A80右移6位后取低6位，即(0x12A80>>6)&63=42。全部Index位处于4KiB页偏移内。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "选择所有成立的说法。沿用本课简化的4KiB页、连续低位Set索引模型。",
+      "options": [
+        "32KiB、8-way、64B的VIPT L1可让全部Set Index位落在4KiB页内偏移中。",
+        "64KiB、8-way、64B的VIPT L1在4KiB基础页上，天然保证所有同一PA的不同VA都访问相同Set，无需其他机制。",
+        "共享映射的两种VA指向同一PA是Synonym；相同VA在两个地址空间指向不同PA是Homonym。",
+        "使用物理Tag后，OS修改页表时不再需要考虑TLB翻译失效或地址空间标识复用。",
+        "TLB命中路径与L1 Set读取可以重叠，所以把两段延迟无条件相加可能高估VIPT命中关键路径。",
+        "一次Load命中L1便能证明先前同核Store已经对其他核全局可见。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别检查页内位数、同物异名/同名异物、物理Tag与TLB的职责，以及ROB退休和跨核可见性的差别。",
+      "explanation": "A：32KiB/(8×64B)=64 sets，s+b=6+6=12；C：Synonym/ Homonym定义正确；E：VIPT翻译和Set数组读取可以并行。B：64KiB 8-way使用13个低位，超出4KiB页偏移；D：TLB仍需翻译失效协议；F：Cache命中不保证Store跨核可见。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "假设基础页4KiB、Cache Line 64B、连续低位索引。比较设计A（48KiB、12-way）与B（64KiB、8-way）：A（12分）求Set数、Index位数、b+s及简单VIPT条件；B（10分）VA1=0x2140与VA2=0x3140映射同一物理页，逐项求设计B中的Set Index并说明Synonym风险和补救；C（10分）TLB Hit 2周期、L1阵列3周期、物理Tag比较/选择1周期，PIPT顺序、VIPT并行，TLB Miss率1%、每次额外70周期，忽略L1数据Miss，求两种命中延迟及平均延迟、解释IPC边界；D（8分）解释TLB权限、Store退休与全局可见，以及Synonym与TSO Store Buffering的区别。",
+      "hint": "从S=C/(AB)出发；设计B的Index需要7位。别名地址的页内低12位一致，但地址位12不同。延迟部分分别用“顺序相加”与“并行取最大值”，再按1%的Miss比例计算额外平均代价。",
+      "rubric": [
+        "A（12分）：A的S=64、s=6、b+s=12满足；B的S=128、s=7、b+s=13不满足；解释该条件是朴素VIPT无跨组Synonym风险的结构条件，非任何Cache的绝对容量限制。",
+        "B（10分）：VA1 Set=5，VA2 Set=69（设计B共128组），虽然同一PA、同一物理Tag却落不同Set；提出增加相联度、别名检测、映射/页着色约束、PIPT等具体修复方案之一。",
+        "C（10分）：PIPT Hit=2+3+1=6，VIPT Hit=max(2,3)+1=4；平均分别6+0.01×70=6.7、4+0.01×70=4.7周期；说明OoO重叠、流水线实现、TLB Cache Miss等使IPC不能直接按延迟差推算。",
+        "D（8分）：权限由地址翻译及架构机制校验；Store退休不等于Store Buffer已传播、跨核可见；Synonym是不同VA映射同一PA产生的缓存别名，TSO Store Buffering是允许的跨核内存排序行为。"
+      ],
+      "model_answer": "A：Q=4096B，p=12，b=6。A：S=49152/(12×64)=64，s=6，b+s=12，C/A=4096=Q，满足朴素VIPT无跨Set别名条件。B：S=65536/(8×64)=128，s=7，b+s=13>12，C/A=8192>Q，不满足。B：VA1=0x2140，VA2=0x3140，页内偏移均0x140。对应(地址>>6)&127分别为5和69。它们若翻译成相同PPN，指向同一物理Line，却可能被不同虚拟Set分别缓存；物理Tag只在已选Set内检查，不能自动消除跨Set重复。可采用16-way降低Set数到64、别名检测、特定映射约束或PIPT。C：PIPT Hit=6、VIPT Hit=4周期；额外Miss期望0.01×70=0.7，所以PIPT平均6.7、VIPT平均4.7周期。这是特定重叠模型，不能推出IPC必然同比例变化。D：TLB Hit只是翻译缓存命中，仍须验证访问权限和翻译有效性。Store从ROB退休后可仍在Store Buffer，不必立即为其他核可见；同核Load可在允许条件下从较老Store转发。Synonym是地址别名结构问题，TSO Store Buffering是内存模型允许的跨核读写顺序。"
+    }
+  ]
+}
