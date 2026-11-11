@@ -2147,12 +2147,33 @@
         "次梯度",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-023",
+      "track": "ai",
+      "number": 23,
+      "date": "2026-11-11",
+      "week": 4,
+      "title": "第23课｜预训练数据配比、去重与评测污染：数据质量怎样改变优化目标",
+      "abstract": "推导训练域混合风险与采样分布，理解精确/近重复和评测污染检查，设计可审计的数据构建、打包与系统评估流程。",
+      "file": "lessons/ai-023.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "pretraining",
+        "data-mixture",
+        "deduplication",
+        "MinHash",
+        "contamination",
+        "data-quality",
+        "dataset-curation"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-11",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-023"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
