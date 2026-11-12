@@ -2242,12 +2242,33 @@
         "互补松弛",
         "收敛证明"
       ]
+    },
+    {
+      "id": "ai-024",
+      "track": "ai",
+      "number": 24,
+      "date": "2026-11-12",
+      "week": 4,
+      "title": "第24课｜Scaling Laws 与 Compute-Optimal Training：为什么参数并非越大越好？",
+      "abstract": "从语言模型经验损失缩放律与 C≈6ND 推导固定计算量下的参数/Token 最优配置，辨析 Chinchilla、外推误差和部署推理成本。",
+      "file": "lessons/ai-024.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "pretraining",
+        "scaling-laws",
+        "chinchilla",
+        "compute-optimal",
+        "flops",
+        "empirical-model",
+        "inference-cost"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-12",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-024"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
