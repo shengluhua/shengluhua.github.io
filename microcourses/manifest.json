@@ -2197,12 +2197,33 @@
         "TSO",
         "memory-model"
       ]
+    },
+    {
+      "id": "algo-024",
+      "track": "algo",
+      "number": 24,
+      "date": "2026-11-12",
+      "week": 4,
+      "title": "算法与数据结构第24课：最小生成树——割性质、Kruskal 与 Prim",
+      "abstract": "从割性质与交换论证证明 MST 贪心选择的安全性，手工追踪 Kruskal、Prim，并辨析负边、等权、非连通图与最短路树。",
+      "file": "lessons/algo-024.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "minimum-spanning-tree",
+        "cut-property",
+        "kruskal",
+        "prim",
+        "greedy",
+        "disjoint-set"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-12",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-024",
     "opt-024",
     "ai-024"
   ],
