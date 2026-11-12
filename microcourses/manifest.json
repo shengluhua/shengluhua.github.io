@@ -2219,12 +2219,34 @@
         "greedy",
         "disjoint-set"
       ]
+    },
+    {
+      "id": "opt-024",
+      "track": "opt",
+      "number": 24,
+      "date": "2026-11-12",
+      "week": 4,
+      "title": "第24课：投影梯度法、梯度映射与 KKT",
+      "abstract": "从投影变分不等式推导梯度映射与 KKT 的联系，证明凸约束问题的 O(1/K) 函数值收敛与非凸驻点界，并通过数值迭代和反例说明适用条件。",
+      "file": "lessons/opt-024.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "投影梯度",
+        "变分不等式",
+        "法锥",
+        "KKT",
+        "互补松弛",
+        "收敛证明"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-12",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-024",
     "ai-024"
   ],
   "orphanQuizzes": []
