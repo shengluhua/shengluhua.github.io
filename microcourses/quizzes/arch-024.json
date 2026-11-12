@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "arch-024",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "Core 0把X=1写入一个Write-back Cache Line，修改后该行处于有效的独占修改状态，但尚未被逐出、DRAM中仍可能保留旧值。Core 1随后通过正常的缓存一致性协议读取X。以下哪一项最准确？",
+      "options": [
+        "Write-back要求每次Store立即同步写完DRAM，因此前提不可能成立。",
+        "因为DRAM尚未更新，Core 1必然只能读到旧值。",
+        "一致性协议可以让Core 1获得Core 0修改后的数据；是否发生DRAM写回与该数据能否被一致性域中的其他核正确读取不是同一回事。",
+        "如果Core 0的Store已经退休，CPU就不需要Store Buffer，也不需要缓存一致性协议。"
+      ],
+      "answer": 2,
+      "hint": "想想MESI的Modified数据究竟在哪里；另一个核发出读取请求后，是否只能从DRAM读取？",
+      "explanation": "Write-back允许数据在脏Cache Line中停留而不立即写到下一级/DRAM。相干系统在其他核需要该块时，可以通过所有权转移、缓存间数据提供或其他协议路径向其提供最新数据。退休、传播/可见性、回写到DRAM是不同事件。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "教学用单核Write-back + Write-allocate Cache：每行64B，某Set为2-way、真LRU、初始为空；A/B/C是映射到该Set的三个不同物理块。执行 W A → W B → R A → W C → R B（W为写命中/未命中时写入该块部分字节，R为读）。规定每个读Miss或写分配Miss都从下一级取回完整64B，每次脏块逐出向下一级回写64B；忽略全部控制消息和其他流量。问下一级数据总传输量多少Byte？只填整数。",
+      "answer": 384,
+      "tolerance": 0,
+      "unit": "B",
+      "hint": "用MRU→LRU记录每一步的两条Line；先数需要完整取回的Miss，再单独数Dirty Victim。",
+      "explanation": "W A读入A并Dirty；W B读入B并Dirty；R A命中使A为MRU；W C未命中，逐出Dirty B，取回C并写Dirty；R B未命中，逐出Dirty A，取回B。共4次64B取回和2次64B脏回写：4×64+2×64=384B。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "针对普通可缓存、相干的内存和本课明确的教学策略，选择所有正确陈述。",
+      "options": [
+        "Write-through要求每个Store都必须等DRAM完成实际写入后才能从ROB退休，任何写缓冲都不允许。",
+        "Write-allocate写Miss在部分字节Store时，可能先申请整条Line及写所有权，即使实际只改动8B。",
+        "Write-back中的Dirty Line被逐出时可能产生下一级回写；Clean Line逐出通常不需要写回原数据。",
+        "如果Core 0的修改尚未写回DRAM，一致性域中的Core 1就不可能读到其新值。",
+        "允许Store Buffering的TSO中，两个核各自先Store不同地址再Load对方地址，两个Load都读到旧0可以是合法的架构结果。",
+        "No-write-allocate必定降低总访存流量、能耗和延迟，不需要考虑后续写的局部性。"
+      ],
+      "answer": [
+        1,
+        2,
+        4
+      ],
+      "hint": "把回写时机、写Miss是否填充、跨核可见性和Store→Load顺序分开；警惕“必须”“不可能”“必定”。",
+      "explanation": "B正确：写分配可能发生RFO/整行填充和所有权获取。C正确：脏逐出通常需把修改传播到下层，干净逐出无需数据回写。E正确：TSO可允许典型Store Buffering (0,0)。A错误：Write-through可用写缓冲，且下层不必立刻写DRAM。D错误：一致性协议可从拥有修改副本的缓存获取最新数据。F错误：流量与局部性、重复写、下层粒度等有关。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一教学场景：普通相干可缓存内存，64B Cache Line，首次写入目标块时L1未命中。方案A是Write-back + Write-allocate：一次冷写需要64B整行取回，若最终脏块逐出需64B回写；方案B是Write-through + No-write-allocate：每次8B Store直接向下一级发送8B，不发生L1分配；为便于比较，忽略下一级可能的额外RFO、写合并、协议控制、其它负载。A（10分）：若对同一个块重复写入n次，每次8B，推导两方案在“最终脏逐出”的数据流量，计算n=6和n=24时的流量，并求交叉阈值。B（12分）：按时间线分析Core 0的Store X=1从ROB退休、进入Store Buffer、获得写所有权、更新Dirty Line，以及Core 1经相干协议读到X=1，说明为什么不必等待写回DRAM；再给出经典双核Store Buffering程序的SC/TSO区别。C（10分）：一个12项的已提交Store队列，按连续平均速率模型每周期进入0.55项、排出0.35项，从空队列开始，估算首次达到容量的时间，说明稳态条件和为什么实际突发不能只靠平均值预测。D（8分）：为两种策略设计公平实验，至少包含总线/下一级流量、Miss、Store停顿、正确性与一致性，并给出适用边界（MMIO、预取或其他共享者等）。",
+      "hint": "A把每次小写的数据量与整行填充/最终回写分开；B画出提交、传播、共享读取三个时间点；C使用净入队速率；D不要把下一级传输直接等同于DRAM传输。",
+      "rubric": [
+        "A（10分）：准确建立两策略流量表达式，计算n=6和24并求交叉阈值，明确简化假设。",
+        "B（12分）：区别ROB退休、Store Buffer、Dirty Line、相干读取与DRAM回写；用SC顺序约束与TSO缓冲解释双核例子。",
+        "C（10分）：正确计算队列净增长和容量达到时间，给出稳定性判断与平均模型边界。",
+        "D（8分）：设计可复现实验和正确性检查，识别Write-through缓冲、写分配、内存类型和下层额外流量等局限。"
+      ],
+      "model_answer": "A：A的流量为64B读取+64B最终脏逐出=128B，B为8n B；n=6时128B vs 48B，n=24时128B vs 192B；n=16相等，超过16时A在本模型下更省下一级数据流量。B：ROB退休并非立即跨核可见；Store可先进入已提交缓冲，获得相干写所有权后更新L1 Modified行。Core 1读取时协议可以从拥有最新值的缓存取得1，而不是等待DRAM更新。双核初始X=Y=0，Core0: X=1; r0=Y，Core1: Y=1; r1=X。SC下(0,0)要求S_X<L_Y<S_Y<L_X<S_X形成环而不允许；允许Store→不同址Load放松的TSO可使两Store暂存缓冲、两Load读旧0。C：净增长0.55−0.35=0.20项/周期，12/0.20=60周期（连续平均速率模型）；若持续到达率超过服务率则不可稳态稳定，短时突发和服务抖动会改变达到容量时间。D：固定工作负载、地址分布、行大小和层次，记录L1读/写Miss、RFO/Writeback/WT写字节、下一级与DRAM实测流量、缓冲占用和Store Stall，验证跨核读取最新值及内存模型，考虑MMIO非缓存/设备排序、写合并、Coherence、预取和隐藏下一级读修改写。"
+    }
+  ]
+}
