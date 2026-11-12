@@ -129,20 +129,20 @@ D_{\mathrm{WT+NWA}} = 8n\ \mathrm{B}.
 访问序列：
 
 ~~~text
-W A → W B → R A → W C → R B
+W A → R B → W A → W C → R B
 ~~~
 
 | 访问 | Hit/Miss | 完成后本组MRU→LRU | 被逐出块 | 下一级数据行为 |
 |---|---|---|---|---|
 | W A | Miss | A(D) | 无 | 读入A 64B |
-| W B | Miss | B(D), A(D) | 无 | 读入B 64B |
-| R A | Hit | A(D), B(D) | 无 | 无 |
-| W C | Miss | C(D), A(D) | B(D) | 读入C 64B，回写B 64B |
+| R B | Miss | B(C), A(D) | 无 | 读入B 64B |
+| W A | Hit | A(D), B(C) | 无 | 无 |
+| W C | Miss | C(D), A(D) | B(C) | 读入C 64B，干净逐出不写回 |
 | R B | Miss | B(C), C(D) | A(D) | 读入B 64B，回写A 64B |
 
-D表示Dirty，C表示Clean。每一次Miss都完整取回Line；这里假定没有相干干扰。
+D表示Dirty，C表示Clean。每一次Miss都完整取回Line，且没有其他相干干扰。本例共4次64B Line Fill和1次64B Dirty Writeback，下一级数据流量为320B。
 
-注意两点：**读Hit会更新LRU次序，但不自动把Dirty改为Clean**；**写Miss可能同时产生Line Fill和Dirty Victim回写两类不同流量**。这也是“Miss数量”和“下一级传输字节”不是一一对应的原因。
+注意两点：**读Hit会更新LRU次序，但不自动把Dirty改为Clean**；**写Miss可能同时产生Line Fill和Dirty Victim回写两类不同流量，但Clean Victim不必回写数据**。这也是“Miss数量”和“下一级传输字节”不是一一对应的原因。
 
 ## 六、Store Buffer为什么是退休与传播之间的桥梁？（约3分钟）
 
@@ -310,7 +310,7 @@ Core 0把X=1写入一个Write-back Cache Line，修改后该行处于有效的�
 
 ### Lv4｜流量交叉点、Store Buffer与跨核语义联合设计（40分，开放推导，预计10—12分钟）
 
-统一教学场景：普通相干可缓存内存，64B Cache Line，首次写入目标块时L1未命中。方案A是Write-back + Write-allocate：一次冷写需要64B整行取回，若最终脏块逐出需64B回写；方案B是Write-through + No-write-allocate：每次8B Store直接向下一级发送8B，不发生L1分配；为便于比较，忽略下一级可能的额外RFO、写合并、协议控制、其它负载。A（10分）：若对同一个块重复写入n次，每次8B，推导两方案在“最终脏逐出”的数据流量，计算n=6和n=24时的流量，并求交叉阈值。B（12分）：按时间线分析Core 0的Store X=1从ROB退休、进入Store Buffer、获得写所有权、更新Dirty Line，以及Core 1经相干协议读到X=1，说明为什么不必等待写回DRAM；再给出经典双核Store Buffering程序的SC/TSO区别。C（10分）：一个12项的已提交Store队列，按连续平均速率模型每周期进入0.55项、排出0.35项，从空队列开始，估算首次达到容量的时间，说明稳态条件和为什么实际突发不能只靠平均值预测。D（8分）：为两种策略设计公平实验，至少包含总线/下一级流量、Miss、Store停顿、正确性与一致性，并给出适用边界（MMIO、预取或其他共享者等）。
+统一教学场景：普通相干可缓存内存，64B Cache Line，首次写入目标块时L1未命中。方案A是Write-back + Write-allocate：每个冷块先取回64B、最终脏逐出再回写64B；方案B是Write-through + No-write-allocate：每次8B Store向下一级发8B，不在L1分配；忽略额外RFO、写合并、协议控制和其他负载。A（10分）：工作负载包含10个互不相同的冷块：4个块各写入1次8B，另外6个块各重复写入32次8B。分别计算全选方案A、全选方案B、按块选择较省数据流量的混合方案的下一级传输总Byte，并求混合方案相对全A节省多少Byte；解释为何实际硬件不能直接照搬按块切换的模型。B（12分）：按时间线分析Core 0的Store X=1从ROB退休、进入Store Buffer、获得写所有权、更新Dirty Line，以及Core 1经相干协议读到X=1，说明为什么不必等待写回DRAM；再给出经典双核Store Buffering程序的SC/TSO区别。C（10分）：一个12项的已提交Store队列，按连续平均速率模型每周期进入0.55项、排出0.35项，从空队列开始，估算首次达到容量的时间，说明稳态条件和为什么实际突发不能只靠平均值预测。D（8分）：为两种策略设计公平实验，至少包含总线/下一级流量、Miss、Store停顿、正确性与一致性，并给出适用边界（MMIO、预取或其他共享者等）。
 
 **可选提示（不泄露标准答案）：** A把每次小写的数据量与整行填充/最终回写分开；B画出提交、传播、共享读取三个时间点；C使用净入队速率；D不要把下一级传输直接等同于DRAM传输。
 
