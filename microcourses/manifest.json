@@ -2170,10 +2170,41 @@
         "data-quality",
         "dataset-curation"
       ]
+    },
+    {
+      "id": "arch-024",
+      "track": "arch",
+      "number": 24,
+      "date": "2026-11-12",
+      "week": 4,
+      "title": "第24课｜Cache写策略与一致性前奏：Write-back、Write-through、Write-allocate、Dirty与Store Buffer",
+      "abstract": "从Store的退休、缓冲、写所有权和Dirty Line出发，辨析Write-back/through与Write-allocate/no-allocate，推导写流量模型和LRU Trace，说明缓存一致性可见性并不等于DRAM回写。",
+      "file": "lessons/arch-024.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "cache",
+        "write-back",
+        "write-through",
+        "write-allocate",
+        "dirty-bit",
+        "store-buffer",
+        "RFO",
+        "MESI",
+        "coherence",
+        "TSO",
+        "memory-model"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-11",
+  "indexVerifiedOn": "2026-11-12",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-024",
+    "opt-024",
+    "ai-024"
+  ],
   "orphanQuizzes": []
 }
