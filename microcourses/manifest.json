@@ -2265,10 +2265,42 @@
         "empirical-model",
         "inference-cost"
       ]
+    },
+    {
+      "id": "arch-025",
+      "track": "arch",
+      "number": 25,
+      "date": "2026-11-13",
+      "week": 4,
+      "title": "第25课｜非阻塞Cache与MSHR：Memory-Level Parallelism如何隐藏Miss延迟？",
+      "abstract": "理解Hit-under-Miss、Miss-under-Miss、MSHR合并与反压，利用Little定律推导MLP吞吐上界，分析指针依赖、ROB/LQ和内存带宽限制，区分AMAT、IPC及TSO。",
+      "file": "lessons/arch-025.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "cache",
+        "non-blocking-cache",
+        "MSHR",
+        "MLP",
+        "hit-under-miss",
+        "miss-under-miss",
+        "little-law",
+        "ROB",
+        "load-queue",
+        "pointer-chasing",
+        "memory-bandwidth",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-12",
+  "indexVerifiedOn": "2026-11-13",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-025",
+    "opt-025",
+    "ai-025"
+  ],
   "orphanQuizzes": []
 }
