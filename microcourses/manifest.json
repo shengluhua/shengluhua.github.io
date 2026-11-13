@@ -2340,12 +2340,34 @@
         "势函数",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-025",
+      "track": "ai",
+      "number": 25,
+      "date": "2026-11-13",
+      "week": 4,
+      "title": "第25课｜预训练稳定性：Warmup、Cosine、梯度裁剪与 Loss Spike",
+      "abstract": "从平滑性下降引理与 AdamW 更新出发，推导 Warmup/Cosine 调度和全局梯度裁剪，辨析混合精度 Loss Scaling、梯度累积及 Loss Spike 的诊断与恢复。",
+      "file": "lessons/ai-025.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "pretraining",
+        "optimization",
+        "warmup",
+        "cosine-decay",
+        "adamw",
+        "gradient-clipping",
+        "mixed-precision",
+        "loss-spike"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-13",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-025"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
