@@ -2317,12 +2317,34 @@
         "proof",
         "greedy"
       ]
+    },
+    {
+      "id": "opt-025",
+      "track": "opt",
+      "number": 25,
+      "date": "2026-11-13",
+      "week": 4,
+      "title": "第25课｜FISTA与加速近端梯度法：非光滑凸优化如何达到O(1/K²)",
+      "abstract": "从复合函数三点不等式出发，严格推导FISTA的势函数与O(1/K²)函数值界，比较ISTA与FISTA数值迭代、非单调性及理论失效边界。",
+      "file": "lessons/opt-025.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "凸优化",
+        "FISTA",
+        "ISTA",
+        "近端梯度",
+        "加速收敛",
+        "势函数",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-13",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-025",
     "ai-025"
   ],
   "orphanQuizzes": []
