@@ -2293,12 +2293,35 @@
         "memory-bandwidth",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-025",
+      "track": "algo",
+      "number": 25,
+      "date": "2026-11-13",
+      "week": 4,
+      "title": "算法与数据结构第25课：四种正确性证明——边数归纳、定型、势函数与割",
+      "abstract": "对比 Bellman–Ford、Dijkstra、Johnson 和 MST 的正确性证书，以不变量、反例及数值追踪统一理解算法何时可以安全做局部决策。",
+      "file": "lessons/algo-025.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "shortest-path",
+        "bellman-ford",
+        "dijkstra",
+        "johnson",
+        "mst",
+        "invariants",
+        "proof",
+        "greedy"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-13",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-025",
     "opt-025",
     "ai-025"
   ],
