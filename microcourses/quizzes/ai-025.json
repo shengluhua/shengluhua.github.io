@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "ai-025",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "对大模型预训练中的 Warmup、Cosine Decay 和梯度裁剪，下列哪项机制解释最严谨？（单选）",
+      "options": [
+        "A. 只要使用线性 Warmup，每一步的训练损失都必然单调下降。",
+        "B. Cosine Decay 的作用是把梯度按照余弦逐坐标变换，因此它等价于梯度裁剪。",
+        "C. Warmup 逐步提高优化器使用的学习率，后续 Decay 降低学习率；它们有助于控制更新过程，但不保证消除 Loss Spike。",
+        "D. Warmup 的唯一作用是改变 Tokenizer 产生的序列长度。"
+      ],
+      "answer": 2,
+      "hint": "区分学习率对更新量的控制、梯度范数的约束，以及随机训练中是否存在逐步单调保证。",
+      "explanation": "C 正确。Warmup/Decay 调整学习率 η_t，梯度裁剪改变输入优化器的梯度范数，两者不是同一操作；SGD 的下降引理也只有在平滑、确定性梯度和适当步长下才能给出相应保证。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "纯 SGD（无动量、无权重衰减）使用全局 L2 范数裁剪：原始梯度 g=(5,12)，阈值 c=6.5，学习率 η=0.04。先裁剪梯度，再做 θ_new=θ_old−η·g_clip。求第一个参数的更新量 Δθ₁=θ_new,1−θ_old,1。填写带符号十进制数。",
+      "answer": -0.1,
+      "tolerance": 0.0001,
+      "unit": "",
+      "hint": "先计算二维梯度的 L2 范数，再按整个向量的同一缩放因子裁剪，最后应用 SGD 的负号。",
+      "explanation": "||g||₂=√(25+144)=13，裁剪比例 6.5/13=0.5，因此 g_clip=(2.5,6)，Δθ₁=−0.04×2.5=−0.1。裁剪的是完整向量，不是逐坐标限幅。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "在使用 AdamW、梯度累积与混合精度的 Decoder-only 预训练中，下列哪些陈述成立？（多选；默认讨论常见正确实现，梯度范数按整个模型计算。）",
+      "options": [
+        "A. FP16 使用 Loss Scaling 时应先把缩放的梯度反缩放，再依据真实梯度做裁剪及优化器更新。",
+        "B. 全局裁剪阈值为 c、学习率为 η，就严格保证 AdamW（含动量、二阶预条件与权重衰减）每一步参数更新的 L2 范数不超过 ηc。",
+        "C. 若想对一个有效大 Batch 的累积梯度做全局范数裁剪，应在完成相应梯度累积后裁剪，而不是分别裁剪每个 Microbatch 再相加。",
+        "D. Loss Spike 一定是某一条训练样本本身错误；直接删除当步数据就能证明模型稳定。",
+        "E. 如果训练中每个 optimizer step 的有效 Token 数发生变化，按 step 设计的学习率曲线和按累计 Token 设计的曲线未必对应相同数据进度。",
+        "F. BF16 的指数范围通常大于 FP16，因而一般比 FP16 更不依赖 Loss Scaling；但它并不能自动防止所有数值异常。"
+      ],
+      "answer": [
+        0,
+        2,
+        4,
+        5
+      ],
+      "hint": "检查操作顺序：反缩放→累积后全局裁剪→优化器；再区分 SGD 的步长界与 AdamW 的实际更新，以及 step 与 token 两种计时单位。",
+      "explanation": "A/C/E/F 正确。Loss Scaling 是数值表示技巧，裁剪针对真实梯度；分别裁剪 microbatch 不等价于裁剪和；改变有效 batch 会使 step 进度与 token 进度脱钩。AdamW 的预条件、历史状态、权重衰减使 ηc 不是其完整更新范数的严格上界。Loss Spike 也不能单归因于某批数据。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "研究/推导题（40 分）。设计一个用于 1B 级 Decoder-only 预训练的稳定性分析方案。\n\nA（12 分）：从 L-smooth 损失的下降引理出发，推导确定性全梯度下降在合适学习率下的单步下降条件；解释该结论为何不能直接保证随机 AdamW 训练没有 Loss Spike。\n\nB（10 分）：写出线性 Warmup + Cosine Decay 的分段公式，明确总步数 T、Warmup 步数 W、η_max、η_min；再写出全局 L2 梯度裁剪公式，说明它与权重衰减不同。\n\nC（10 分）：设计一个 Warmup 时长、峰值学习率、裁剪阈值的受控消融实验，说明如何发现 Loss Spike、区分数据异常与数值/优化不稳定，并避免只凭平滑训练曲线下结论。\n\nD（8 分）：给出 FP16 Loss Scaling 与梯度累积时安全的反向—反缩放—裁剪—更新顺序，并列出分布式训练应保存的诊断指标、复现元数据和至少一种恢复策略。",
+      "hint": "A 代入 θ_new=θ−η∇f 并观察一阶负项与二阶正项；B 明确余弦的进度变量；C 记录未裁剪范数与每域 loss；D 关注 unscale、NaN/Inf 检查、有效 Token 数和 checkpoint。",
+      "rubric": [
+        "A（12分）：正确写出 L-smooth 下降引理4分、代入全梯度更新并给出 0<η<2/L 条件5分、说明随机与 AdamW 适用边界3分。",
+        "B（10分）：Warmup 与 Cosine 的分段公式及端点正确6分、全局 L2 裁剪公式与权重衰减区别4分。",
+        "C（10分）：控制变量与多随机种子3分、未平滑 loss/梯度/数据/数值异常诊断5分、明确恢复和统计评价2分。",
+        "D（8分）：反缩放和累积后裁剪顺序4分、分布式日志及恢复可复现性4分。"
+      ],
+      "model_answer": "A：若 ∇f 为 L-Lipschitz，f(θ−ηg)≤f(θ)−η∇f(θ)ᵀg+(Lη²/2)||g||²；令 g=∇f 得 f(θ−η∇f)≤f(θ)−η(1−Lη/2)||∇f||²，0<η<2/L 保证该上界不增。随机噪声、AdamW 预条件与非固定 L 不满足直接替代前提。\nB：0≤t≤W 时 η(t)=η_max·t/W；W<t≤T 时 p=(t−W)/(T−W)，η(t)=η_min+(η_max−η_min)(1+cos πp)/2。裁剪 g_clip=g·min(1,c/||g||₂)；AdamW 的 decoupled weight decay 额外作用于 θ。\nC：固定模型、数据顺序/种子组、token batch、精度、训练 FLOPs 与评测，网格调整 W、η_max、c；监测原始 train loss、held-out loss、pre/post clip global norm、裁剪率、logit/activation 范数、NaN/Inf、分域损失及数据 batch hash；跨随机种子比较 spike 数、恢复、最终质量和吞吐。\nD：对归一化的累积 loss 进行 scale→backward；跨 microbatch 累积 scaled grad；在所有分片贡献对齐后 unscale、检测 Inf/NaN；有限梯度做跨分片全局 norm 裁剪，再 AdamW 更新与调度、清梯度；若非有限则跳过当前更新并调整 loss scale。保存模型、优化器、scheduler、scaler、RNG、数据采样器/进度、版本与 checkpoint，可回滚并定位异常，避免公开敏感数据。"
+    }
+  ]
+}
