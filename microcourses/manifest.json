@@ -2364,10 +2364,44 @@
         "mixed-precision",
         "loss-spike"
       ]
+    },
+    {
+      "id": "arch-026",
+      "track": "arch",
+      "number": 26,
+      "date": "2026-11-14",
+      "week": 4,
+      "title": "第26课｜硬件预取：Stride/Stream预测、准确率、覆盖率与Cache污染",
+      "abstract": "从Stride和Stream预取算法出发，推导预取距离与MSHR容量及带宽的关系，区分准确率、覆盖率和及时性，并以Cache污染和TSO边界检验预取效果。",
+      "file": "lessons/arch-026.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": false,
+      "diagram": "mermaid",
+      "tags": [
+        "cache",
+        "hardware-prefetching",
+        "stride",
+        "stream",
+        "next-line",
+        "prefetch-distance",
+        "prefetch-degree",
+        "accuracy",
+        "coverage",
+        "timeliness",
+        "pollution",
+        "MSHR",
+        "bandwidth",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-13",
+  "indexVerifiedOn": "2026-11-14",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-026",
+    "opt-026",
+    "ai-026"
+  ],
   "orphanQuizzes": []
 }
