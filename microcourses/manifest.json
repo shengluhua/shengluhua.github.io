@@ -2439,12 +2439,33 @@
         "convex",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-026",
+      "track": "ai",
+      "number": 26,
+      "date": "2026-11-14",
+      "week": 4,
+      "title": "第26课｜Batch Size、梯度累积与数据并行：从正确梯度到GPU吞吐",
+      "abstract": "推导有效Token Batch与变长微批的梯度加权，解释梯度噪声尺度、DDP、ZeRO/FSDP显存和通信权衡及多GPU吞吐评测。",
+      "file": "lessons/ai-026.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "pretraining",
+        "batch-size",
+        "gradient-accumulation",
+        "DDP",
+        "ZeRO",
+        "FSDP",
+        "gradient-noise-scale"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-14",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-026"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
