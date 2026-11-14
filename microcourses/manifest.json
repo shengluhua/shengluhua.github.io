@@ -2394,12 +2394,34 @@
         "bandwidth",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-026",
+      "track": "algo",
+      "number": 26,
+      "date": "2026-11-14",
+      "week": 4,
+      "title": "算法与数据结构第26课：MST 唯一性、边敏感性与次小生成树",
+      "abstract": "通过基本环与基本割证明最小生成树的唯一性、单边权重敏感性及唯一 MST 时的严格次小生成树公式。",
+      "file": "lessons/algo-026.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "mst",
+        "uniqueness",
+        "sensitivity",
+        "second-best-mst",
+        "cycle-property",
+        "cut-property",
+        "exchange-argument"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-14",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-026",
     "opt-026",
     "ai-026"
   ],
