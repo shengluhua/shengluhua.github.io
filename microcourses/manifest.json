@@ -2417,12 +2417,33 @@
         "cut-property",
         "exchange-argument"
       ]
+    },
+    {
+      "id": "opt-026",
+      "track": "opt",
+      "number": 26,
+      "date": "2026-11-14",
+      "week": 4,
+      "title": "第26课｜近端梯度映射、回溯 FISTA 与单调加速",
+      "abstract": "从复合优化的近端梯度映射出发，证明局部二次上界回溯、非递减曲率 FISTA 的 O(1/K²) 收敛，以及非凸情形的驻点性；区分单调输出包装与真正的单调 FISTA。",
+      "file": "lessons/opt-026.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "prox",
+        "FISTA",
+        "backtracking",
+        "gradient-mapping",
+        "convex",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-14",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-026",
     "ai-026"
   ],
   "orphanQuizzes": []
