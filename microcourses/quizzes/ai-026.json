@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-026",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "两张 GPU 做数据并行，rank 0 有 3 个有效监督 Token，rank 1 有 9 个。各卡先对本地有效 Token 的 Loss 求均值，再用普通 DDP 平均两卡梯度。哪项判断最准确？",
+      "options": [
+        "A. DDP 会自动根据有效 Token 数加权本地均值，所以肯定等于全局 Token 均值。",
+        "B. 两卡有效 Token 数不同，等权平均本地均值梯度通常改变目标；应按有效 Token 数加权，并考虑 DDP 的平均因子。",
+        "C. 只要梯度累积步数足够大，错误的本地归一化就会自动变正确。",
+        "D. Loss Mask 只影响最终评估，不会影响训练梯度。"
+      ],
+      "answer": 1,
+      "hint": "比较“每张卡的平均梯度各占一半”和“每个有效 Token 都占同一权重”是否相同。",
+      "explanation": "局部均值梯度为 g₀、g₁ 时，普通 DDP 平均得到 (g₀+g₁)/2；全局有效 Token 平均是 (3g₀+9g₁)/12。除非两卡有效数相同或梯度恰好满足特殊条件，否则二者不等。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某标量参数 θ 的梯度来自两张 GPU：rank 0 有 3 个有效 Token，本地平均梯度为 2；rank 1 有 9 个有效 Token，本地平均梯度为 6。所有有效 Token 等权参与同一个全局平均损失。求正确的全局梯度 ∂L/∂θ（填十进制数）。",
+      "answer": 5,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先恢复每张卡的梯度总和，再除以全局有效 Token 数。",
+      "explanation": "全局梯度为 (3×2+9×6)/(3+9)=60/12=5；直接平均两个本地梯度均值会得到 4，是错误的加权方式。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "设数据并行卡数 P、每卡每次前向 b 条序列、长度 S、梯度累积 A 次。存在 Padding/Loss Mask，采用 AdamW。哪些陈述成立？（多选）",
+      "options": [
+        "A. 无论各卡有效 Token 数是否相等，普通 DDP 等权平均各卡平均梯度都严格等于全局 Token 均值梯度。",
+        "B. 固定 b、S、A 且先不考虑 Mask，P 翻倍会使名义每步 Token Batch 翻倍；固定训练 Token 预算时优化步数约减半。",
+        "C. 单样本梯度独立同分布、二阶矩有限时，B 个样本的平均梯度协方差按 1/B 缩小。",
+        "D. 普通 DDP AllReduce 会自动把模型参数、梯度及 AdamW 状态全部按 P 分片。",
+        "E. ZeRO Stage 2 典型地分片优化器状态和梯度，但仍复制参数；Stage 3 进一步分片参数并引入按需通信。",
+        "F. 累积步数 A 翻倍并减小 b 保持全局 Batch 不变，一定使每次更新的总通信量和墙钟耗时严格减半。"
+      ],
+      "answer": [
+        1,
+        2,
+        4
+      ],
+      "hint": "分别写名义 Token Batch、独立样本均值的方差，区分 DDP 的复制与 ZeRO 的三阶段分片。",
+      "explanation": "B：B_nominal=PAbS，P 翻倍时名义 Batch 翻倍（固定 token 预算的步数约减半）。C：独立样本均值梯度的 Cov=Σ/B。E：ZeRO-1 分片 optimizer states，ZeRO-2 加入梯度，ZeRO-3 再分片参数。A 忽略有效 Token 权重，D 混淆 DDP 与分片，F 不存在固定的时间/通信减半保证。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设计 8×GPU Decoder-only 预训练（允许变长 Packing、Loss Mask、AdamW 和混合精度）。A（12分）：定义 P、A、b、S 与有效 Token 数，写出全局 Token-mean Loss 和梯度；解释 DDP+累积如何避免不同 rank/microbatch 的归一化错误。B（10分）：假设单样本梯度独立同分布，均值 μ、协方差 Σ，推导 Batch 平均梯度的协方差和一种梯度噪声尺度指标，说明临界 Batch 的局限。C（10分）：比较 DDP、ZeRO-1/2/3、FSDP 的三类状态（参数、梯度、优化器状态）以及通信；用 1B 参数、8 GPU、理想化每参数 16 字节状态模型估算每卡长期状态显存，说明忽略项。D（8分）：设计等有效训练 Token/FLOPs 下扫描 Batch、累积与 GPU 数的消融，列出质量、有效吞吐、通信与稳定性指标。",
+      "hint": "A 先把所有有效 Token 的 Loss 求和再除以全局有效数；B 从独立协方差求和开始；C 逐项计数并区别常驻和临时张量；D 不要把等 Batch 等同于等墙钟时间。",
+      "rubric": [
+        "A（12分）：正确定义 PAbS、有效 mask 总数和全局 Token-mean Loss/梯度；处理不同 rank 与累积窗口并考虑 DDP 的平均因子。",
+        "B（10分）：正确推导 Cov(ḡ)=Σ/B 与 E||ḡ||²=||μ||²+trΣ/B，给出 noise scale 及独立性、接近驻点的局限。",
+        "C（10分）：列清 DDP、ZeRO-1/2/3 和 FSDP 的状态分片与 AllReduce/AllGather/ReduceScatter，使用假设的 16B/param 计算表，并指出排除项。",
+        "D（8分）：控制原始数据、总有效 Token、FLOPs、学习率/optimizer steps、随机种子和硬件；测量 held-out loss、time-to-quality、有效 Token/s、通信、显存与 Spike。"
+      ],
+      "model_answer": "A：B_nominal=PAbS；N_valid=Σm；L=(Σmℓ)/N_valid，∇L=(Σm∇ℓ)/N_valid。DDP 默认 P 卡梯度平均，故可令每卡对本地 Loss 之和乘 P/N_valid，完成累积后仅最终同步；全局有效数须跨卡统计。B：令 g_i 独立，E[g_i]=μ，Cov(g_i)=Σ，平均梯度的 Cov=Σ/B，E||ḡ||²=||μ||²+trΣ/B，噪声尺度近似 trΣ/||μ||²；并非普适精确 critical batch。C：示意 FP16 权重2B、FP16 梯度2B、FP32 master4B、Adam m4B/v4B 共16B/param。8 卡，DDP 16GB；ZeRO-1 4+12/8=5.5GB；ZeRO-2 2+14/8=3.75GB；ZeRO-3 16/8=2GB（十进制GB，不包括激活、AllGather临时参数、通信缓冲、碎片）。DDP 梯度 AllReduce；FSDP 按需 AllGather 参数并 ReduceScatter 梯度。D：固定模型、Tokenizer、源数据/有效 Token 和实际 FLOPs，扫描 P/A/b，明确学习率进度与每步 Batch 影响，报告 held-out loss、time-to-quality、有效 Token/s、Peak HBM、通信临界路径、梯度范数、loss spike 与多 seed。"
+    }
+  ]
+}
