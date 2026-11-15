@@ -2462,10 +2462,44 @@
         "FSDP",
         "gradient-noise-scale"
       ]
+    },
+    {
+      "id": "arch-027",
+      "track": "arch",
+      "number": 27,
+      "date": "2026-11-15",
+      "week": 4,
+      "title": "第27课｜Cache替换、预取协同与多核干扰：为什么更高Hit Rate未必带来更高IPC？",
+      "abstract": "用Reuse Distance解释LRU的扫描污染，比较LIP、RRIP和预取插入策略，建立共享LLC下的MPKI、CPI和公平性性能账本，区分缓存相干与TSO可见性。",
+      "file": "lessons/arch-027.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "cache",
+        "replacement",
+        "LRU",
+        "reuse-distance",
+        "LIP",
+        "RRIP",
+        "prefetch",
+        "pollution",
+        "LLC",
+        "multicore",
+        "MPKI",
+        "fairness",
+        "CAT",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-14",
+  "indexVerifiedOn": "2026-11-15",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-027",
+    "opt-027",
+    "ai-027"
+  ],
   "orphanQuizzes": []
 }
