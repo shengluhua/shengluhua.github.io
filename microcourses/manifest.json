@@ -2492,12 +2492,33 @@
         "CAT",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-027",
+      "track": "algo",
+      "number": 27,
+      "date": "2026-11-15",
+      "week": 4,
+      "title": "算法与数据结构第27课：二进制提升与 LCA——把树上路径最大值查询降到对数时间",
+      "abstract": "用 2 的幂次祖先表和路径最大边表，在 O(n log n) 预处理后 O(log n) 查询 LCA 与路径最大边，并加速 MST 唯一性和次小生成树分析。",
+      "file": "lessons/algo-027.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "binary-lifting",
+        "lca",
+        "tree-path-maximum",
+        "mst",
+        "second-best-mst",
+        "sparse-table"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-15",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-027",
     "opt-027",
     "ai-027"
   ],
