@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-027",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "在 Decoder-only 预训练中，团队想将 FP16 改为 BF16，并尝试 FP8 矩阵乘法。下列哪项机制判断最准确？",
+      "options": [
+        "A. BF16 与 FP16 都是 16 bit，所以指数范围、尾数精度完全相同。",
+        "B. BF16 的指数位通常比 FP16 多、尾数位更少；FP8 常需缩放与选择计算算子，不能默认所有训练状态都用 1 字节存储。",
+        "C. FP8 E4M3 的表示范围必然大于 BF16，因此绝不需要检查溢出。",
+        "D. Activation Checkpointing 的主要作用是把 AdamW 动量由 FP32 自动转换成 FP8。"
+      ],
+      "answer": 1,
+      "hint": "区分指数范围、尾数精度、矩阵乘法输入与优化器状态；不要把存储格式位宽直接等同于整个训练的显存比例。",
+      "explanation": "BF16 为 1 符号/8 指数/7 尾数位，FP16 为 1/5/10；BF16 动态范围更大但有效精度较粗。FP8 的 E4M3/E5M2 还有更显著的范围与精度折中，常需缩放，且训练仍可能保留 FP32 累积、主权重或优化器状态。Activation checkpoint 处理激活保存/重算，而非优化器量化。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某稠密 Decoder-only 预训练使用 N=2×10^9 个参数，8 张 GPU；按教学近似，每个有效训练 Token 的模型计算量为 6N FLOPs。8 卡合计有效吞吐为 16000 Tokens/s；按当前精度的约定，每张 GPU 峰值为 100 TFLOP/s（1 TFLOP/s=10^12 FLOP/s）。求该配置的 Model FLOPs Utilization（MFU），填写 0 到 1 的小数。",
+      "answer": 0.24,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先计算每秒模型 FLOPs＝6N×全局有效 Tokens/s，再除以 8 张卡的合计峰值 FLOP/s；注意单位 10^12。",
+      "explanation": "每秒模型 FLOPs≈6×2×10^9×16000=1.92×10^14 FLOP/s；总峰值=8×100×10^12=8×10^14 FLOP/s。MFU≈1.92/8=0.24，即 24%。这是在统一计算口径和峰值精度下的近似估计。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "考虑 Transformer 训练中的 Activation Checkpointing、选择性重计算与 MFU/HFU，下列哪些陈述成立？（多选）",
+      "options": [
+        "A. 将某个计算块设置为 Activation Checkpoint 后，数学上必须改变该块的函数定义和训练标签，才能回传梯度。",
+        "B. 在顺序网络中只保留若干块边界激活、反向时重算中间激活，可用额外 FLOPs 换取更低的激活常驻内存。",
+        "C. 若重计算区域含随机 Dropout 或其他有状态操作，需注意随机状态和计算一致性，否则可能影响正确梯度。",
+        "D. FP8 使用 8 bit 存储，所以无论优化器、激活缓存、通信和临时张量如何，训练峰值显存必然恰好减半。",
+        "E. 若按定义 HFU 将实际执行的重计算 FLOPs 计入而 MFU 只计算模型所需 FLOPs，二者可能不同；HFU 更高不必然表示同等质量训练更快。",
+        "F. Full Activation Recomputation 在所有 GPU 和所有序列长度上都必然比完全保存激活速度更快。"
+      ],
+      "answer": [
+        1,
+        2,
+        4
+      ],
+      "hint": "分别判断数学函数是否改变、重计算是否免费、随机算子是否需要一致状态，以及硬件做了更多 FLOPs 是否必然更有用。",
+      "explanation": "B：反向需要时重算中间前向激活可降低保存成本，付出额外算术。C：需正确处理 RNG/dropout/状态和分布式环境；否则重算可能不等价。E：MFU 的模型 FLOPs 口径不计多余重算，而 HFU 可以统计实际硬件执行 FLOPs，故两者可能有差异。A、D、F 分别误解函数语义、完整显存组成与性能代价。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设计一项 8 GPU、稠密 Decoder-only 预训练实验，以比较数值精度、Activation Checkpointing 和真实 GPU 吞吐。A（12 分）：说明 FP16/BF16/FP8 E4M3/E5M2 的指数—尾数权衡，给出 FP8 缩放量化/反量化公式和非有限/饱和检测，说明哪些状态应保留更高精度。B（12 分）：对 L 层顺序 Transformer，每层边界激活大小为 h，按每 k 层设重算边界的简化模型，推导保存激活量 O(h(L/k+k)) 及 k 的最优量级，说明该估计的假设与重计算开销。C（8 分）：给出有效 Token/s、MFU、HFU 的口径，解释重计算和不同 Tensor Core 峰值如何影响跨配置比较。D（8 分）：设计至少 3 种精度 × 3 种重计算策略的公平消融，列出正确性、数值、性能、显存、通信和模型质量指标。",
+      "hint": "A 先写符号/指数/尾数与 x≈s·round_FP8(x/s)；B 将边界数 L/k 和单段临时层数 k 相加并最小化；C 明确峰值 FLOPs 采用哪个精度；D 区分模型计算量、额外重计算量与 GPU 实际运行时间。",
+      "rubric": [
+        "A（12分）：正确比较各格式位宽、范围和精度，写出缩放/反缩放及溢出、下溢、累积精度控制。",
+        "B（12分）：清楚推导保存边界 L/k 与单段临时 k 带来的 O(h(L/k+k))，最优 k≈√L，注明简化和重算 FLOPs/时延代价。",
+        "C（8分）：明确有效 Token/s 与 MFU/HFU 的分子分母、峰值 dtype 和额外重计算；避免把较高利用率直接等价于更快 time-to-quality。",
+        "D（8分）：有公平的 3×3 对照、固定预算/数据/硬件、前向反向数值检查、OOM/NaN、峰值内存、通信/墙钟/训练质量等指标。"
+      ],
+      "model_answer": "A：FP16 1/5/10，BF16 1/8/7；FP8 E4M3 1/4/3（最大常见有限值448），E5M2 1/5/2（更大范围但更粗）。令 scale s>0，q=round_FP8(clip(x/s,-Fmax,Fmax))，x_hat=sq；监控 amax、饱和/零值、NaN/Inf，保留适当的高精度累积与优化器状态。B：理想顺序分组有约 L/k 个边界和 k 层重算临时激活，M≈h(L/k+k)，导数 -L/k²+1=0 得 k≈√L，最低约2h√L；忽略真实每层内部激活和临时峰值，反向需增加计算。C：MFU≈F_model_per_token×valid_token/s/(P×peak_FLOPs_per_GPU)，HFU 在对应定义下计入实际重计算，需固定相同峰值口径并同时量墙钟。D：使用 FP16/BF16/FP8（支持的 GPU）× 无/选择性/全层重计算；固定 Tokenizer、数据、模型、有效 Token、优化预算，比较前向与梯度误差、验证 CE、数值异常、峰值显存、有效 token/s、通信、MFU/HFU 与 time-to-quality；对每种策略给合适调优机会并明确混杂因素。"
+    }
+  ]
+}
