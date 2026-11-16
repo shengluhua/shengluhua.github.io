@@ -2592,12 +2592,36 @@
         "TSO",
         "coherence"
       ]
+    },
+    {
+      "id": "algo-028",
+      "track": "algo",
+      "number": 28,
+      "date": "2026-11-16",
+      "week": 4,
+      "title": "算法与数据结构第28课：四周综合考核——从摊还分析到图的最优性证明",
+      "abstract": "第4周第7天综合复习与考核：串联摊还复杂度、通用哈希、回滚并查集、Bellman–Ford、Dijkstra、Johnson 和 MST 的不变量与证明边界。",
+      "file": "lessons/algo-028.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "review",
+        "assessment",
+        "amortized-analysis",
+        "universal-hashing",
+        "rollback-dsu",
+        "bellman-ford",
+        "dijkstra",
+        "johnson",
+        "mst"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-16",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-028",
     "opt-028",
     "ai-028"
   ],
