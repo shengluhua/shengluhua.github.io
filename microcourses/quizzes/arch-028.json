@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "lesson_id": "arch-028",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某OoO处理器升级了预取器，L1 Demand Miss减少，但IPC下降；与此同时，一个已退休Store仍可能位于Store Buffer。哪项分析最严谨？",
+      "options": [
+        "只要Demand Miss减少，AMAT、CPI和端到端时间必定同比改善。",
+        "Store从ROB退休意味着该写入已经立即对所有相干核心全局可见。",
+        "应同时检查预取及时性、污染、MSHR争用与关键路径暴露；且Store退休与跨核可见性属于不同阶段。",
+        "只要使用物理Tag，TLB权限和地址空间标识都可以省略。"
+      ],
+      "answer": 2,
+      "hint": "把Cache事件数量、是否命中关键路径，以及Store的架构提交与跨核传播分开考虑。",
+      "explanation": "选择C。Demand Miss减少未必提高IPC：预取可能太晚、污染热点、占用MSHR和下级带宽，导致剩余Miss关键路径暴露更多；Store从ROB退休仍可能留在Store Buffer，跨核可见性不同于退休。其他选项混淆了不同体系结构层次。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "阶段测评数值题：程序退休2,000,000条指令，排除以下额外惩罚后的基础CPI为0.92；共有12,000次分支误预测，每次额外暴露12周期；Demand Miss为8 MPKI，每个Miss平均暴露45周期。所有新增惩罚彼此及与基础时间完全不重叠，频率与指令数固定。求总CPI，单位cycles/instruction。",
+      "answer": 1.352,
+      "tolerance": 0.000001,
+      "unit": "cycles/instruction",
+      "hint": "写成基础CPI + 误预测次数×暴露周期/总指令数 + MPKI/1000×每次Miss暴露周期。",
+      "explanation": "基础周期=2,000,000×0.92=1,840,000；误预测额外周期12,000×12=144,000；Demand Miss数=2,000,000×8/1000=16,000，额外周期16,000×45=720,000；总周期2,704,000，总CPI=2,704,000/2,000,000=1.352。加法成立仅因题目明确无重叠。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "在4KiB基础页、连续低位索引的简单VIPT模型，普通相干内存、支持OoO/非阻塞Cache以及允许Store Buffering的TSO模型下，选择所有成立的说法。",
+      "options": [
+        "32KiB、8-way、64B Line的VIPT L1，其Index加Offset刚好为12位，可以完全取自4KiB页内偏移。",
+        "64KiB、8-way、64B Line的VIPT L1，同一物理页的所有虚拟别名天然总会选择同一Set，无需任何额外处理。",
+        "分支预测错误时，恢复PC和RAT通常还必须正确处理Free List所有权及投机GHR；仅保证错误指令不退休并不保证所有内部资源状态正确。",
+        "只要MSHR增加一倍，单条严格依赖的指针追逐链就一定能够让两次后继Miss并行执行。",
+        "预取请求即使后来被程序使用，也可能晚到、抢占MSHR或驱逐热点Line，所以无法单由使用率推断IPC收益。",
+        "两核各自Store不同地址后Load对方地址都读旧0，可以在TSO下合法，而不能据此认定缓存一致性失效。",
+        "已经从ROB退休的Store在所有CPU上必须同时立刻变得可见，故经典Store Buffering的(0,0)在TSO下不可能。"
+      ],
+      "answer": [
+        0,
+        2,
+        4,
+        5
+      ],
+      "hint": "分别检查页内位数、错误路径资源恢复、依赖链、预取资源压力，以及TSO的Store→Load放松。",
+      "explanation": "A正确：Set=32KiB/(8×64B)=64，b+s=6+6=12。B错：64KiB 8-way有128 Set，需要第13个低位，虚拟别名可能分属不同Set。C正确：RAT/GHR与Free List/年轻指令恢复必须配套。D错：严格串行依赖链的下一地址未就绪，资源增加不创造并行。E正确：预取使用率不等于及时性或收益。F正确：TSO可容许两个Store暂留缓冲、两个Load读旧值。G错：退休不意味着立即对所有其他核可见。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "综合架构设计审计（40分，预计12分钟）。请按A—D小题写出计算、关键假设与至少一项反例。\n\nA｜ROB与分支恢复（10分）。3位GHR初值为101₂，规则H'=((H<<1)|b)&7。分支B先预测Taken(1)，错误路径上另一分支C预测Not Taken(0)，随后B解析实际Not Taken(0)。计算恢复后正确的3位GHR；说明除PC外，RAT、Free List和年轻指令的提交/回收应满足的两项不变量。另解释为什么错误路径Load被Squash也不能证明其所有Cache副作用已撤销。\n\nB｜VIPT别名与Cache（10分）。比较64KiB、8-way、64B Line、4KiB页的连续低位VIPT L1：算Set数、Index位数及b+s；两个VA 0x12040和0x13040映射到同一物理页帧、相同页内偏移时，求两者Set Index，解释可能的Synonym问题并提出一种处理机制。\n\nC｜MLP与性能账本（10分）。L1有12个MSHR，每个不同Line Miss平均占120周期，处理器可发0.18 Line/cycle，下级可完成0.16 Line/cycle，每Line 64B。给出理想稳态完成率及Line数据带宽上界。再讨论为什么三条严格依赖的指针追逐链无法仅靠增加MSHR达到这个上界，以及为什么不能直接把平均访存延迟当作CPI。\n\nD｜跨核可见性与实验（10分）。初始X=Y=0，Core0执行STORE X=1; r0=LOAD Y；Core1执行STORE Y=1; r1=LOAD X。证明SC不允许(r0,r1)=(0,0)，解释TSO如何允许。辨析ROB退休、Store Buffer传播、Dirty回写DRAM三者时机；提出比较“保守预取/激进预取”时至少四个必须记录的性能/正确性指标。",
+      "hint": "A恢复到B预测前GHR并移入真实方向；B先求S=C/(AB)，再按虚拟地址位计算Index；C使用Little定律；D分别列出SC保序关系和两个Load读旧值所需顺序。",
+      "rubric": [
+        "A（10分）：准确恢复3位GHR（2）；说明RAT/Free List有效物理版本与错误路径不得退休等不变量（5）；区分Squash与Cache副作用（3）。",
+        "B（10分）：Set数/Index/Offset计算（4）；两个VA对应Set及物理别名问题（4）；提出页着色、额外别名探测等可靠机制（2）。",
+        "C（10分）：Little定律和发出/内存服务三者取最小值（5）；带宽及单位（2）；解释依赖链与AMAT/CPI边界（3）。",
+        "D（10分）：SC全序环证明（3）；TSO Store Buffering合法执行（2）；退休/传播/Dirty回写关系（2）；对照实验指标与正确性边界（3）。"
+      ],
+      "model_answer": "A：B预测前H=101，预测T时变011，错误路径C预测N时变110；B实际N后恢复B预测前101再移入0得到010。检查RAT回滚、仍在Live集合的物理寄存器不得进入Free List、年轻错误路径不提交、GHR删除错误历史；已经发出的缓存请求未必可撤销。B：S=65536/(8×64)=128，s=7，b=6，b+s=13>12。0x12040右移6得0x481，低7位1；0x13040右移6得0x4C1，低7位65。二者同一物理页、相同页内偏移，但虚拟索引落不同Set，物理Tag比较只在所选Set内部进行，可能无法发现重复副本；可采用页着色、别名检查或改变L1索引策略。C：MSHR上界12/120=0.1 Line/cycle，发出0.18、下级0.16，故完成率上界0.1 Line/cycle，64B数据带宽6.4 B/cycle。三条严格指针链至多暴露约3个在途的下一地址，依赖上界为3/120=0.025 Line/cycle，增加MSHR不解除依赖。AMAT是服务延迟，CPI取决于关键路径及MLP。D：SC保留S_X<L_Y、S_Y<L_X，而两个读0还需L_Y<S_Y、L_X<S_X，形成S_X<L_Y<S_Y<L_X<S_X矛盾。TSO两Store先驻留各自Store Buffer，随后两个不同地址Load读0，可合法。Store从ROB退休不等于跨核可见；修改后的Dirty Line即使尚未写回DRAM，其他相干核也可经持有者获得新数据。比较预取需固定工作量并统计Demand MPKI、Prefetch准确/及时性、MSHR满周期、下级流量、Cache污染、IPC/完成时间和功能正确性。"
+    }
+  ]
+}
