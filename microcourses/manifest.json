@@ -2561,10 +2561,45 @@
         "hfu",
         "gpu"
       ]
+    },
+    {
+      "id": "arch-028",
+      "track": "arch",
+      "number": 28,
+      "date": "2026-11-16",
+      "week": 4,
+      "title": "第28课｜四周阶段考核：CPI、乱序执行、Cache/MLP与内存可见性综合推理",
+      "abstract": "第一阶段综合验收：统一性能账本与Amdahl边界、ROB与分支恢复、Cache/TLB/VIPT、MSHR/预取/替换、SC与TSO的架构可见性，并完成四级综合测评。",
+      "file": "lessons/arch-028.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "phase-exam",
+        "review",
+        "CPI",
+        "Amdahl",
+        "ROB",
+        "rename",
+        "branch",
+        "cache",
+        "TLB",
+        "VIPT",
+        "MSHR",
+        "MLP",
+        "prefetch",
+        "TSO",
+        "coherence"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-15",
+  "indexVerifiedOn": "2026-11-16",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-028",
+    "opt-028",
+    "ai-028"
+  ],
   "orphanQuizzes": []
 }
