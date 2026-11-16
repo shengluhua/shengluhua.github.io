@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-028",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某团队报告模型在公开问答基准上的准确率提高，但新训练集含有该基准题目及其解析的改写，同时训练损失下降。下列哪项结论最严谨？",
+      "options": [
+        "A. 训练交叉熵降低就从数学上保证未见任务准确率提高，因此无需检查数据来源。",
+        "B. 更低训练损失不能单独证明泛化；应审计题目、答案和改写的重合，并用独立未污染评测集验证。",
+        "C. 只要训练与测试文件名不同，就可以严格证明不存在评测泄漏。",
+        "D. 只要模型使用 Causal Mask，训练集中的评测答案就不可能造成污染。"
+      ],
+      "answer": 1,
+      "hint": "区分训练分布上的拟合、真实未见数据上的泛化，以及架构中的因果 Mask 所防止的未来 token 泄漏。",
+      "explanation": "B 正确。训练交叉熵只衡量给定训练样本与目标上的概率拟合，不保证独立测试泛化；题目/答案/解析及近似改写若进入训练，会使公开基准偏乐观。不同文件名不能保证内容隔离。Causal Mask 限制一次自回归前向中的未来输入可见性，与跨训练集/评测集的内容污染是不同问题。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某序列的三个位置具有词表大小 V=3 的 logits：z₀=(ln3,0,0)，z₁=(0,0,0)，z₂=(0,0,ln2)。移位后的标签分别为 [0,忽略,2]，Loss Mask 为 [1,0,1]。采用自然对数、按有效 Token 数平均的 Cross-Entropy。求平均损失 L，填写至少四位小数。",
+      "answer": 0.6019864022,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "先在词表维做 Softmax；仅计算第 0、2 位置正确类别的负对数概率，分母是有效位置数，不是 3。",
+      "explanation": "位置 0 的正确概率为 3/(3+1+1)=3/5；位置 2 的正确概率为 2/(1+1+2)=1/2。中间位置被忽略。因此 L=[−ln(3/5)−ln(1/2)]/2=ln(10/3)/2≈0.6019864022。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "考虑稠密 Decoder-only 模型的固定计算预算预训练与 GPU 训练系统，下列哪些陈述成立？（多选；各陈述按其给定假设理解。）",
+      "options": [
+        "A. 若近似 C=6ND 且 C 固定，参数 N 增为两倍时，可处理的训练 Token 数 D 约降为一半。",
+        "B. FlashAttention 的分块在线 Softmax 会使标准密集精确 Attention 的全部 Q/K 两两交互从 Θ(T²d) 严格降为 Θ(Td)。",
+        "C. 不同 GPU 的有效 Token 数不同时，普通 DDP 等权平均本地 token-mean 梯度必然等于全局 token-mean 梯度。",
+        "D. ZeRO-3/FSDP 全分片可以分片参数、梯度与优化器状态，但计算时可能需要临时聚合参数，理论长期状态显存不等于实际峰值。",
+        "E. Activation Checkpointing 可通过反向时重算降低要保存的激活；即使 HFU 上升，也不能由此推断同等质量训练更快。",
+        "F. 即使 Tokenizer 与评估数据不同，也可以仅凭模型的 per-token Perplexity 数值做严格公平比较。"
+      ],
+      "answer": [
+        0,
+        3,
+        4
+      ],
+      "hint": "分别计算 ND 固定时的反比例；区分密集 Attention 算术量与 HBM 访存；区分 rank 等权与 token 等权、长期状态与临时峰值、硬件利用率与 time-to-quality。",
+      "explanation": "A 正确：D=C/(6N)。D 正确：ZeRO-3/FSDP 全分片仍可能在前向/反向临时 AllGather，激活和通信缓冲影响峰值。E 正确：重算以额外计算换激活内存，HFU 增加不一定缩短时间。B 将减少显式矩阵 HBM IO 错写为消灭二次密集 Q/K 算术；C 忽略不同有效 token 数所需的加权；F 忽略 tokenizer、数据和损失定义的可比性。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "为一个稠密 Decoder-only 预训练项目设计从数据到 GPU 的可复现训练与评测方案。A（12 分）：写出 Token IDs→Embedding→Causal Attention→LM Head→移位标签 Cross-Entropy 的形状和计算关系；推导单位置 dℓ/dzₖ，并说明 Causal Mask 与 Loss Mask 的不同职责。B（10 分）：给定经验式 L(N,D)=E+A/N^α+B/D^β 与 C=kND（常数均为正），推导固定 C 的最优 N*(C)、D*(C) 及 α=β 时的增长指数，说明经验式的有效范围。C（10 分）：8 卡、不同长度/有效 Token 的 DDP+梯度累积中写出正确的全局 token-mean 梯度，解释 FP16 unscale、检查非有限值、全局裁剪、AdamW 更新的顺序；比较普通 DDP 与全分片 FSDP 的模型状态和通信。D（8 分）：提出控制数据去重、评测污染、Tokenizer、预算与超参的消融；同时报告 held-out CE/BPB、任务质量、有效 Token/s、峰值显存、通信/重计算和 time-to-quality。",
+      "hint": "A 从矩阵形状、Softmax 与 −ln pᵧ 出发；B 代入 D=C/(kN) 求导；C 先累积每个有效 Token 的梯度和，再归一化并注意 DDP 默认平均；D 区分经验拟合、离线质量指标和实际墙钟成本。",
+      "rubric": [
+        "A（12 分）：给出正确的 B×T→B×T×d→B×T×V 形状与因果/移位机制（5分）；推导 ∂ℓ/∂zₖ=pₖ−1[k=y]（4分）；正确区分 Attention Mask 与 Loss Mask（3分）。",
+        "B（10 分）：正确设 K=C/k、消元、求导并给出 N*=[αA/(βB)]^{1/(α+β)}K^{β/(α+β)}（4分）；D*=[βB/(αA)]^{1/(α+β)}K^{α/(α+β)}（4分）；指出 α=β 的平方根增长及经验适用范围（2分）。",
+        "C（10 分）：给出按有效 Token 求和/全局 N_valid 的梯度和 DDP 平均因子的处理（4分）；明确梯度累积→unscale→finite check→clip→AdamW（3分）；正确区分 DDP 复制与 FSDP 分片/AllGather（3分）。",
+        "D（8 分）：涵盖数据血缘/去重/测试隔离与隐私检查（2分），公平的 Tokenizer、FLOPs、数据与随机种子控制（2分），质量/性能/显存/通信/稳定性/时间达标指标（4分）。"
+      ],
+      "model_answer": "A：输入 IDs∈{0,…,V−1}^{B×T}，嵌入后 H∈R^{B×T×d}；每头 Q,K,V 在时间维做 S=QKᵀ/√d_h+M_causal、P=softmax_key(S)、O=PV；最终 LM Head 给 Z∈R^{B×T×V}。输入/标签错位，ℓ=−z_y+log∑e^{z_j}，故 ∂ℓ/∂z_k=p_k−1[k=y]；Attention Mask 避免未来输入泄漏，Loss Mask 排除无效监督。B：固定 K=C/k，D=K/N，令 −αAN^{−α−1}+βBK^{−β}N^{β−1}=0，得到 N*=[αA/(βB)]^{1/(α+β)}K^{β/(α+β)}、D*=[βB/(αA)]^{1/(α+β)}K^{α/(α+β)}；α=β 时两者∝√C，仅是经验拟合约束下的结论。C：g=(∑_{p,a,i,t}m_{pait}∇ℓ_{pait})/N_valid；若普通 DDP 对 rank 取均值，可按 P/N_valid 缩放各 rank 的有效 loss-sum 后反传，完整累积再 unscale/finite-check/全局裁剪/AdamW。DDP 复制参数/优化器等，FSDP 分片并引入按需通信。D：冻结评估与污染审计，记录数据血缘，固定 tokenizer/原始数据或显式分开比较，等有效 Token/FLOPs 加独立验证；报告质量、有效吞吐、显存、通信、失败率和 time-to-quality，不用单个训练 CE 或 MFU 替代总体结论。"
+    }
+  ]
+}
