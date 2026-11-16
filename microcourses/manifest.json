@@ -2643,12 +2643,35 @@
         "投影",
         "算子分裂"
       ]
+    },
+    {
+      "id": "ai-028",
+      "track": "ai",
+      "number": 28,
+      "date": "2026-11-16",
+      "week": 4,
+      "title": "第28课：前四周综合复盘与第一次阶段考核",
+      "abstract": "串联统计学习、梯度优化、Transformer、自回归预训练与GPU系统，推导交叉熵、缩放最优分配和分布式梯度，并完成第一次阶段考核。",
+      "file": "lessons/ai-028.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "review",
+        "phase-exam",
+        "cross-entropy",
+        "transformer",
+        "scaling-laws",
+        "data-quality",
+        "ddp",
+        "mixed-precision",
+        "gpu"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-16",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-028"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
