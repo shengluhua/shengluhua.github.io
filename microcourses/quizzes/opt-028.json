@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "lesson_id": "opt-028",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "在下列陈述中，哪一项在其所述假设下必然成立？",
+      "options": [
+        "A. 对任意闭凸集 C 上的约束最优点 x^*，必有 \\nabla f(x^*)=0。",
+        "B. 若 f 可微且 \\nabla f 为 L-Lipschitz，则对任意 x,y 有\nf(y)\\le f(x)+\\langle\\nabla f(x),y-x\\rangle+\\frac L2\\|y-x\\|^2。",
+        "C. 严格凸必推出存在全局 \\mu>0 的强凸常数。",
+        "D. KKT 中 g_i(x^*)=0 必推出对应乘子 \\lambda_i^*>0。"
+      ],
+      "answer": 1,
+      "hint": "区分约束最优性、Smooth 的二次上界、严格凸与强凸，以及互补松弛的逻辑方向。",
+      "explanation": "梯度 L-Lipschitz 等价地给出 descent lemma：f(y)≤f(x)+⟨∇f(x),y−x⟩+(L/2)||y−x||²。约束最优点梯度不必为零；严格凸不保证全局正强凸模量；活跃约束允许零乘子。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "考虑\n\\[\nf(x)=\\frac12(x-5)^2,\\qquad\nh(x)=2|x|+\\delta_{[0,4]}(x),\n\\]\n其中 \\delta_{[0,4]} 在区间 [0,4] 上为 0、区间外为 +\\infty。已知 L=1，取近端梯度步长 \\eta=\\frac14、初值 x_0=0：\n\\[\nx_{k+1}=\\operatorname{prox}_{\\eta h}\\bigl(x_k-\\eta f'(x_k)\\bigr).\n\\]\n对 v\\ge0，有\n\\[\n\\operatorname{prox}_{\\eta h}(v)=\\min\\{4,\\max\\{0,v-2\\eta\\}\\}.\n\\]\n连续执行两步，求 x_2。只填写数值，保留四位小数。",
+      "answer": 1.3125,
+      "tolerance": 0.0001,
+      "unit": "",
+      "hint": "先算 v_k=x_k−η(x_k−5)，再减去 2η，并检查结果是否落在 [0,4]。",
+      "explanation": "η=0.25。第一步 v_0=0−0.25(−5)=1.25，故 x_1=1.25−0.5=0.75。第二步 f'(0.75)=−4.25，v_1=0.75+1.0625=1.8125，故 x_2=1.8125−0.5=1.3125。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "single",
+      "points": 25,
+      "prompt": "考虑 f(x)=\\frac12x^2（其梯度 Lipschitz 常数 L=1），从 x_0=1 使用普通梯度下降\n\\[\nx_{k+1}=x_k-\\eta\\nabla f(x_k)\n\\]\n并取 \\eta=2。哪一项正确？",
+      "options": [
+        "A. x_k 线性收敛到 0，因为 η=2/L 是允许的严格收敛步长。",
+        "B. x_k=(-1)^k，目标值恒为 1/2；迭代不收敛，说明端点 η=2/L 不能被误当成一般收敛保证。",
+        "C. x_1=0，因此一步到达全局最优点。",
+        "D. |x_k| 每步严格增大并趋于无穷。"
+      ],
+      "answer": 1,
+      "hint": "先把梯度写成 x_k，得到一个标量线性递推；注意端点与开区间步长条件的区别。",
+      "explanation": "递推为 x_{k+1}=(1−η)x_k=−x_k，所以 x_k=(−1)^k。序列在 1 与 −1 间振荡，f(x_k)=1/2 不变。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "设所有变量属于有限维欧氏空间。完成 A—D，写出关键假设与推导步骤。\n\n**A（10 分）：Smooth 与 GD。** 设 f 凸、可微且 L-Smooth，最优点 x^* 存在。由下降引理证明\n\\[\nf(x-\\nabla f(x)/L)\\le f(x)-\\frac{1}{2L}\\|\\nabla f(x)\\|^2.\n\\]\n进一步利用凸性和平方距离恒等式证明\n\\[\nf(x_K)-f^*\\le\\frac{L\\|x_0-x^*\\|^2}{2K}.\n\\]\n\n**B（10 分）：Prox、投影与 Moreau。** 对真、下半连续、凸函数 h，令 p=\\operatorname{prox}_{\\gamma h}(v)。从近端子问题的一阶最优性写出包含式。再令 h=\\delta_C，其中 C 为非空闭凸集，推导投影条件 v-p\\in N_C(p)，并写出 Moreau envelope\n\\[\ne_\\gamma h(v)=\\min_z\\left\\{h(z)+\\frac{1}{2\\gamma}\\|z-v\\|^2\\right\\}\n\\]\n的梯度公式。\n\n**C（12 分）：KKT、活跃约束与零乘子。** 求解\n\\[\n\\begin{aligned}\n\\min_{x_1,x_2}\\quad&\n\\frac12[(x_1-3)^2+(x_2-2)^2]+|x_1|+2|x_2|\\\\\n\\text{s.t.}\\quad&x_1+x_2\\le2.\n\\end{aligned}\n\\]\n给出最优点、活跃集、一个合法的非光滑 KKT 次梯度与乘子，并验证驻点、原始/对偶可行及互补松弛。解释本例为何说明“活跃不必对应正乘子”。\n\n**D（8 分）：对偶与理论边界。** 写出拉格朗日对偶函数 q(\\lambda,\\nu)，用不等式证明弱对偶 q(\\lambda,\\nu)\\le p^*。说明 Slater、LICQ、MFCQ 各自主要保证什么；最后比较凸 L-Smooth 情形下 GD 的 O(1/K) 与 AGD/FISTA 的 O(1/K^2) 保证，并写明不能省略的关键假设。",
+      "hint": "A：把 x^+=x−∇f(x)/L 代入下降引理，再将目标差改写成相邻平方距离之差。B：使用 0∈∂h(p)+(p−v)/γ；指标函数的次微分就是法锥。C：先求可分目标的无约束最优点，再检查耦合约束；在 x_2=0 处使用区间次微分。D：从 q=inf L≤L(可行点)≤f(可行点) 出发，分清凸问题的 Slater 与局部非线性规划的 LICQ/MFCQ。",
+      "rubric": [
+        "A（10 分）：正确写出 L-Smooth 下降引理并代入 1/L 梯度步（4 分）；推出平方距离望远镜不等式并求和得到 O(1/K)（6 分）。",
+        "B（10 分）：近端最优性 0∈∂h(p)+(p−v)/γ（3 分）；指标函数推出投影/法锥条件（3 分）；Moreau envelope 梯度为 (v−prox_{γh}(v))/γ（4 分）。",
+        "C（12 分）：最优点 (2,0)，原始可行且约束活跃（3 分）；给出 ∂(2|x_2|)=[−2,2] 中的合法次梯度并验证驻点（4 分）；λ=0、互补松弛及凸 KKT 充分性解释正确（5 分）。",
+        "D（8 分）：弱对偶不等式链正确（3 分）；准确区分 Slater、LICQ、MFCQ（3 分）；GD/AGD 收敛率及凸性、Smooth、步长、解存在等条件说明正确（2 分）。"
+      ],
+      "model_answer": "**A.** L-Smooth 的下降引理为\n\\[\nf(y)\\le f(x)+\\langle\\nabla f(x),y-x\\rangle+\\frac L2\\|y-x\\|^2.\n\\]\n取 y=x-\\nabla f(x)/L，即得\n\\[\nf(y)\\le f(x)-\\frac{1}{2L}\\|\\nabla f(x)\\|^2.\n\\]\n再记 x^+=x-\\nabla f(x)/L。由凸性\n\\(f(x)-f^*\\le\\langle\\nabla f(x),x-x^*\\rangle\\)，结合下降引理可整理为\n\\[\nf(x^+)-f^*\\le\n\\frac L2\\bigl(\\|x-x^*\\|^2-\\|x^+-x^*\\|^2\\bigr).\n\\]\n对 k=0,\\ldots,K-1 求和；GD 的目标值单调不增，故\n\\[\nK(f(x_K)-f^*)\\le\\frac L2\\|x_0-x^*\\|^2.\n\\]\n\n**B.** 近端子问题的一阶最优性为\n\\[\n0\\in\\partial h(p)+\\frac{p-v}{\\gamma},\n\\quad\\text{即}\\quad\n\\frac{v-p}{\\gamma}\\in\\partial h(p).\n\\]\n若 h=\\delta_C，则 \\(\\partial\\delta_C(p)=N_C(p)\\)，所以\n\\(v-p\\in N_C(p)\\)，等价于\n\\(\\langle v-p,z-p\\rangle\\le0\\) 对所有 z∈C 成立。Moreau envelope 可微且\n\\[\n\\nabla e_\\gamma h(v)=\\frac{v-\\operatorname{prox}_{\\gamma h}(v)}{\\gamma}.\n\\]\n\n**C.** 不带耦合约束时，两个坐标分别做软阈值：\\(x_1^*=3-1=2\\)，\\(x_2^*=0\\)（因为中心 2 被阈值 2 压到 0）。该点满足 \\(x_1+x_2=2\\)，故也是约束问题的全局最优点。约束 \\(g=x_1+x_2-2\\le0\\) 活跃。光滑部分梯度为 \\((-1,-2)\\)；正则项次微分可取 \\(s=(1,2)\\)，因为 \\(1\\in\\partial|2|\\)，且 \\(2\\in\\partial(2|0|)=[-2,2]\\)。取 \\(\\lambda=0\\)，则\n\\[\n0=(-1,-2)+(1,2)+0(1,1).\n\\]\n原始可行、\\(\\lambda\\ge0\\)、驻点成立，且 \\(\\lambda g=0\\)。目标和约束均凸，因此 KKT 足以证明全局最优。这里约束活跃但乘子为零。\n\n**D.** 对 \\(g_i(x)\\le0, Ax=b\\)，\n\\[\nL(x,\\lambda,\\nu)=f(x)+\\sum_i\\lambda_i g_i(x)+\\nu^T(Ax-b),\n\\quad \\lambda\\ge0,\n\\]\n\\[\nq(\\lambda,\\nu)=\\inf_x L(x,\\lambda,\\nu).\n\\]\n对任意原始可行 x 和对偶可行乘子，\n\\[\nq(\\lambda,\\nu)\\le L(x,\\lambda,\\nu)\n=f(x)+\\sum_i\\lambda_i g_i(x)\\le f(x),\n\\]\n故取原始最优值后有 \\(q(\\lambda,\\nu)\\le p^*\\)。Slater 是凸问题的严格可行资格条件，在标准正则假设下保证强对偶及最优乘子存在；LICQ 是活跃约束梯度线性无关，保证常见光滑 NLP 的 KKT 必要性并使乘子唯一；MFCQ 较弱，可保证 KKT 乘子存在但不保证唯一。对凸 L-Smooth 无约束问题，GD 步长 1/L 有 \\(O(1/K)\\) 函数值误差；AGD 有 \\(O(1/K^2)\\)，但需要凸性、L-Smooth、最优点存在和正确的加速参数。复合情形的 PGD/FISTA 还要求 h 真、下半连续、凸且近端子问题正确求解；FISTA 迭代的函数值不必逐步单调。"
+    }
+  ]
+}
