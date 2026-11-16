@@ -2617,12 +2617,37 @@
         "johnson",
         "mst"
       ]
+    },
+    {
+      "id": "opt-028",
+      "track": "opt",
+      "number": 28,
+      "date": "2026-11-16",
+      "week": 4,
+      "title": "第28课：四周阶段测验与综合复盘——凸性、KKT、GD/AGD、近端方法",
+      "abstract": "复盘前四周凸几何与光滑性、KKT 与对偶、GD/AGD 收敛、Prox/Moreau/投影及算子分裂，并用四级综合测验检查假设—推导—算法—证书的完整链条。",
+      "file": "lessons/opt-028.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "四周阶段测验",
+        "凸优化",
+        "KKT",
+        "对偶",
+        "GD",
+        "AGD",
+        "Prox",
+        "Moreau",
+        "投影",
+        "算子分裂"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-16",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-028",
     "ai-028"
   ],
   "orphanQuizzes": []
