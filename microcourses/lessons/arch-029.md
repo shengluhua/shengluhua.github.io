@@ -308,13 +308,13 @@ Core 1：Y=1仍在本核Store Buffer；之后Load X读取旧0
 
 **B｜False Sharing与量化代价（10分）** 同一个对齐64B Line里，Core0只写偏移0处的8B计数器a，Core1只写偏移8处的8B计数器b。两核交替共完成400次写，第一笔取得写所有权的成本不计，以后每次核间写所有权交换额外暴露70周期，成本互不重叠。求所有权交换次数和额外周期；把a、b拆到各自独立的Line后，说明在无其他共享者的理想条件下上述交换会如何变化，并讨论额外空间成本。
 
-**C｜内存模型证明（10分）** 初始X=Y=0，Core0执行STORE X=1; r0=LOAD Y；Core1执行STORE Y=1; r1=LOAD X。以严格偏序成环的方式证明SC下(r0,r1)=(0,0)不可能；再用Store Buffer解释TSO为什么可以产生(0,0)且不违反MESI。指出本核同址Store-to-Load Forwarding为何与跨核可见性不同。
+**C｜内存模型与单侧屏障（10分）** 初始X=Y=0。Core0执行STORE X=1; FENCE; r0=LOAD Y；Core1执行STORE Y=1; r1=LOAD X。假设FENCE在TSO中保证本核较老Store在后继Load之前达到全局可见点，且没有其他写。判断**只有Core0设置FENCE**时(r0,r1)=(0,0)是否可能；再判断**Core1也在Store与Load之间增加同类FENCE**后是否可能。分别用可见顺序或时间线证明，并解释这与MESI及本核同址Store-to-Load Forwarding的关系。
 
 **D｜实验设计与边界（8分）** 为比较“同Line的两个独立计数器”与“分别Cache Line对齐”的实现设计公平实验：固定任务量，给出至少四项应收集的统计（如HITM、Invalidation、缓存Miss、端到端时间、IPC、P99、空间/Cache工作集等），并解释为什么不能只凭总Miss Rate或DRAM内容判断性能与正确性。
 
 <details><summary>可选提示（不泄露答案）</summary>
 
-A先逐项确定读者与写者是否已持有有效Line；B第一笔之后才统计交替的所有权切换；C分别写出两条程序顺序边和两条读旧值需要的边；D把相干事件、性能、工作集和正确性分开。
+A依次追踪持有者和读值；B不要计入第一笔初始获取；C对比只有单侧Fence与双侧Fence时能否构造无环的跨核可见顺序；D检查相干流量和端到端时间。
 
 </details>
 
