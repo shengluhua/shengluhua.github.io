@@ -2668,10 +2668,38 @@
         "mixed-precision",
         "gpu"
       ]
+    },
+    {
+      "id": "arch-029",
+      "track": "arch",
+      "number": 29,
+      "date": "2026-11-17",
+      "week": 5,
+      "title": "第29课｜MESI协议与缓存行所有权：Invalidation、共享读与写权限转移",
+      "abstract": "从四种MESI稳定状态出发推导共享读、所有权升级、Modified转发与False Sharing；严格区分缓存一致性、Store Buffer全局可见性和SC/TSO内存模型。",
+      "file": "lessons/arch-029.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "cache-coherence",
+        "MESI",
+        "invalidation",
+        "ownership",
+        "false-sharing",
+        "store-buffer",
+        "TSO",
+        "memory-consistency"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-16",
+  "indexVerifiedOn": "2026-11-17",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-029",
+    "opt-029",
+    "ai-029"
+  ],
   "orphanQuizzes": []
 }
