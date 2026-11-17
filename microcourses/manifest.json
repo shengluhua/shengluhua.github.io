@@ -2714,12 +2714,26 @@
         "ford-fulkerson",
         "min-cut"
       ]
+    },
+    {
+      "id": "opt-029",
+      "track": "opt",
+      "number": 29,
+      "date": "2026-11-17",
+      "week": 5,
+      "title": "数学优化理论第29课：坐标下降——循环、随机与Gauss–Southwell规则",
+      "abstract": "推导坐标光滑下的单步充分下降、重要性采样与GS-L的线性收敛，比较循环更新、随机选取与贪心选取，讲解耦合二次函数迭代和非可分非光滑失败反例。",
+      "file": "lessons/opt-029.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": []
     }
   ],
   "indexVerifiedOn": "2026-11-17",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-029",
     "ai-029"
   ],
   "orphanQuizzes": []
