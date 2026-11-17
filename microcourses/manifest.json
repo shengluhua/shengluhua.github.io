@@ -2729,12 +2729,34 @@
       "quiz": true,
       "diagram": "mermaid",
       "tags": []
+    },
+    {
+      "id": "ai-029",
+      "track": "ai",
+      "number": 29,
+      "date": "2026-11-17",
+      "week": 5,
+      "title": "第29课：Prefill、Decode 与 KV Cache——推理为何受显存带宽限制",
+      "abstract": "推导 Prefill/Decode 计算量、GQA KV 显存公式、Roofline 带宽瓶颈与 TTFT/TPOT，并设计服务实验。",
+      "file": "lessons/ai-029.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "true",
+      "tags": [
+        "LLM inference",
+        "Prefill",
+        "Decode",
+        "KV Cache",
+        "GQA",
+        "Roofline",
+        "TTFT",
+        "TPOT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-17",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-029"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
