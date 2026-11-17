@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-029",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "一个标准全量因果注意力 Decoder-only 模型，输入 Prompt 长 S，之后自回归生成 G 个 Token。关于 Prefill、Decode 与 KV Cache，哪种机制描述最准确？",
+      "options": [
+        "Prefill 只能一次处理一个 Prompt Token，而 Decode 可以无依赖地并行生成同一请求的所有后续 Token。",
+        "Prefill 可以并行处理已知 Prompt 的不同位置并建立 KV；Decode 逐 Token 生成，KV Cache 避免重复计算历史 K/V，但仍须访问历史 KV。",
+        "KV Cache 保存完整历史 Attention Probability Matrix，因此后续不必访问 K 和 V。",
+        "使用 KV Cache 后，单步全量 Attention 的计算量严格与历史长度无关。"
+      ],
+      "answer": 1,
+      "hint": "区分 Prompt 已知与后续 Token 尚未确定；缓存的是历史 K/V，还是历史注意力概率？",
+      "explanation": "Prefill 在正确因果 Mask 下处理已知 Prompt 的所有位置，产生各层 KV；自回归 Decode 的下一 Token 依赖已生成前缀。KV Cache 保存历史 K/V，省掉旧 Token 的重复投影与网络计算，但新 Query 仍要读取历史 KV。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个 GQA 模型有 L=28 层，每层 H_kv=4 个 KV Head，Head Dimension d_h=128。KV 使用 BF16（每元素 2 bytes）。B=3 条请求，各自缓存 T=2048 Token，不共享前缀，忽略分页碎片、元数据、量化 Scale、设备分片。求全体 KV Cache 容量，单位 MiB（1 MiB=2^20 bytes）。填写数值。",
+      "answer": 168,
+      "tolerance": 0.001,
+      "unit": "MiB",
+      "hint": "K 和 V 各存一份；按层数、KV Head 数、维度、长度、Batch 和字节数相乘，再换算 MiB。",
+      "explanation": "M=2×28×3×2048×4×128×2=176160768 bytes=168 MiB。GQA 应使用 KV Head 数而不是 Query Head 数。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "针对标准全量因果注意力的 LLM 在线服务，不引入近似或稀疏注意力，下列哪些陈述成立？（多选）",
+      "options": [
+        "缓存历史 KV 可避免重复计算旧 Token 的 K/V，但单步全量 Attention 仍需随历史长度增长的 KV 读取。",
+        "Prefill 和小 Batch Decode 在任意 GPU 上都具有相同算术强度，因而必然同为 compute-bound。",
+        "TTFT 通常包括排队和 Prefill 等首 Token 路径开销；Prefill/Decode 分离可减小干扰，但存在 KV 传输与调度成本。",
+        "PagedAttention 让新 Query 对 T 个旧 Key 的精确全量 Attention 操作数直接由 Θ(T) 降成 Θ(1)。",
+        "提高 Decode Batch 可能摊薄权重读取的单位输出 Token 成本，同时增加 KV 占用并可能改变单请求延迟。",
+        "不开启 KV Cache 而每步重新运行完整前缀，与使用 Cache 的历史计算量严格相同。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别考虑数学上 Q 要访问多少 Key、权重读取的 Batch 摊销、SLO 中的排队及跨设备 KV 传输。",
+      "explanation": "正确为 A、C、E。全量 Decode 仍需要历史 KV；P/D 分离减少资源干扰但引入迁移成本；大 Batch 更利于权重复用但会增加 KV 与尾延迟压力。B 把算术强度绝对化，D 错把内存分页当成稀疏 Attention，F 忽略重新计算历史前缀。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "为 L 层、H_q 个 Query Head、H_kv 个 KV Head、维度 d_h 的稠密因果 Decoder-only 模型设计推理服务分析。每请求 Prompt 长 S、生成 G 个 Token，KV 每元素 b 字节。\n\nA（12 分）：从 K/V 张量形状推导 B 条请求各缓存 T 个 Token 的 KV 字节数；比较 MHA/GQA/MQA，说明公式限制与 PagedAttention 的作用。\n\nB（10 分）：推导 Prefill 与单步 Decode 的全量 Self-Attention 算术阶和 G 步累积阶；用权重与 KV 读取解释 Roofline/带宽判断，指出 FLOPs 不等于实测时延。\n\nC（10 分）：明确定义 TTFT、ITL/TPOT、吞吐与 Goodput，设计共享 GPU 和 P/D 分离对照，包含排队、传输和 p95 SLO。\n\nD（8 分）：设计公平消融，至少覆盖上下文长度、Batch、Cache 开关、精度/硬件、输出一致性、显存峰值和同步计时。",
+      "hint": "A 写 2×层数×请求数×缓存长度×KV Head×Head Dim×字节；B 分开 S 个 Prompt Query 和每步 1 个新 Query；C 关注尾延迟和 KV 迁移；D 必须固定模型与请求分布。",
+      "rubric": [
+        "A（12）：KV 本体公式 2LBTH_kv d_h b 正确（5）；MHA/GQA/MQA 区别（4）；假设、PagedAttention 和碎片说明（3）",
+        "B（10）：Prefill Θ(LS²H_qd_h)，单步 Decode Θ(LTH_qd_h)，累积 Θ(LH_qd_h(GS+G²))（6）；权重/KV 访存与 Roofline（4）",
+        "C（10）：TTFT/ITL/TPOT/Goodput 定义（5）；双 SLO、P/D 干扰及迁移、混合负载对照（5）",
+        "D（8）：输入、模型、GPU、长度、Batch、采样策略、正确性、warmup、延迟分位数、显存与吞吐控制，每项合理给分"
+      ],
+      "model_answer": "A：标准 KV 容量为 2LBTH_kv d_h b；MHA 中 H_kv=H_q，GQA 介于其间，MQA 为 1；分页并不减少全部 QK 连接。B：Prefill 的自注意力 Θ(LS²H_qd_h)，Cached Decode 单步 Θ(LTH_qd_h) 另加 Θ(N) 稠密参数运算，G 步累计 Θ(LH_qd_h(GS+G²))；性能还受 N×每权重字节的读取和历史 KV 带宽约束。C：TTFT 为到达至首 Token 可见时间；ITL 是相邻输出间隔，TPOT 可取首尾时间差除以 G−1；Goodput 统计满足 SLO 的吞吐；对比共置与分离架构的 p95、KV 迁移和队列。D：固定模型/tokenizer/采样、硬件和请求集，扫描 S、G、并发与 Cache 策略，测 logits 一致性、显存、tokens/s、TTFT/ITL/TPOT 分位、SLO 达标、启动和传输开销。"
+    }
+  ]
+}
