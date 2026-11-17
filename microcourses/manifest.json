@@ -2692,12 +2692,33 @@
         "TSO",
         "memory-consistency"
       ]
+    },
+    {
+      "id": "algo-029",
+      "track": "algo",
+      "number": 29,
+      "date": "2026-11-17",
+      "week": 5,
+      "title": "算法与数据结构第29课：网络流入门——流守恒、残量网络与增广路",
+      "abstract": "从容量与流守恒定义可行流，理解反向残量边如何撤销旧决策，手工执行 Ford–Fulkerson 增广，并用残量可达割证明最大流最小割。",
+      "file": "lessons/algo-029.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "network-flow",
+        "flow-conservation",
+        "residual-network",
+        "augmenting-path",
+        "ford-fulkerson",
+        "min-cut"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-17",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-029",
     "opt-029",
     "ai-029"
   ],
