@@ -114,6 +114,8 @@ FORD_FULKERSON(G, s, t):
         for each residual arc a in P:
             residual_capacity[a] -= delta
             residual_capacity[reverse(a)] += delta
+    for each original edge e:
+        f[e] = c[e] - residual_forward_capacity[e]
     return f, value(f)
 ```
 
