@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "arch-029",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "物理X初始为2。Core 0已通过相干协议完成对X的写入，使其L1持有X=7的Modified（M）副本；DRAM中的X仍可能是2。随后Core 1请求读取X。哪项判断最严谨？",
+      "options": [
+        "Core 1必须从DRAM读取2，因为写回尚未发生。",
+        "Core 0已经是M，因此Core 1可以无须相干协议，直接读取自己的过时共享副本。",
+        "相干系统必须使Core 1取得最新的有效数据版本，可由Modified持有者或相应相干路径提供，不要求程序先等待最终DRAM写回。",
+        "只要Core 0的一条Store从ROB退休，就说明Core 1在同一周期必然能读到7。"
+      ],
+      "answer": 2,
+      "hint": "把“谁持有最新副本”“DRAM是否更新”和“Store是否仅退休”分成三个问题。",
+      "explanation": "在MESI稳定模型中M状态表示该缓存是唯一有效、已修改的副本。Core 1不能绕过相干协议读取过时DRAM或先前无效的本地副本；必须通过最新数据拥有者等正确相干路径获取数据。Store退休不必等同于已完成所有权传播。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "两核教学MESI：同一物理Line X初始状态为(I,I)，内存X=0；每一步相干事务在下一步之前完成，无自发替换。依次执行：(1) Core0读X；(2) Core1读X；(3) Core0写X=1；(4) Core1读X；(5) Core1写X=2；(6) Core0读X；(7) Core0写X=3。问：整个Trace里使**另一个核原先有效的Line变为I**的所有权升级/失效事务共发生几次？填写整数，不计初始I，也不把正常M→S读降级计为Invalidation。",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "次",
+      "hint": "每次写之前检查写入者是否持有S、E或M；只有别核持有有效副本而写入者需要独占所有权时才数一次。",
+      "explanation": "状态依次为(I,I)→(E,I)→(S,S)→(M,I)→(S,S)→(I,M)→(S,S)→(M,I)。第3、5、7步各有一次使对方由S变I的升级，合计3次。读导致的M→S不算失效。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "针对本课的普通可缓存内存与两核MESI稳定状态模型，选择**所有**正确说法。",
+      "options": [
+        "本核持有某Line的E副本时，若没有其他并发事务，本核写该Line可E→M，无须向别核额外发送Invalidate。",
+        "本核对某Line只持有S副本时，要写入一般需要升级写权限并使其他有效共享副本失效。",
+        "另一个核持有某Line的M副本时，读取者仍可通过相干协议获取最新数据，而不一定等到该Line最终从Cache逐出到DRAM。",
+        "因为MESI保证同一Line相干，所以它自动禁止TSO经典Store Buffering的(0,0)架构结果。",
+        "两个线程写不同变量，但变量位于同一64B Cache Line，仍可能不断争用该Line的写所有权。",
+        "只要Store从ROB退休，该Store就必然已经对所有其他核心全局可见。"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "hint": "分开判断单行写所有权、脏副本转发、同Line不同字段，以及不同地址的内存排序。",
+      "explanation": "A正确：E是干净独占，可本地升级。B正确：S→M需取得写权限与失效。C正确：最新M数据可经相干路径提供。D错误：MESI是单Line相干机制，不直接决定SC/TSO的跨地址排序。E正确：False Sharing以Line为粒度。F错误：Store退休与Store Buffer排空/全局可见不是一回事。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一假设：两个核、64B Line、Write-invalidate教学MESI，所有事务按所列顺序完整结束；无自发驱逐、无其他共享者，所有写入实际取得权限后才记为完成。请完成A—D，写清状态、公式、边界。\n\n**A｜MESI Trace与所有权（12分）** 物理X初始0，双方均I。依次：(1) Core0读X；(2) Core1读X；(3) Core1写X=3；(4) Core0读X；(5) Core0写X=5。逐步列出(Core0,Core1) MESI状态和读出的X值；指出何时发生Invalidate、何时要由修改者提供最新数据。说明这里“M→S”的含义。\n\n**B｜False Sharing与量化代价（10分）** 同一个对齐64B Line里，Core0只写偏移0处的8B计数器a，Core1只写偏移8处的8B计数器b。两核交替共完成400次写，第一笔取得写所有权的成本不计，以后每次核间写所有权交换额外暴露70周期，成本互不重叠。求所有权交换次数和额外周期；把a、b拆到各自独立的Line后，说明在无其他共享者的理想条件下上述交换会如何变化，并讨论额外空间成本。\n\n**C｜内存模型证明（10分）** 初始X=Y=0，Core0执行STORE X=1; r0=LOAD Y；Core1执行STORE Y=1; r1=LOAD X。以严格偏序成环的方式证明SC下(r0,r1)=(0,0)不可能；再用Store Buffer解释TSO为什么可以产生(0,0)且不违反MESI。指出本核同址Store-to-Load Forwarding为何与跨核可见性不同。\n\n**D｜实验设计与边界（8分）** 为比较“同Line的两个独立计数器”与“分别Cache Line对齐”的实现设计公平实验：固定任务量，给出至少四项应收集的统计（如HITM、Invalidation、缓存Miss、端到端时间、IPC、P99、空间/Cache工作集等），并解释为什么不能只凭总Miss Rate或DRAM内容判断性能与正确性。",
+      "hint": "A先逐项确定读者与写者是否已持有有效Line；B第一笔之后才统计交替的所有权切换；C分别写出两条程序顺序边和两条读旧值需要的边；D把相干事件、性能、工作集和正确性分开。",
+      "rubric": [
+        "A（12分）：给出5步准确状态与读值（8分），正确区分Invalidate和M持有者提供最新数据以及M→S（4分）。",
+        "B（10分）：在明确不计首次获取的条件下，正确数交替所有权交换与周期（6分）；讨论分离Line减少乒乓与空间/局部性权衡（4分）。",
+        "C（10分）：SC偏序环证明（4分）；TSO Store Buffer过程（3分）；MESI相干/本核转发/全局可见性的区别（3分）。",
+        "D（8分）：公平实验及至少四个适当指标（6分）；避免仅看Miss Rate或DRAM旧值的论证（2分）。"
+      ],
+      "model_answer": "A：初始(I,I)，R0后(E,I)且读0；R1后(S,S)且读0；W1=3后(I,M)，失效Core0；R0后(S,S)且读3，修改者Core1必须提供或经相干系统保证最新数据；W0=5后(M,I)，失效Core1。M→S是拥有者在别人读时降级并转交最新版本；在经典MESI S为干净状态，系统要保持对应下层相干一致，不意味着等候最终DRAM逐出。\n\nB：400次严格交替写、第一笔初次获得权限不计，余下399次写都跨核交换所有权：399×70=27,930周期。若变量分别各占一个不共享的64B Line，经过初次获取后双方可独占各自Line，理想化跨核所有权乒乓为0；代价是更多空间/Cache和TLB资源，并须真实测量。\n\nC：SC中Sx<Ly、Sy<Lx，两个Load读0又要求Ly<Sy、Lx<Sx，组成Sx<Ly<Sy<Lx<Sx的环，所以不可能。TSO允许两核已退休Store分别驻留其Store Buffer，随后不同址Load从相干内存系统读对方尚未传播的旧值0；稍后Store进入MESI写序列并维持各Line相干。同址Load可从本核Store Buffer转发，不等于别核观察到Store。\n\nD：固定指令/任务完成量与线程绑定、频率、内存布局、缓存热身、并发条件；统计HITM或Cache-to-Cache transfer、Invalidate/ownership transaction、Demand Miss、总线字节、IPC/总时间/P99、Cache/页工作集和数据正确性。Miss少不代表关键路径快；DRAM旧副本在存在M所有者时也可能与相干执行正确共存。"
+    }
+  ]
+}
