@@ -2802,12 +2802,33 @@
         "max-flow-min-cut",
         "complexity-proof"
       ]
+    },
+    {
+      "id": "opt-030",
+      "track": "opt",
+      "number": 30,
+      "date": "2026-11-18",
+      "week": 5,
+      "title": "第30课｜块坐标下降与复合正则的坐标 Prox",
+      "abstract": "推导块坐标下降、块近端充分下降、循环法的聚点最优性与组软阈值；展示耦合约束失败反例和活跃 KKT 乘子。",
+      "file": "lessons/opt-030.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "true",
+      "tags": [
+        "数学优化",
+        "块坐标下降",
+        "Prox",
+        "块Lipschitz",
+        "组稀疏",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-18",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-030",
     "ai-030"
   ],
   "orphanQuizzes": []
