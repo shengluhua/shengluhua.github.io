@@ -2753,10 +2753,40 @@
         "TTFT",
         "TPOT"
       ]
+    },
+    {
+      "id": "arch-030",
+      "track": "arch",
+      "number": 30,
+      "date": "2026-11-18",
+      "week": 5,
+      "title": "第30课｜MESI状态机与协议竞态：Transient State、Invalidate ACK与Directory压力",
+      "abstract": "从两核同时升级同一Line的竞态出发，理解MESI瞬态、失效确认、目录序列化、热点所有权传递和死锁/公平性；再次区分权限、Store Buffer全局可见与TSO。",
+      "file": "lessons/arch-030.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "MESI",
+        "cache-coherence",
+        "transient-state",
+        "invalidation-ack",
+        "directory",
+        "race-condition",
+        "false-sharing",
+        "deadlock",
+        "store-buffer",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-17",
+  "indexVerifiedOn": "2026-11-18",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-030",
+    "opt-030",
+    "ai-030"
+  ],
   "orphanQuizzes": []
 }
