@@ -113,7 +113,7 @@ sequenceDiagram
 在Invalidate**并行**发出的简化模型中：
 
 \[
-\boxed{T_{\rm upgrade}\approx T_{\rm req}+\max_j T_{{\rm ack},j}+T_{\rm grant}}
+\boxed{T_{\rm upgrade}\approx T_{\rm req}+\max_j T_{\mathrm{ack},j}+T_{\rm grant}}
 \]
 
 不是把每个核的ACK耗时相加，因为失效确认在互连上可以重叠。
