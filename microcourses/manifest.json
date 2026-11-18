@@ -2824,12 +2824,32 @@
         "组稀疏",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-030",
+      "track": "ai",
+      "number": 30,
+      "date": "2026-11-18",
+      "week": 5,
+      "title": "第30课｜Continuous Batching 与请求级调度：吞吐、延迟与 KV 资源",
+      "abstract": "从迭代级调度与动态批处理出发，推导排队与 KV 容量约束，分析 Chunked Prefill、抢占、TTFT/TPOT 和 Goodput 的系统权衡。",
+      "file": "lessons/ai-030.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "LLM推理",
+        "ContinuousBatching",
+        "IterationScheduling",
+        "ChunkedPrefill",
+        "KVCache",
+        "Goodput"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-18",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-030"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
