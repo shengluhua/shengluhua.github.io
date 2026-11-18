@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-030",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某在线 LLM 服务同时处理输出长度不相同、随时到达的请求。关于 Static Batching 与 Continuous Batching 的机制，哪项最准确？",
+      "options": [
+        "Static Batching 允许任何新请求在每一轮立即加入，而 Continuous Batching 必须等所有请求同时结束。",
+        "Continuous Batching 在生成迭代边界移出已完成请求并接纳新请求，但同一请求的自回归后续 token 仍具有因果依赖。",
+        "Continuous Batching 通过取消因果 Attention，使同一请求所有未知输出 token 在一次前向中生成。",
+        "只要使用 Continuous Batching，就不需要管理 KV Cache 容量，也不会产生排队。"
+      ],
+      "answer": 1,
+      "hint": "区分“同一次迭代里并行处理多个请求”与“同一请求的连续 token 是否可并行预测”；思考何时释放运行槽位。",
+      "explanation": "Static Batching 通常在整个批次完成前不插入新请求；Continuous Batching 以迭代为粒度调整活跃集合，及时释放完成请求并补入等待请求。每个请求的自回归依赖仍在，KV 容量与排队约束也没有消失。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某教学化 Chunked Prefill 调度器，每轮新计算 Token 预算为 256。始终有 20 条处于 Decode 的请求，每条每轮恰处理 1 个新 Token，且这 20 条在整个例子中都不结束。另有唯一一条等待请求，Prompt 还需 Prefill 600 个 Token。假设调度器始终先安排 20 个 Decode Token，再把剩余预算全部分配给该 Prefill；活跃请求数、KV 显存及其他开销均不构成限制。请问该 Prefill 在第 3 轮处理多少个 Token？（填写整数）",
+      "answer": 128,
+      "tolerance": 0,
+      "unit": "token",
+      "hint": "每轮先扣除 Decode 使用的 Token 数，再依次更新 Prompt 剩余量；不要把 256 全部留给 Prefill。",
+      "explanation": "每轮留给 Prefill 的预算是 256−20=236。两轮 Prefill 共处理 472 个 Token，尚余 600−472=128 个，因此第三轮处理 128 个。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "考虑标准自回归 LLM 在线推理：调度器每轮限制新计算 Token 预算、运行请求数量和 KV Block 池容量，允许 Chunked Prefill。下列哪些结论正确？（多选）",
+      "options": [
+        "Iteration-level Scheduling 可以在相邻迭代之间释放完成请求并加入等待请求，而不破坏同一请求的自回归顺序。",
+        "只要启用 Chunked Prefill，每个请求的 TTFT 与 TPOT 都必然同时降低，不会存在调度额外开销。",
+        "每轮 Token 预算不仅要计入运行请求的新 Decode Token，还应计入本轮调度的 Prefill Chunk Token。",
+        "仅知道 max_num_batched_tokens 就能确定 KV 是否足够，无须考虑请求已缓存的历史长度。",
+        "KV 不足时发生的抢占可能引入重新计算或状态迁移开销，调度优先级还可能影响公平性。",
+        "在给定 TTFT 与 TPOT 双重 SLO 时，只提高总 Tokens/s 就严格保证满足 SLO 的请求率提高。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "把 Token 计算预算、历史 KV 容量、排队/抢占成本和 SLO 分开判断；注意带“必然”“只要”的结论。",
+      "explanation": "A 成立：调度粒度改变但因果依赖不变。C 成立：Decode 新 token 与 Prefill chunk 都消耗本轮新计算预算。E 成立：抢占可能重算或换出状态，优先级可导致长尾或饥饿。B 不保证每个请求两项延迟都改善；D 忽视历史 KV 占用；F 忽视尾延迟与双 SLO。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "为单节点 GPU 上的 Decoder-only LLM 设计一个支持 Continuous Batching 的推理服务调度器。\nA（12 分）：定义等待队列、运行集合、每轮 Prefill/Decode 决策变量，并写出 Token Budget、最大运行序列数以及 KV Block 容量约束。说明 Token Budget 与 KV 容量为什么不是同一个量。\nB（10 分）：用 TTFT、TPOT、E2E、Little 定律描述队列与尾延迟，定义同时满足 TTFT 和 TPOT 门限的 Goodput；说明吞吐与 Goodput 不等价。\nC（10 分）：比较静态批处理、Iteration-level FCFS、Decode-first Chunked Prefill，以及一种带公平/饥饿保护的优先级策略；解释 KV 不足时抢占、重计算/迁移的影响。\nD（8 分）：设计公平实验，覆盖短/长 Prompt、短/长输出、突发/稳态到达率和 KV 压力，列出正确性、吞吐、p95/p99 TTFT/ITL、抢占与峰值显存等指标。",
+      "hint": "从每轮集合变化与三种不同资源约束出发；再分别分析排队、正在生成的请求、长 Prefill 和抢占。实验要保持模型、硬件、Tokenizer 与请求流一致。",
+      "rubric": [
+        "A（12）：正确给出 Wait/Running 集合、decode 0/1 和 prefill chunk 变量（4）；本轮 token 预算与运行数量约束（4）；按历史+新增 token 计算的 KV block 约束及两种资源的区别（4）。",
+        "B（10）：TTFT/TPOT/E2E 定义与分解（4）；在稳态条件下正确用 Little 定律 L=λW（2）；定义双 SLO Goodput 并论证与 Tokens/s 不等价（4）。",
+        "C（10）：四种方案的机制与权衡（6）；说明饥饿保护及 KV 抢占/重算/迁移开销（4）。",
+        "D（8）：控制变量与负载矩阵（4）；正确性、延迟分位数、容量、吞吐与 KV/抢占诊断（4）。"
+      ],
+      "model_answer": "设 R_t 为运行请求、W_t 为等待请求，x_i∈{0,1} 表示本轮对运行请求 i 处理一个 decode token，c_j∈[0,r_j] 表示对 prefill j 的本轮 chunk 长度。约束 Σ_i x_i+Σ_j c_j≤K（计算 token 预算），|R'_t|≤S_max（活跃序列上限），Σ_i ceil((h_i+新增_i)/g)≤B_KV（历史加新增 token 的 block 占用）；Prefill 必须遵循同一请求的顺序。TTFT 包含排队+Prefill+输出路径；TPOT=(t_last−t_first)/(G−1)，E2E≈TTFT+(G−1)TPOT；稳态 Little 定律 L=λE[W]。Goodput=单位时间内同时满足 TTFT 和 TPOT SLO 的完成请求数。静态 Batch 有长短尾拖累；迭代 FCFS 能及时替换；decode-first chunked prefill 限制长 prefill 对 ITL 的干扰但可能推迟新请求 TTFT；优先级策略需等待时间提升/预算配额避免饥饿。KV 不足可等待或抢占，重算和迁移带来额外成本。固定模型、采样策略、Tokenizer、GPU、请求流与测量窗口，扫描到达率、长度和显存压力，报告正确性、有效输出 tokens/s、requests/s、Goodput、TTFT/ITL 的 p50/p95/p99、排队、KV 使用、抢占次数/代价，并设置 Warmup 和独立测试种子。"
+    }
+  ]
+}
