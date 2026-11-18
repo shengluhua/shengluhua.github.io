@@ -2779,12 +2779,34 @@
         "store-buffer",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-030",
+      "track": "algo",
+      "number": 30,
+      "date": "2026-11-18",
+      "week": 5,
+      "title": "算法与数据结构第30课：Edmonds–Karp——BFS 增广为什么有多项式界",
+      "abstract": "从最短增广路的层数单调性出发，证明关键残量弧的饱和次数受限，得到 Edmonds–Karp 的 O(VE²) 时间界，并手工推演最大流与最小割。",
+      "file": "lessons/algo-030.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "network-flow",
+        "edmonds-karp",
+        "bfs",
+        "residual-network",
+        "shortest-augmenting-path",
+        "max-flow-min-cut",
+        "complexity-proof"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-18",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-030",
     "opt-030",
     "ai-030"
   ],
