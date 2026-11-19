@@ -2872,12 +2872,34 @@
         "MESI",
         "ordering"
       ]
+    },
+    {
+      "id": "algo-031",
+      "track": "algo",
+      "number": 31,
+      "date": "2026-11-19",
+      "week": 5,
+      "title": "算法与数据结构第31课：Dinic——层次图、阻塞流与当前弧优化",
+      "abstract": "通过 BFS 层次图与 DFS 阻塞流一次处理多条最短增广路，证明阶段距离严格增长和 Dinic 的 O(n²m) 时间界。",
+      "file": "lessons/algo-031.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "network-flow",
+        "dinic",
+        "level-graph",
+        "blocking-flow",
+        "residual-network",
+        "current-arc",
+        "max-flow"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-19",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-031",
     "opt-031",
     "ai-031"
   ],
