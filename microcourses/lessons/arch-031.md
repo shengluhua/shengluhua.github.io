@@ -265,7 +265,19 @@ F. 在没有其他冲突写入的正确发布程序中，acquire load若读到�
 
 ### Lv4｜内存序证明、C++发布与性能设计（40分，开放推导，预计10—12分钟）
 
-统一条件：X、Y初值0，两个核分别执行S_X: STORE X=1; L_Y: r0=LOAD Y与S_Y: STORE Y=1; L_X: r1=LOAD X。无其他写者、原子且普通相干访问。A（12分）：分别在SC、无Fence的TSO、只有Core0完整Fence的TSO、双侧完整Fence的TSO中判断(0,0)是否允许；给出SC约束环及单侧Fence时一个合法的全局可见顺序，并说明Store指令进入缓冲与对外传播的区别。B（10分）：对发布程序“data=42; flag.store(true, release)”和订阅程序“if(flag.load(acquire)) read data”，画出在acquire读取到对应true时的sequenced-before/synchronizes-with/happens-before关系；解释读到false及非原子数据竞争的边界。C（8分）：固定基线运行时间为3,000,000周期；优化方案要求执行40000次完整Fence，每次新增18个暴露周期，且全部不重叠。求新增周期、总周期、相对基线运行时间增幅，并说明为什么不能把单侧Fence的较低开销当作正确替代。D（10分）：设计至少三组SB Litmus比较（无Fence、单侧、双侧），说明如何验证允许结果、如何用工具检查、如何报告实验和哪几类统计/系统条件会影响观测；再次区分ROB退休、取得M权限、Store全局可见、Dirty回写DRAM。
+统一条件：普通可缓存相干内存，X、Y初值0；每核使用符合题意的原子Load/Store，没有其他写者。
+
+**A｜新Litmus：Load Buffering（12分）**  
+Core0执行“r0=LOAD X; STORE Y=1”，Core1执行“r1=LOAD Y; STORE X=1”。在SC与本课FIFO Store Buffer的TSO抽象下，判断(r0,r1)=(1,1)是否合法，画出约束环，并与经典SB的(0,0)比较。回到SB时，再构造只有Core0插入完整Fence仍能产生(0,0)的可见顺序。
+
+**B｜发布、订阅与语言边界（10分）**  
+写者执行“data=42; flag.store(true, release)”，读者先执行“ok=flag.load(acquire)”，随后若ok为true就读data。说明ok=true且读自该release时的sequenced-before/synchronizes-with/happens-before链；如果ok=false却仍无条件读取普通非原子data，会有什么风险？
+
+**C｜Fence性能账本（8分）**  
+固定基线运行时间3,000,000周期；一个满足正确性要求的方案增加40,000次完整Fence，每次额外暴露18周期、彼此不重叠。求新增周期、总周期、相对基线的运行时间增幅；解释为什么语义不充分的单侧Fence不能仅因便宜就替代正确方案。
+
+**D｜验证实验与可见性（10分）**  
+设计SB的无Fence、单侧Fence、双侧Fence三组Litmus测试，说明如何用模型检查和硬件实测报告允许结果、环境配置与性能；解释为什么“未观察到(0,0)”不等于模型禁止。最后区分ROB退休、获得M权限、某个Store全局可见、Dirty最终写回DRAM。
 
 **可选提示（不含答案）：**A通过有向边能否构成环判断，单侧可让未Fence一侧的Load先于其Store对外传播；B找明确的读自关系；C先计算Fence增加的总周期；D注意“未观测到”不等于逻辑上禁止。
 
