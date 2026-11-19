@@ -57,15 +57,15 @@
       "level": 4,
       "type": "open",
       "points": 40,
-      "prompt": "统一条件：X、Y初值0，两个核分别执行S_X: STORE X=1; L_Y: r0=LOAD Y与S_Y: STORE Y=1; L_X: r1=LOAD X。无其他写者、原子且普通相干访问。A（12分）：分别在SC、无Fence的TSO、只有Core0完整Fence的TSO、双侧完整Fence的TSO中判断(0,0)是否允许；给出SC约束环及单侧Fence时一个合法的全局可见顺序，并说明Store指令进入缓冲与对外传播的区别。B（10分）：对发布程序“data=42; flag.store(true, release)”和订阅程序“if(flag.load(acquire)) read data”，画出在acquire读取到对应true时的sequenced-before/synchronizes-with/happens-before关系；解释读到false及非原子数据竞争的边界。C（8分）：固定基线运行时间为3,000,000周期；优化方案要求执行40000次完整Fence，每次新增18个暴露周期，且全部不重叠。求新增周期、总周期、相对基线运行时间增幅，并说明为什么不能把单侧Fence的较低开销当作正确替代。D（10分）：设计至少三组SB Litmus比较（无Fence、单侧、双侧），说明如何验证允许结果、如何用工具检查、如何报告实验和哪几类统计/系统条件会影响观测；再次区分ROB退休、取得M权限、Store全局可见、Dirty回写DRAM。",
-      "hint": "A通过有向边能否构成环判断，单侧可让未Fence一侧的Load先于其Store对外传播；B找明确的读自关系；C先计算Fence增加的总周期；D注意“未观测到”不等于逻辑上禁止。",
+      "prompt": "统一条件：普通可缓存相干内存，X、Y初值0；每核使用符合题意的原子Load/Store，没有其他写者。\n\n**A｜新Litmus：Load Buffering（12分）**  \nCore0执行“r0=LOAD X; STORE Y=1”，Core1执行“r1=LOAD Y; STORE X=1”。在SC与本课FIFO Store Buffer的TSO抽象下，判断(r0,r1)=(1,1)是否合法，画出约束环，并与经典SB的(0,0)比较。回到SB时，再构造只有Core0插入完整Fence仍能产生(0,0)的可见顺序。\n\n**B｜发布、订阅与语言边界（10分）**  \n写者执行“data=42; flag.store(true, release)”，读者先执行“ok=flag.load(acquire)”，随后若ok为true就读data。说明ok=true且读自该release时的sequenced-before/synchronizes-with/happens-before链；如果ok=false却仍无条件读取普通非原子data，会有什么风险？\n\n**C｜Fence性能账本（8分）**  \n固定基线运行时间3,000,000周期；一个满足正确性要求的方案增加40,000次完整Fence，每次额外暴露18周期、彼此不重叠。求新增周期、总周期、相对基线的运行时间增幅；解释为什么语义不充分的单侧Fence不能仅因便宜就替代正确方案。\n\n**D｜验证实验与可见性（10分）**  \n设计SB的无Fence、单侧Fence、双侧Fence三组Litmus测试，说明如何用模型检查和硬件实测报告允许结果、环境配置与性能；解释为什么“未观察到(0,0)”不等于模型禁止。最后区分ROB退休、获得M权限、某个Store全局可见、Dirty最终写回DRAM。",
+      "hint": "A给Load→Store与读取新值分别画有向边，判断是否成环；SB单侧示例让未Fence一侧Load早于其Store传播；B必须指定acquire读到哪次release；C计算新增周期除基线；D不把实验频数当成数学禁止证明。",
       "rubric": [
-        "A（12分）：四种情形判定各2分；SC约束环与单侧合法顺序各2分，且正确区分Store入缓冲和对外传播。",
-        "B（10分）：正确列出跨线程release/acquire同步链6分；读到旧值和非原子数据竞争边界4分。",
-        "C（8分）：新增周期、总周期、增幅各2分；解释单侧Fence不能作为正确替代2分。",
-        "D（10分）：覆盖三组配置与允许结果3分；模型工具/硬件测量与未观测不等于禁止3分；四个时间点与至少两个相关统计条件4分。"
+        "A（12分）：SC和TSO下LB(1,1)结论及机制各2分；严格约束环4分；和SB对比、构造SB单侧Fence允许的序列4分。",
+        "B（10分）：正确给出release/acquire及happens-before传递链6分；false分支无条件访问非原子data的竞态风险4分。",
+        "C（8分）：新增周期、总周期、时间增幅各2分；解释单侧Fence的语义不充分2分。",
+        "D（10分）：三组测试及可达结果3分；模型检查、硬件设置、未观测不等于禁止3分；四个不同时间点及至少两项统计指标4分。"
       ],
-      "model_answer": "A：SC不允许(0,0)，因S_X<L_Y<S_Y<L_X<S_X形成环；TSO无Fence允许；仅Core0有完整Fence仍允许，可取外部观察顺序L_X<S_X<L_Y<S_Y（Core1的S_Y先进入本核缓冲而后传播）；两侧完整Fence不允许，因为两个Store→Load的观察顺序边共同导致环。B：写data sequenced-before Release flag；Acquire读取这次Release写入的true产生synchronizes-with；再sequenced-before读data；传递生成happens-before。若acquire读旧false不能由该Release建立同步，若以普通非原子变量构成缺少happens-before的冲突访问则有数据竞争/未定义行为。C：40000×18=720000周期；总周期3720000；增长720000/3000000=24%。单侧Fence可能仍允许0,0，不能以不满足语义的低成本当成合法替代。D：分别运行SB、SB+单侧Full Fence、SB+双侧Full Fence；用herd7及适用模型判定可达结果，实测使用合法原子或汇编、编译器/ISA固定、核心绑定、多次采样，报告0,0出现次数、总次数、时钟/完成时间、缓冲/相干等待等；有限次未观测到不能证明架构禁止。ROB退休是本核提交，M是Line写所有权，Store传播达到可见点是内存模型事件，Dirty回写DRAM可更晚发生。"
+      "model_answer": "A：LB的r0=r1=1要求S_X<L_X、S_Y<L_Y；而po和TSO均保留L_X<S_Y与L_Y<S_X，故S_X<L_X<S_Y<L_Y<S_X形成环。SC不允许，TSO也不允许（TSO保留Load→Store）；不同于SB允许Store→Load可见顺序放松。SB仅Core0有完整Fence时可采用L_X<S_X<L_Y<S_Y的全局观察顺序：Core1的S_Y先进入本地缓冲而后传播，因此两个Load可以读0。B：data写 sequenced-before release flag；acquire读该release的true建立synchronizes-with；acquire sequenced-before读data；传递构成HB，确保正确发布。读到false不与这次release同步，若无条件读普通data而与写并发冲突，可能发生数据竞争及未定义行为。C：40,000×18=720,000周期，总3,720,000周期，增幅24%。D：三组分别为SB、SB+单侧Full Fence、SB+双侧Full Fence，(0,0)在前两组允许，第三组禁止。用herd7及适当模型枚举，实测用正确原子/汇编、绑定核心、固定编译配置、记录0,0次数与总次数、完成时间、频率和微架构指标；有限次未观测不能证明不允许。ROB退休是本核架构提交，M是Line写权限，Store可见点是数据传播/模型约束，Dirty回写DRAM可以更晚。"
     }
   ]
 }
