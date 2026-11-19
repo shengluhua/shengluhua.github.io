@@ -2910,12 +2910,32 @@
       "quiz": true,
       "diagram": "mermaid",
       "tags": []
+    },
+    {
+      "id": "ai-031",
+      "track": "ai",
+      "number": 31,
+      "date": "2026-11-19",
+      "week": 5,
+      "title": "第31课：PagedAttention、前缀缓存与 KV Block 驱逐",
+      "abstract": "推导分页 KV 的内外碎片与块大小，解释链式前缀哈希、引用计数、缓存驱逐、写时复制以及 TTFT/显存取舍。",
+      "file": "lessons/ai-031.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "true",
+      "tags": [
+        "llm-serving",
+        "kv-cache",
+        "pagedattention",
+        "prefix-caching",
+        "eviction",
+        "gpu"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-19",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-031"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
