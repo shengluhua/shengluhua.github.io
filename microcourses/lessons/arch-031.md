@@ -279,7 +279,7 @@ Core0执行“r0=LOAD X; STORE Y=1”，Core1执行“r1=LOAD Y; STORE X=1”。
 **D｜验证实验与可见性（10分）**  
 设计SB的无Fence、单侧Fence、双侧Fence三组Litmus测试，说明如何用模型检查和硬件实测报告允许结果、环境配置与性能；解释为什么“未观察到(0,0)”不等于模型禁止。最后区分ROB退休、获得M权限、某个Store全局可见、Dirty最终写回DRAM。
 
-**可选提示（不含答案）：**A通过有向边能否构成环判断，单侧可让未Fence一侧的Load先于其Store对外传播；B找明确的读自关系；C先计算Fence增加的总周期；D注意“未观测到”不等于逻辑上禁止。
+**可选提示（不含答案）：**A给Load→Store与读取新值分别画有向边，判断是否成环；SB单侧示例让未Fence一侧Load早于其Store传播；B必须指定acquire读到哪次release；C计算新增周期除基线；D不把实验频数当成数学禁止证明。
 
 ---
 
