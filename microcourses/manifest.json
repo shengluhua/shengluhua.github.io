@@ -2846,10 +2846,40 @@
         "KVCache",
         "Goodput"
       ]
+    },
+    {
+      "id": "arch-031",
+      "track": "arch",
+      "number": 31,
+      "date": "2026-11-19",
+      "week": 5,
+      "title": "第31课｜SC、TSO与内存序：Store Buffering、Fence与Happens-before",
+      "abstract": "以Store Buffering为中心，利用事件偏序证明SC与TSO允许结果的差异，分析单侧和双侧Fence、Store-to-Load Forwarding，以及release/acquire建立Happens-before的条件和语言层边界。",
+      "file": "lessons/arch-031.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "SC",
+        "TSO",
+        "memory-model",
+        "store-buffer",
+        "fence",
+        "happens-before",
+        "release-acquire",
+        "litmus-test",
+        "MESI",
+        "ordering"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-18",
+  "indexVerifiedOn": "2026-11-19",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-031",
+    "opt-031",
+    "ai-031"
+  ],
   "orphanQuizzes": []
 }
