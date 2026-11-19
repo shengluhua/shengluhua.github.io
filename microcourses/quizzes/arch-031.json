@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "arch-031",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "两个核的Cache严格遵守MESI，但在x86-TSO中仍出现经典SB的(r0,r1)=(0,0)。下列哪种解释最严谨？",
+      "options": [
+        "说明MESI失效，因为只要Cache相干，所有不同地址的读写都必须符合SC。",
+        "说明两个Core必然错误地同时持有同一Line的M状态。",
+        "可以是合法的内存模型结果：两个不同地址的Store尚在各自缓冲中，而后续Load已完成；同一地址的一致性并未被破坏。",
+        "说明每个Store已经完成DRAM回写，只是另一核的TLB不正确。"
+      ],
+      "answer": 2,
+      "hint": "先区分每条Line的所有权，以及两个不同地址的跨核观察顺序。",
+      "explanation": "MESI管同一Line副本权限和最新值，TSO允许各核的Store暂留本地FIFO写缓冲、后续不同地址Load先观察到旧值；并不要求相干协议出错。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "教学TSO执行Trace：X初值0，只有Core0会写X。t=0 Core0把STORE X=1放入本核Store Buffer；t=1 Core0执行r0=LOAD X；t=2 Core1执行r1=LOAD X；t=3 Core0执行FULL FENCE并等待；t=5 Core0的Store传播到全局相干视图，Fence完成；t=6 Core1执行r2=LOAD X。所有Load按给定时刻完成，Store未合并，r0、r1、r2均为0或1。计算十进制编码E=r0+2*r1+4*r2（相当于把三个Load结果当作不同权重的位）。只填写E。",
+      "answer": 5,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "本核同址Load可以从未传播的Store Buffer转发；另一核在传播前后分别观察。然后按权重编码。",
+      "explanation": "r0=1（本核同址转发），r1=0（其他核在t=2尚未观察到Store），r2=1（t=5写已传播）；E=1+2×0+4×1=5。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "在两个地址X、Y初始为0、无其他写者、普通相干x86-TSO以及题目所指明的C++原子语义下，选择所有成立的说法。",
+      "options": [
+        "在经典Store Buffering中，只给Core0在Store与Load之间加完整Fence，就保证(r0,r1)=(0,0)不可能出现。",
+        "经典Store Buffering中两侧在Store与Load之间都加入完整Store→Load Fence，能够禁止两个Load都读取旧0。",
+        "x86-TSO抽象中的Store可暂留FIFO写缓冲，较年轻的同址Load可经Store-to-Load Forwarding读取本核最新的有效缓冲写入。",
+        "C++中只要一线程做release store，另一线程做acquire load，即使acquire读到了旧值，也必然与那次release建立synchronizes-with。",
+        "缓存行处于M状态本身就证明当前核所有已退休Store均已完成全局传播且DRAM已经回写。",
+        "在没有其他冲突写入的正确发布程序中，acquire load若读到相应release store发布的值，可形成synchronizes-with，并通过happens-before约束此前的数据发布。"
+      ],
+      "answer": [
+        1,
+        2,
+        5
+      ],
+      "hint": "逐条确认Fence插入的位置、相同地址转发、以及Acquire究竟读自哪次Release；不要用Cache状态替代语言同步。",
+      "explanation": "B、C、F成立。单侧Fence仍可构造未加Fence一侧的Store延迟传播；acquire必须满足规定的读自关系才与相应release同步；M权限既不代表全部Store排空，也不代表DRAM回写。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一条件：X、Y初值0，两个核分别执行S_X: STORE X=1; L_Y: r0=LOAD Y与S_Y: STORE Y=1; L_X: r1=LOAD X。无其他写者、原子且普通相干访问。A（12分）：分别在SC、无Fence的TSO、只有Core0完整Fence的TSO、双侧完整Fence的TSO中判断(0,0)是否允许；给出SC约束环及单侧Fence时一个合法的全局可见顺序，并说明Store指令进入缓冲与对外传播的区别。B（10分）：对发布程序“data=42; flag.store(true, release)”和订阅程序“if(flag.load(acquire)) read data”，画出在acquire读取到对应true时的sequenced-before/synchronizes-with/happens-before关系；解释读到false及非原子数据竞争的边界。C（8分）：固定基线运行时间为3,000,000周期；优化方案要求执行40000次完整Fence，每次新增18个暴露周期，且全部不重叠。求新增周期、总周期、相对基线运行时间增幅，并说明为什么不能把单侧Fence的较低开销当作正确替代。D（10分）：设计至少三组SB Litmus比较（无Fence、单侧、双侧），说明如何验证允许结果、如何用工具检查、如何报告实验和哪几类统计/系统条件会影响观测；再次区分ROB退休、取得M权限、Store全局可见、Dirty回写DRAM。",
+      "hint": "A通过有向边能否构成环判断，单侧可让未Fence一侧的Load先于其Store对外传播；B找明确的读自关系；C先计算Fence增加的总周期；D注意“未观测到”不等于逻辑上禁止。",
+      "rubric": [
+        "A（12分）：四种情形判定各2分；SC约束环与单侧合法顺序各2分，且正确区分Store入缓冲和对外传播。",
+        "B（10分）：正确列出跨线程release/acquire同步链6分；读到旧值和非原子数据竞争边界4分。",
+        "C（8分）：新增周期、总周期、增幅各2分；解释单侧Fence不能作为正确替代2分。",
+        "D（10分）：覆盖三组配置与允许结果3分；模型工具/硬件测量与未观测不等于禁止3分；四个时间点与至少两个相关统计条件4分。"
+      ],
+      "model_answer": "A：SC不允许(0,0)，因S_X<L_Y<S_Y<L_X<S_X形成环；TSO无Fence允许；仅Core0有完整Fence仍允许，可取外部观察顺序L_X<S_X<L_Y<S_Y（Core1的S_Y先进入本核缓冲而后传播）；两侧完整Fence不允许，因为两个Store→Load的观察顺序边共同导致环。B：写data sequenced-before Release flag；Acquire读取这次Release写入的true产生synchronizes-with；再sequenced-before读data；传递生成happens-before。若acquire读旧false不能由该Release建立同步，若以普通非原子变量构成缺少happens-before的冲突访问则有数据竞争/未定义行为。C：40000×18=720000周期；总周期3720000；增长720000/3000000=24%。单侧Fence可能仍允许0,0，不能以不满足语义的低成本当成合法替代。D：分别运行SB、SB+单侧Full Fence、SB+双侧Full Fence；用herd7及适用模型判定可达结果，实测使用合法原子或汇编、编译器/ISA固定、核心绑定、多次采样，报告0,0出现次数、总次数、时钟/完成时间、缓冲/相干等待等；有限次未观测到不能证明架构禁止。ROB退休是本核提交，M是Line写所有权，Store传播达到可见点是内存模型事件，Dirty回写DRAM可更晚发生。"
+    }
+  ]
+}
