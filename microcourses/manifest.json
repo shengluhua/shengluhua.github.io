@@ -2895,12 +2895,26 @@
         "current-arc",
         "max-flow"
       ]
+    },
+    {
+      "id": "opt-031",
+      "track": "opt",
+      "number": 31,
+      "date": "2026-11-19",
+      "week": 5,
+      "title": "第31课：ADMM 的增广拉格朗日与三步更新",
+      "abstract": "推导增广拉格朗日、scaled ADMM、KKT 原始与对偶残差、两块凸 ADMM 的 Lyapunov 下降，并通过数值迭代与罚函数反例揭示理论边界。",
+      "file": "lessons/opt-031.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": []
     }
   ],
   "indexVerifiedOn": "2026-11-19",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-031",
     "ai-031"
   ],
   "orphanQuizzes": []
