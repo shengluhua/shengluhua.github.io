@@ -2959,12 +2959,33 @@
         "litmus",
         "happens-before"
       ]
+    },
+    {
+      "id": "algo-032",
+      "track": "algo",
+      "number": 32,
+      "date": "2026-11-20",
+      "week": 5,
+      "title": "算法与数据结构第32课：二分图最大匹配——从交替路到最大流归约",
+      "abstract": "通过单位容量网络把二分图最大匹配转成最大流，追踪交替增广路的撤销与重排，并用整数流对应及对称差证明最优性。",
+      "file": "lessons/algo-032.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "bipartite-matching",
+        "max-flow",
+        "augmenting-path",
+        "residual-network",
+        "berge-lemma",
+        "integrality"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-20",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-032",
     "opt-032",
     "ai-032"
   ],
