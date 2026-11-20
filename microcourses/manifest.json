@@ -2932,10 +2932,41 @@
         "eviction",
         "gpu"
       ]
+    },
+    {
+      "id": "arch-032",
+      "track": "arch",
+      "number": 32,
+      "date": "2026-11-20",
+      "week": 5,
+      "title": "第32课｜从SC/TSO到弱内存模型：Load Buffering、Message Passing与ARM/RISC-V Fence",
+      "abstract": "比较SC、x86-TSO、Arm与RISC-V RVWMO的允许结果，推导LB和MP的执行环，讲清Arm DMB/LDAR/STLR及RISC-V FENCE前驱后继集合，联系依赖、预取、Store Buffer与跨核可见性。",
+      "file": "lessons/arch-032.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "memory-model",
+        "SC",
+        "TSO",
+        "RVWMO",
+        "Arm",
+        "RISC-V",
+        "load-buffering",
+        "message-passing",
+        "fence",
+        "litmus",
+        "happens-before"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-19",
+  "indexVerifiedOn": "2026-11-20",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-032",
+    "opt-032",
+    "ai-032"
+  ],
   "orphanQuizzes": []
 }
