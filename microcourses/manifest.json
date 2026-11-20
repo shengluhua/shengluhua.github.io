@@ -2981,12 +2981,33 @@
         "berge-lemma",
         "integrality"
       ]
+    },
+    {
+      "id": "opt-032",
+      "track": "opt",
+      "number": 32,
+      "date": "2026-11-20",
+      "week": 5,
+      "title": "第32课｜ADMM残差平衡、罚参数选择与停止准则",
+      "abstract": "推导ADMM的原始与对偶KKT残差、绝对相对停止准则与目标误差联系；分析罚参数自适应、变量重标定及尺度敏感反例。",
+      "file": "lessons/opt-032.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "ADMM",
+        "残差",
+        "KKT",
+        "停止准则",
+        "罚参数",
+        "scaled-dual"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-20",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-032",
     "ai-032"
   ],
   "orphanQuizzes": []
