@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "arch-032",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "Arm AArch64普通可缓存内存：Writer先写data=42，再用STLR发布flag=1；Reader用普通LDR读取flag，读到1后再用普通LDR读取data。假设无其他写者，且两个地址不同。以下判断哪项最严谨？",
+      "options": [
+        "STLR在发布端排序，因此不管Reader怎样读取，都已经获得相当于完整Release/Acquire配对的保证。",
+        "应让Reader使用匹配的Acquire Load（如LDAR）并确认读到发布的flag版本，才能建立所需的发布-消费排序；仅Writer做Release不等于Reader也有Acquire约束。",
+        "只要两变量属于同一个Cache Line，MESI就自动保证SC，无需考虑读侧的排序。",
+        "Reader可以用DMB ISHST确保前面的Load先于后面的Load，因为ISHST专门用于Load→Load。"
+      ],
+      "answer": 1,
+      "hint": "区分发布端的“此前访问先于flag”与消费端的“读flag先于后继访问”；再检查ISHST究竟约束哪些类型。",
+      "explanation": "Arm STLR只提供发布端Release方向，Reader的普通LDR不能假装具有Acquire排序。合适的LDAR读到对应STLR发布版本后，才建立需要的读侧排序；DMB ISHST是Store-Store屏障，MESI也不能代替跨地址内存模型。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某Hart上的一个Fence前有5次普通、不同地址访存：2次Load与3次Store；Fence后有5次访存：3次Load与2次Store。只统计跨越Fence的“前操作→后操作”有序访问对，每对计1，不计同侧操作间关系。问题：把FENCE W,W替换成FENCE RW,RW，新增了多少个被该Fence明确约束的跨Fence访问对？仅填写整数。",
+      "answer": 19,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "全R/W集合产生(前R+W)×(后R+W)对；只约束W→W时只数前Store与后Store的组合。",
+      "explanation": "FENCE RW,RW包含(2+3)(3+2)=25个跨Fence访问对。FENCE W,W只包含3×2=6对。新增25−6=19对。这里计的是概念上的顺序约束，不是实际Fence耗时。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "在普通可缓存内存、独立地址且没有依赖（除选项特指的情况）的ISA级Litmus语境中，选择所有正确说法。",
+      "options": [
+        "对Arm普通Normal内存，DMB ISHST主要约束Store→Store，不能直接当作一般的Load→Store屏障。",
+        "FENCE.TSO与FENCE RW,RW在RISC-V普通主存上的Store→Load排序能力完全等价。",
+        "在RISC-V RVWMO中，一个Load的值用于计算后续Store的地址，可能建立受到模型保护的语法地址依赖，不能再把这两次访问当成独立无依赖的Load→Store。",
+        "对MP，Reader如果读到正确的发布flag版本，Acquire约束后续访存；但没有发布端正确排序，仍不能只靠Reader一侧宣称data一定已发布。",
+        "只要LLC中的data Line已被预取命中，未传播的跨核Store必然对Reader可见，因此可以省略同步。",
+        "在基础无依赖LB中，(1,1)在x86-TSO中被禁止，但对弱内存模型来说可以是允许结果。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        5
+      ],
+      "hint": "分别检查Arm ISHST的访问类型、RISC-V FENCE.TSO是否包含W→R、RVWMO语法依赖，以及发布-消费必须具备的两侧排序。",
+      "explanation": "A正确：ISHST限Store-Store。B错误：FENCE.TSO不强制普通W→R，RW,RW会强制。C正确：RVWMO保留语法地址依赖。D正确：Reader需要Acquire，Writer也应正确Release。E错误：预取不替代内存模型或可见性。F正确：LB 1,1需要放松Load→Store，TSO仍保留，而弱模型可允许。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一假设：两个核、独立对齐的普通可缓存地址，X/Y/data/flag初值为0，写入常数，且没有第三方写入；ISA级Litmus，不用C++数据竞争程序代替。\n\n**A｜LB中的一侧与两侧屏障（12分）**  \nCore0执行：r0=LOAD X；DMB ISH；STORE Y=1。Core1执行：r1=LOAD Y；STORE X=1（无屏障）。在适用同一Inner Shareable域的Arm弱模型里，分析(r0,r1)=(1,1)是否可能；随后给Core1的Load和Store之间也加DMB ISH，再判断此结果，分别给出合法总序构造或不可达有向环。\n\n**B｜RISC-V MP中的两侧排序（10分）**  \nWriter：STORE data=42；FENCE W,W；STORE flag=1。Reader：rF=LOAD flag；FENCE R,R；rD=LOAD data。假设rF读到对应的flag=1。解释在RVWMO模型下rD能否仍读0，列出构成关键约束的操作与边。再讨论仅删除Reader一侧FENCE可能造成的风险。\n\n**C｜FENCE.TSO的反事实（10分）**  \n回到经典SB：Core0执行STORE X=1；FENCE.TSO；r0=LOAD Y；Core1执行STORE Y=1；FENCE.TSO；r1=LOAD X。说明两侧均使用FENCE.TSO是否必然禁止(0,0)。若将两侧改为FENCE RW,RW，重新判断并用顺序边解释差别。\n\n**D｜正确性与性能验证（8分）**  \n给出使用herdtools7/等价模型检查与真实CPU测量的实验方案，至少说明三个要记录的条件或指标，并区分“规范允许但实测没发生”“Fence的排序效果”和“Store从ROB退休、相干可见、DRAM写回”。",
+      "hint": "A看谁仍允许Load→Store松弛；B使用writer W→W、reader R→R和读自发布flag的边；C确认FENCE.TSO是否真的约束W→R；D模型证明与统计频次是两回事。",
+      "rubric": [
+        "A（12分）：分别构造单侧Fence下的允许顺序、双侧Fence下的不可达环；明确前提和所保留的Load→Store边。",
+        "B（10分）：正确使用RISC-V FENCE W,W与R,R及flag读自关系证明MP数据可见；解释删除读侧Fence的风险。",
+        "C（10分）：正确区分FENCE.TSO与FENCE RW,RW的W→R约束，并对两侧SB进行顺序分析。",
+        "D（8分）：提出模型检查与硬件实测的对照条件、指标和性能边界；清楚区分退休、相干可见与DRAM回写。"
+      ],
+      "model_answer": "A：设Core0的L_X=a、S_Y=b，Core1的L_Y=c、S_X=d。读(1,1)要求d≺a及b≺c。单侧DMB ISH保留a≺b；Core1 c→d仍可在弱模型松弛，构造全局d≺a≺b≺c，不违反Core1保留的独立访问边，故允许。双侧DMB ISH还强制c≺d，则d≺a≺b≺c≺d成环，禁止。需假定两核在同一Inner Shareable域。\n\nB：Writer事件Wd（data）、Wf（flag）由FENCE W,W得Wd≺Wf；Reader事件Rf、Rd由FENCE R,R得Rf≺Rd；Rf读到Wf写的1要求Wf≺Rf；若Rd读到初值0需Rd≺Wd。联立Wd≺Wf≺Rf≺Rd≺Wd，矛盾，所以在这些前提下不能rF=1且rD=0。去掉Reader的FENCE R,R，则Rf→Rd不被这一屏障保留，弱模型可能出现看见新flag却读旧data；具体还要检查其他依赖。\n\nC：FENCE.TSO保留Load→Load、Load→Store及Store→Store等，但普通Store→Load不强制；两核SB依然可能各自缓冲Store而Load先读旧0。FENCE RW,RW明确保留Store→Load，所以若都加上，旧值结果要求Sx≺Ly≺Sy≺Lx≺Sx，构成环，禁止。\n\nD：用herd7等对适用ISA模型枚举Litmus允许结果；实测汇编/正规原子，固定核亲和、编译器、内存属性、线程启动方式及迭代次数，记录允许结果频数、Fence耗时、缓存/写缓冲相关指标。允许但未观测到不等于禁止。ROB退休不必然等于该Store跨核可见；相干可见也无需Dirty最终写回DRAM。"
+    }
+  ]
+}
