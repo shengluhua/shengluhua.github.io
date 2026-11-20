@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "ai-032",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "某因果 Decoder-only 服务已经启用 Prefix Caching，计划增加 INT4 KV 量化与 CPU Offloading。下列哪项解释最准确？",
+      "options": [
+        "INT4 KV 量化只修改模型权重，不会影响缓存的 K/V 数值及 Attention 输出。",
+        "把 KV 搬到 CPU 后，GPU 每一步 Decode 都能免费读取该 KV，且一定比重新 Prefill 快。",
+        "KV 量化用更少位数近似存储 K/V，可能引入数值误差；Offloading 改变缓存驻留层级，需要比较迁移与重算成本；两者都不自动消除稠密 Attention 的历史依赖。",
+        "Prefix Cache 命中后，同一请求每个后续 Decode Token 都无需再访问历史 K/V。"
+      ],
+      "answer": 2,
+      "hint": "分清存储位宽、缓存所处设备、因果注意力访问三个不同维度；不要把“省空间”误写成“免费计算”。",
+      "explanation": "量化改变 K/V 的表示精度，可能改变 QK 分数和注意力输出；Offloading 把可复用 KV 放到 CPU/更慢层级，需要加载、同步及设备带宽；Prefix Caching 主要减少重复 Prefill，而不是取消后续 Decode 读取历史 KV。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个 GQA 模型有 16 层、8 个 KV Head、Head Dimension 为 128；同时有 2 条请求，各缓存 1024 Token。K 和 V 都采用紧密打包的 INT4（每元素 4 bit），每 64 个 KV 元素额外保存 4 bytes 的 Scale/Zero-point 元数据，所有组刚好填满。忽略碎片、其他缓冲和高精度残留。请计算 KV 总存储量，单位 MiB（1 MiB=2^20 bytes）。",
+      "answer": 36,
+      "tolerance": 0.001,
+      "unit": "MiB",
+      "hint": "先按 K 与 V 两份、层数、请求数、长度、头数和头维计算元素数；再分别计算 4 bit/元素的 Payload 与每组元数据。",
+      "explanation": "元素总数 n=2×16×2×1024×8×128=67,108,864。INT4 Payload=n×0.5=33,554,432 bytes=32 MiB；组数 n/64=1,048,576，元数据共 4,194,304 bytes=4 MiB；合计 36 MiB。相同元素使用 BF16 为 128 MiB，此例真实压缩比为 128/36≈3.56，而非严格四倍。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "对一个全量因果 Attention 的在线 LLM 服务，考虑 KV Quantization、CPU/远端 Offloading 和缓存恢复。以下哪些陈述成立？（多选）",
+      "options": [
+        "INT4 Payload 可比 BF16 小，但 Scale/Zero-point、非量化窗口和 Padding 会使总 KV 显存节省比例通常不等于理想的四倍。",
+        "只要远端 KV 是 Cache Hit，即使网络很慢、传输有固定开销，也严格保证 TTFT 比重新 Prefill 更低。",
+        "若 Key 的量化误差为 Δk_j，则某一 Query 的 Attention Score 误差满足 |Δz_j|≤||q||₂||Δk_j||₂/√d_h（假设 Score 为 q·k_j/√d_h）。",
+        "如果 Value 完全无误差，Key 的量化误差就绝不可能改变 Attention 输出，因为 Softmax 权重不依赖 Key。",
+        "只有量化 KV 在真实 Kernel 中减少了足够的 HBM 流量、且解量化开销受控，才可能体现为 Decode 延迟下降；省容量不等于保证提速。",
+        "为避免 CPU→GPU 传输，所有活跃请求的 KV 都应立即永久驱逐到 CPU，恢复时无需同步或校验。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分开推导 4 bit 的真实字节预算、QK 分数的误差界，并比较额外解量化/传输时间与节省的工作量。",
+      "explanation": "A 成立：精度位数只直接决定数据 Payload，实际还有组元数据、Padding 和高精度区域。C 由 Cauchy–Schwarz 得出；Key 的误差先改变 Score，再改变 Softmax 权重。E 成立：访存降低可能被解量化、Kernel 调度和其他瓶颈抵消。B 忽略访问层级的加载开销；D 忽略 Softmax 对 Key 的依赖；F 会导致活跃 Decode 缺少 KV，恢复需要正确迁移/同步。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "为一个 GQA Decoder-only 推理服务设计「KV 量化 + 分级缓存」方案。模型有 L 层、Hkv 个 KV Head、维度 d_h；B 个请求各缓存 T 个 Token。请按四部分完成：\n\nA（12 分）：推导 BF16 KV 本体字节数；对于 q-bit、每组 G 个元素共享 m bytes 元数据的量化表示，推导容量（可额外保留 R 个最近 Token 的 BF16 缓存）。写出一套带 Scale 的均匀量化/反量化公式并讨论饱和与分组选择。\n\nB（10 分）：从 z_j=q_t·k_j/√d_h 出发推导 Key 量化的 Score 误差上界；解释 Value 量化误差怎样进入 Attention 输出，为什么误差可能改变输出 Token。\n\nC（10 分）：设完整前缀 KV 的传输量为 M、有效带宽为 W、固定加载开销 t0、解压耗时 td、重新 Prefill 耗时 tr，写出加载与重算的决策不等式；说明 GPU、CPU、远端 KV 的保留/驱逐条件，以及活动引用与上下文一致性。\n\nD（8 分）：设计 BF16/FP8/INT4 KV 和不同卸载层级的受控对照实验，至少报告质量、长上下文、TTFT/TPOT 分位数、Goodput、峰值 HBM、真实传输流量和重算量，并解释如何避免只凭压缩比宣布加速。",
+      "hint": "A 先数 K、V 两份再考虑每组元数据；B 用 Cauchy–Schwarz 与加减中间项；C 将传输、固定开销和解压之和与重算比较；D 固定模型、请求流和硬件并同时测量误差和延迟。",
+      "rubric": [
+        "A（12分）：正确写出 BF16 的 2L B T Hkv d_h×2 bytes（3分）；量化 Payload+组元数据及 R 高精度窗口的通式、边界（5分）；Scale/Zero-point 与饱和、分组粒度（4分）。",
+        "B（10分）：Key score 扰动及 Cauchy–Schwarz 上界（5分）；Attention 输出拆分为权重误差项与 Value 误差项，并解释 Token 决策对微小 Logit 差异的敏感性（5分）。",
+        "C（10分）：明确 t_load≈t0+M/W+td 和与 tr 比较、重叠/排队因素（5分）；活跃块保护、命中身份一致、跨层级迁移/恢复以及驱逐条件（5分）。",
+        "D（8分）：等模型/硬件/数据/请求流与校准设置、冷/热缓存消融（4分）；报告质量与尾延迟、Goodput、带宽、显存、重算/传输并避免错误加速结论（4分）。"
+      ],
+      "model_answer": "定义 n=2LBTHkv d_h，BF16 KV 占 2n bytes。若全部量化且组大小为 G、元数据 m bytes，M_q≈n(q/8+m/G)（需考虑向上取整和 Padding）。保留 R<T 个最近 Token 的 BF16，则 n_r=2LBRHkv d_h，M≈(n−n_r)(q/8+m/G)+2n_r。均匀非对称量化 s=(xmax−xmin)/(2^q−1)，z=round(−xmin/s)，整数 u=clip(round(x/s)+z,0,2^q−1)，重建 x_hat=s(u−z)；常数组需特判。Key 的 Δz_j=q_t·Δk_j/√d_h，故 |Δz_j|≤||q_t||₂||Δk_j||₂/√d_h。若 p,p' 分别是前后 Softmax，o'−o=∑(p'_j−p_j)v_j+∑p'_jΔv_j，说明两种量化误差都会影响输出。加载旧 KV 的粗略成本 t_load=t0+M/W+td；仅当命中正确且 t_load<tr，并能满足 SLO、带宽/排队约束时才优先加载，部分路径可异步重叠。禁止覆盖活跃引用块；必须校验完整前缀、模型及量化配置。实验比较同模型 BF16/FP8/INT4 和 GPU/CPU/远端 KV，控制输入与随机性、冷/热缓存，报告 BPB/任务准确率、长上下文质量、TTFT/TPOT p95、Goodput、峰值显存、真实 bytes 和吞吐；不能把理论四倍压缩写成固定四倍系统加速。"
+    }
+  ]
+}
