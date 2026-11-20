@@ -3003,12 +3003,33 @@
         "罚参数",
         "scaled-dual"
       ]
+    },
+    {
+      "id": "ai-032",
+      "track": "ai",
+      "number": 32,
+      "date": "2026-11-20",
+      "week": 5,
+      "title": "第32课：KV Cache 量化、分级卸载与带宽—精度权衡",
+      "abstract": "推导 INT8/INT4 KV 的带元数据容量、Attention 误差传播和加载—重算决策；比较 GPU/CPU/远端分级缓存与质量、TTFT、TPOT 的系统取舍。",
+      "file": "lessons/ai-032.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "true",
+      "tags": [
+        "llm-inference",
+        "kv-cache",
+        "quantization",
+        "int4",
+        "offloading",
+        "bandwidth",
+        "attention"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-20",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-032"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
