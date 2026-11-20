@@ -23,12 +23,12 @@
       "level": 2,
       "type": "numeric",
       "points": 20,
-      "prompt": "一个 GQA 模型有 16 层、8 个 KV Head、Head Dimension 为 128；同时有 2 条请求，各缓存 1024 Token。K 和 V 都采用紧密打包的 INT4（每元素 4 bit），每 64 个 KV 元素额外保存 4 bytes 的 Scale/Zero-point 元数据，所有组刚好填满。忽略碎片、其他缓冲和高精度残留。请计算 KV 总存储量，单位 MiB（1 MiB=2^20 bytes）。",
-      "answer": 36,
+      "prompt": "一个 GQA 模型有 20 层、4 个 KV Head、Head Dimension 为 128；同时有 3 条请求，各缓存 2048 Token。K 和 V 都采用紧密打包的 INT4（每元素 4 bit），每 128 个 KV 元素额外保存 4 bytes 的 Scale/Zero-point 元数据，所有组刚好填满。忽略碎片、其他缓冲和高精度残留。请计算 KV 总存储量，单位 MiB（1 MiB=2^20 bytes）。",
+      "answer": 63.75,
       "tolerance": 0.001,
       "unit": "MiB",
       "hint": "先按 K 与 V 两份、层数、请求数、长度、头数和头维计算元素数；再分别计算 4 bit/元素的 Payload 与每组元数据。",
-      "explanation": "元素总数 n=2×16×2×1024×8×128=67,108,864。INT4 Payload=n×0.5=33,554,432 bytes=32 MiB；组数 n/64=1,048,576，元数据共 4,194,304 bytes=4 MiB；合计 36 MiB。相同元素使用 BF16 为 128 MiB，此例真实压缩比为 128/36≈3.56，而非严格四倍。"
+      "explanation": "元素总数 n=2×20×3×2048×4×128=125,829,120。INT4 Payload=n×0.5=60 MiB；分组数 n/128=983,040，每组元数据 4 bytes，共 3.75 MiB；合计 63.75 MiB。同量元素使用 BF16 为 240 MiB，有效压缩比为 3.765；不可忽略元数据。"
     },
     {
       "id": "q3",
