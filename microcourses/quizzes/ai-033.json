@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "ai-033",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "一个 Decoder-only LLM 在相同 GPU 上比较 W4A16（4-bit 权重、通常 16-bit 激活）与 W8A8（8-bit 权重和激活）。哪一项判断最严谨？",
+      "options": [
+        "W4A16 一定让 KV Cache、优化器状态和总显存都严格缩小为原来的四分之一。",
+        "W4A16 主要减少被量化的权重存储与潜在带宽，W8A8 还需要对激活进行量化；真实性能取决于 Kernel、Batch 和硬件支持，数值误差也需评测。",
+        "只要把权重存成 INT4，GPU 一定直接以 INT4 对任意矩阵乘法执行满速计算，无需解量化或格式转换。",
+        "W8A8 和 BF16 在实数计算中严格逐位相同，无须校准或独立质量评估。"
+      ],
+      "answer": 1,
+      "hint": "分别问：减少了哪个张量的字节？计算时用什么数据类型？存储容量与执行时延是否等价？",
+      "explanation": "W4A16 只对被选中的权重采用4-bit表示，激活通常仍为16-bit；W8A8同时量化权重和激活，需要合理量化参数及相容内核。权重以外的KV、激活和工作区不会自动同比例缩小；量化与解量化有误差与开销，实际吞吐取决于硬件和算子实现。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "某模型有 256 Mi（即 256×2^20）个需要量化的 Linear 权重，采用紧密打包 INT4；每 128 个权重额外保存 4 bytes 的 Scale/Zero-point 元数据，所有组恰好填满。另有 16 Mi 个参数仍以 BF16（每个 2 bytes）保存。忽略内存对齐、偏置、KV Cache 和其他缓冲。求上述所有权重的总存储量，单位 MiB（1 MiB=2^20 bytes）。只填数字。",
+      "answer": 168,
+      "tolerance": 0.001,
+      "unit": "MiB",
+      "hint": "分开计算 INT4 Payload、每组元数据，以及保留 BF16 的参数；注意 Mi 元素与 MiB 的换算。",
+      "explanation": "INT4 Payload：256 Mi×4/8=128 MiB；分组数 256 Mi/128=2 Mi 组，元数据 2 Mi×4 bytes=8 MiB；未量化部分 16 Mi×2=32 MiB。总计 128+8+32=168 MiB。若均用 BF16 则为 (256+16)×2=544 MiB，因此整体权重压缩比约 3.24，而非4。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "对于 Decoder-only LLM 线性层 Y=XW，考虑后训练量化、校准数据和真实 Serving。以下哪些说法成立？（多选）",
+      "options": [
+        "在精确实数运算且 S 为可逆对角矩阵时，(XS^{-1})(SW)=XW；但随后对两侧进行有限位宽量化仍可能产生误差。",
+        "只要 INT4 权重的 Payload 比 BF16 小四倍，Prefill 与 Decode 的 TTFT/TPOT 就必然均缩短四倍。",
+        "GPTQ 可用校准激活构造层输出重建目标的近似二阶信息，并对量化误差进行补偿；它并非单纯按权重绝对值排序后逐个舍入。",
+        "AWQ 是 Weight-only PTQ 路线，利用激活统计辨识较敏感的权重通道并搜索缩放；不应误称为把所有激活直接量化到 INT4。",
+        "Per-tensor 激活量化遇到少数大幅值离群点时，量化步长可能过粗；SmoothQuant 通过等价缩放迁移部分量化难度，但仍需兼顾权重误差与 Kernel 效率。",
+        "只要校准集上量化重建误差较低，就无需未见任务集、长上下文和 SLO 指标评估，也能保证部署质量。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "hint": "把实数代数恒等式与舍入结果分开；检查三种方法到底改变的是权重、激活还是校准目标；最后用 Roofline 判断四倍压缩能否推出四倍加速。",
+      "explanation": "A是精确代数恒等式而非量化后的无损保证；C的GPTQ通过校准激活的层输出重建误差及近似二阶信息进行补偿；D的AWQ利用激活信息保护显著权重，通常部署为低比特Weight-only；E揭示激活离群点和SmoothQuant的缩放动机。B混淆Payload比与端到端延迟，F混淆校准拟合与独立质量/系统验证。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "为一个单节点 Decoder-only LLM 设计 BF16、W4A16、W8A8(INT8) 与 FP8 的量化推理对照。按四部分作答：\nA（12分）从 Y=XW 推导对称 q-bit 分组权重量化、Scale/Zero-point（允许选择对称方案），给出每组元数据带来的权重存储公式和输出误差 ΔY=X(Ŵ−W) 的一个范数上界，并解释离群值导致的饱和/精度问题。\nB（10分）用可逆对角矩阵 S 推导 SmoothQuant 的实数等价变换，解释校准激活的意义、缩放参数可能的误差代价；再比较 GPTQ 和 AWQ 在校准信息及补偿机制上的区别。\nC（10分）从线性层 FLOPs、权重Bytes与Roofline出发，分析为什么小 Batch Decode、长 Prompt Prefill 可能偏好不同量化方案，并说明何时量化/解量化开销或 Kernel fallback 使低比特不提速。\nD（8分）设计公平实验：固定模型、Tokenizer、请求流、硬件与采样设定；校准集与独立评测集分离；测量权重/总峰值显存、TTFT/TPOT分位数、Tokens/s、双SLO Goodput、算子时间、PPL与下游质量，并报告异常/OOM及数值误差。",
+      "hint": "A 先数每个权重占 q/8 bytes，再按分组加元数据；B 对 X 的列与 W 的对应行做互逆缩放；C 估算小 Batch 下权重读取如何摊销；D 将校准、验证与系统负载分开。",
+      "rubric": [
+        "A（12分）：给出 q-bit 量化/反量化与饱和/舍入（4），权重容量 N(q/8+m/G)及未量化例外（4），ΔY=X(Ŵ−W)与例如 Frobenius 范数上界（4）。",
+        "B（10分）：正确推导 (XS^{-1})(SW)=XW 和变换依赖非零对角值（4），说明校准与SmoothQuant迁移离群点及量化误差（3），区分GPTQ近似二阶误差补偿与AWQ激活感知缩放（3）。",
+        "C（10分）：写出稠密线性层约2Bd_in d_out FLOPs与权重字节预算（4），区分小Batch Decode带宽和大Batch Prefill算力/吞吐（3），讨论解量化、内核支持、Fallback及其他瓶颈（3）。",
+        "D（8分）：控制模型数据硬件及分离校准/评测（3），报告延迟吞吐Goodput显存Kernel等系统指标（3），质量误差、异常和多场景负载（2）。"
+      ],
+      "model_answer": "A：若对称q-bit采用整数等级[-Q,Q]，Q=2^{q-1}-1，Scale s=max|W_group|/Q，整数u=clip(round(w/s),−Q,Q)，重建ŵ=su。N个被量化权重、组大小G、元数据m bytes时M≈N(q/8+m/G)；未量化权重单独累计。ΔY=X(Ŵ−W)，||ΔY||_F≤||X||_F||Ŵ−W||_2。异常值撑大scale导致普通值分辨率下降，超出校准范围可能饱和。B：取S为可逆对角阵，XW=(XS^{-1})(SW)，精确实数下等价；缩小激活离群值会把幅值转给权重，最终量化仍有误差。SmoothQuant依赖校准激活幅值；GPTQ以||X(W−Ŵ)||_F²等层输出重建目标和近似二阶信息作误差补偿；AWQ以激活统计找到敏感通道，搜索权重缩放、通常走Weight-only。C：线性Y=XW时F≈2Bd_in d_out，BF16权重≈2d_in d_out bytes，W4含组元数据≈(0.5+m/G)d_in d_out bytes。B小则权重流量占主导，W4可能收益；大Prefill的矩阵乘法吞吐、激活量化与高效INT8/FP8 Kernel可能更重要。解量化/数据格式、Fallback、KV、排队等会限制收益。D：固定模型、Tokenizer、相同提示与到达时间及硬件，独立校准；检查Logit误差、PPL、下游任务、长上下文，测权重/峰值HBM、TTFT、TPOT、Goodput、tokens/s、kernel时间并报告OOM与失败。"
+    }
+  ]
+}
