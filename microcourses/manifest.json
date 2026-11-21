@@ -3075,12 +3075,35 @@
         "symmetric-difference",
         "complexity"
       ]
+    },
+    {
+      "id": "opt-033",
+      "track": "opt",
+      "number": 33,
+      "date": "2026-11-21",
+      "week": 5,
+      "title": "数学优化理论第33课：PDHG与Chambolle–Pock原始—对偶鞍点法",
+      "abstract": "从Fenchel共轭推导原始—对偶鞍点形式与PDHG更新，证明经典步长条件下的O(1/N)遍历间隙，理解KKT、投影和失败反例。",
+      "file": "lessons/opt-033.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "PDHG",
+        "Chambolle-Pock",
+        "Fenchel对偶",
+        "凸共轭",
+        "Prox",
+        "KKT",
+        "鞍点",
+        "收敛"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-21",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-033",
     "ai-033"
   ],
   "orphanQuizzes": []
