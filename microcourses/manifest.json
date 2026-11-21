@@ -3099,12 +3099,34 @@
         "鞍点",
         "收敛"
       ]
+    },
+    {
+      "id": "ai-033",
+      "track": "ai",
+      "number": 33,
+      "date": "2026-11-21",
+      "week": 5,
+      "title": "LLM 推理量化：Weight-only、W8A8、FP8 与校准",
+      "abstract": "推导权重与激活量化的存储、数值误差及Roofline，解释SmoothQuant、GPTQ、AWQ，设计公平推理实验。",
+      "file": "lessons/ai-033.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "inference",
+        "quantization",
+        "GPTQ",
+        "AWQ",
+        "SmoothQuant",
+        "FP8",
+        "W8A8",
+        "Roofline"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-21",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-033"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
