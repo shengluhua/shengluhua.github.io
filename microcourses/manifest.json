@@ -3052,12 +3052,34 @@
         "barrier",
         "litmus"
       ]
+    },
+    {
+      "id": "algo-033",
+      "track": "algo",
+      "number": 33,
+      "date": "2026-11-21",
+      "week": 5,
+      "title": "算法与数据结构第33课：Hopcroft–Karp——批量最短增广路与平方根复杂度",
+      "abstract": "利用多源 BFS 与一批顶点不相交的最短增广路加速二分图匹配，并通过残量距离单调性和对称差证明 O((n+m)√n) 时间界。",
+      "file": "lessons/algo-033.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "bipartite-matching",
+        "hopcroft-karp",
+        "augmenting-path",
+        "bfs",
+        "dfs",
+        "symmetric-difference",
+        "complexity"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-21",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-033",
     "opt-033",
     "ai-033"
   ],
