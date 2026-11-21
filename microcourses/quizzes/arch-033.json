@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "arch-033",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "四核IRIW：核0写X=1、核1写Y=1；读者A顺序读X再读Y，读者B顺序读Y再读X。两名读者的Load→Load顺序均受到保证，写入满足MCA。若A读到(1,0)、B也读到(1,0)，哪种判断最严谨？",
+      "options": [
+        "MESI使每个Line相干，所以无论读序和传播性质如何都保证这个结果不可能。",
+        "在给定的MCA与两条R→R保序条件下，这个结果要求出现全局顺序环，因此不允许。",
+        "仅凭两名读者源代码的Load先后次序，即便弱模型不保序且系统非MCA，这个结果也必然禁止。",
+        "如果DRAM尚未写回，两名读者不可能从其他核Cache看到写入的新值。"
+      ],
+      "answer": 1,
+      "hint": "把读到1和读到0分别转成该Load在对应Store之后或之前的约束，并加上两名读者的顺序边。",
+      "explanation": "在MCA共享全局逻辑顺序且两个读者保留R→R时，W_X<R_AX<R_AY<W_Y<R_BY<R_BX<W_X，出现环。不应仅由MESI或DRAM状态判断跨地址观察顺序。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "MCA教学时间线：初始X=Y=0；写X=1在全局逻辑时刻t=8可见，写Y=1在t=15可见。读者A在t=10读X得a、t=12读Y得b；读者B在t=17读Y得c、t=19读X得d。读者均按给定顺序执行，无其他写入和本核转发。计算十进制编码E=a+2b+4c+8d。",
+      "answer": 13,
+      "tolerance": 0.001,
+      "unit": "",
+      "hint": "每一次Load与对应地址的全局可见时刻比较，先确定a、b、c、d的0/1值，再按权重编码。",
+      "explanation": "a=1、b=0、c=1、d=1；E=1+0+4+8=13。MCA允许不同时刻的Load分别读取旧值或新值。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "在对齐普通可缓存内存和明确的IRIW语境下，选择所有正确陈述（多选）。",
+      "options": [
+        "同地址缓存一致性单独就保证所有不同地址的写入都以相同次序被所有读者观察，完全不需要额外内存模型约束。",
+        "现代Armv8-A采用other-MCA；不能把早期Armv8文档中的非MCA允许行为直接当作今天的架构规定。",
+        "RISC-V RVWMO虽然是MCA模型，但如果独立普通Load之间缺少R→R保序，仅凭MCA不能判定普通IRIW的反向观察结果必然禁止。",
+        "x86-TSO保留读者Load→Load顺序，却允许两读者在有序IRIW中分别观察完全相反的两个写入顺序。",
+        "RISC-V中在同一读者的两次普通Load之间插入FENCE R,R，可以建立该对Load之间的R→R顺序约束。",
+        "M状态Line的最新值可经相干协议由其他核获得，不要求它先被最终写回DRAM。"
+      ],
+      "answer": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "hint": "同时检查同地址相干、写传播MCA、读侧排序、现代Arm架构版本与Dirty数据来源。",
+      "explanation": "B、C、E、F正确。现代Armv8-A及RVWMO均为MCA；plain IRIW仍须检查读侧Load顺序；x86-TSO有序IRIW禁止；MESI不意味着DRAM需要立即更新。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一模型：四核，X/Y位于不同64B Cache Line，初值均为0，无其他写者。Writer0执行STORE X=1，Writer1执行STORE Y=1；Reader A先读X得a、再读Y得b，Reader B先读Y得c、再读X得d。研究结果a=1,b=0,c=1,d=0。\n\nA（12分）：假定MCA且两名读者均保留Load→Load顺序，建立六条必要的顺序边并证明环。\n\nB（10分）：比较x86-TSO、现代Armv8-A两读者使用DMB ISHLD、RISC-V RVWMO两读者使用FENCE R,R，以及一种非MCA抽象系统的判定；说明历史Arm资料为什么不能代表当前架构。\n\nC（10分）：若两个读者的独立Load→Load不保序，构造一个遵守MCA但得到相同目标读值的全局逻辑顺序；指出与程序顺序冲突的读边。\n\nD（8分）：区分MESI、MCA、SC/TSO、ROB退休、Store Buffer传播和DRAM写回，并提出四项Litmus验证/性能实验检查点。",
+      "hint": "A把读旧和读新都连到对应写入，添加两条读侧边；C尝试先执行两条读旧值的Load，再让两笔Store全局可见。",
+      "rubric": [
+        "A（12分）：W_X<R_AX、R_AX<R_AY、R_AY<W_Y、W_Y<R_BY、R_BY<R_BX、R_BX<W_X，给出严格有向环。",
+        "B（10分）：x86-TSO因MCA与读序禁止；现代Armv8-A other-MCA配两侧DMB ISHLD禁止；RVWMO MCA配两侧FENCE R,R禁止；非MCA抽象可能不同传播；指出Arm2017起调整的历史事实。",
+        "C（10分）：构造如R_AY(0)<R_BX(0)<W_X<W_Y<R_AX(1)<R_BY(1)，并明确A/B两读者均在逻辑顺序中颠倒了R→R；SC与x86-TSO不允许。",
+        "D（8分）：区分Coherence、MCA、Ordering、Store Buffer与Dirty回写，实验含ISA/屏障、编译或汇编、CPU亲和性、测试频数/性能指标；模型允许不等于必然观测。"
+      ],
+      "model_answer": "A：目标读值在MCA共享逻辑顺序中要求W_X<R_AX（A读X新）、R_AY<W_Y（A读Y旧）、W_Y<R_BY（B读Y新）、R_BX<W_X（B读X旧）。加两读者保序R_AX<R_AY和R_BY<R_BX，得到W_X<R_AX<R_AY<W_Y<R_BY<R_BX<W_X，严格有向环。B：x86-TSO保留R→R且写有共同可见次序，故禁止；现代Armv8-A为other-MCA，给两个读者各DMB ISHLD保留读序后禁止；RVWMO为MCA，两个FENCE R,R保留读序后禁止。非MCA系统可先向A传播X，先向B传播Y，局部保序仍可能相反；旧Armv8允许非MCA的资料不代表2017年后更新的Armv8-A。C：无R→R保序时，可选R_AY(0)<R_BX(0)<W_X<W_Y<R_AX(1)<R_BY(1)，存在共同的写入逻辑顺序，MCA未被破坏，但两个读者独立Load被观察为颠倒；SC不许。D：MESI维护同Line独占/失效，MCA约束写入给其他观察者的逻辑可见性，SC/TSO还规定程序序边；Store退休可仍在写缓冲，修改值被跨核取得后DRAM仍可能为旧。herdtools模型检查允许性，实际测试报告ISA/内存属性、屏障、编译优化、核心绑定、样本量、IPC与相干流量；未观察到不是禁止的证明。"
+    }
+  ]
+}
