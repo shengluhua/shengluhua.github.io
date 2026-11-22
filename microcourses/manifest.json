@@ -3172,12 +3172,35 @@
         "lp-duality",
         "integrality"
       ]
+    },
+    {
+      "id": "opt-034",
+      "track": "opt",
+      "number": 34,
+      "date": "2026-11-22",
+      "week": 5,
+      "title": "第34课｜PDHG停止准则、Fenchel原始—对偶Gap与ADMM比较",
+      "abstract": "从Fenchel弱对偶推导可验证的原始—对偶间隙，辨别PDHG的KKT残差与收敛证书，并与ADMM比较。",
+      "file": "lessons/opt-034.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "凸优化",
+        "Fenchel共轭",
+        "PDHG",
+        "Chambolle-Pock",
+        "primal-dual-gap",
+        "KKT",
+        "ADMM",
+        "停止准则"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-22",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-034",
     "ai-034"
   ],
   "orphanQuizzes": []
