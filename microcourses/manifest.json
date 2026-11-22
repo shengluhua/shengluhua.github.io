@@ -3150,12 +3150,33 @@
         "coherence",
         "TSO"
       ]
+    },
+    {
+      "id": "algo-034",
+      "track": "algo",
+      "number": 34,
+      "date": "2026-11-22",
+      "week": 5,
+      "title": "算法与数据结构第34课：Kőnig定理——最大匹配与最小顶点覆盖的对偶性",
+      "abstract": "从最大二分图匹配构造最小顶点覆盖，证明Kőnig定理，并用线性规划弱对偶理解最优性证书与非二分图反例。",
+      "file": "lessons/algo-034.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "bipartite-matching",
+        "vertex-cover",
+        "konig-theorem",
+        "alternating-paths",
+        "lp-duality",
+        "integrality"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-22",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-034",
     "opt-034",
     "ai-034"
   ],
