@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "arch-034",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "一台双Socket Linux服务器采用默认本地优先的匿名页分配策略。主线程固定在Node 0，调用malloc申请8GiB，但尚未访问这些页；之后Node 1上的工作线程第一次实际写入整片数组。忽略缺页前其他触碰、内存不足、显式内存策略及后续迁移。最严谨的结论是什么？",
+      "options": [
+        "调用malloc的一刻8GiB物理页必然全部放在Node 0，因为申请者在Node 0。",
+        "第一次真正分配匿名物理页通常发生在工作线程写入触发缺页时，因此在上述假设下页面优先从Node 1分配。",
+        "每条64B Cache Line都可由不同线程在运行时独立决定NUMA节点，故物理页放置毫无意义。",
+        "只要MESI正确，Node 1访问Node 0的DRAM就不会有额外互连代价。"
+      ],
+      "answer": 1,
+      "hint": "区分虚拟地址区间的预留和匿名物理页实际分配；问的是谁触发首次缺页，而不是谁调用malloc。",
+      "explanation": "普通匿名内存的malloc通常只得到虚拟地址空间；真正写触摸触发缺页和物理页分配。在默认本地优先策略、内存可用且无其他策略/迁移时，Node 1首次触摸的页优先落在Node 1。单位通常是页而非Cache Line；malloc和first-touch不可混为一谈。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "教学延迟模型：一个固定工作负载产生5000次彼此完全串行、无法与计算重叠、均到达DRAM的64B读Miss，其中35%访问远程NUMA节点。每次本地Miss耗时90ns、远程Miss耗时170ns，除这批Miss之外不计任何成本。请计算这些Miss合计暴露的延迟，单位微秒（μs）。只填数值。",
+      "answer": 590,
+      "tolerance": 0.001,
+      "unit": "μs",
+      "hint": "先按本地与远程比例加权求平均单次延迟，再乘总次数；最后由ns换算成μs。",
+      "explanation": "平均延迟=(1−0.35)×90+0.35×170=118ns；5000×118ns=590000ns=590μs。由于题目明确串行且不重叠，才可把单次访问延迟直接相加。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "关于Linux NUMA页面放置、互连与内存语义，选出所有正确陈述。假定普通相干CPU内存，命令含义以当前numactl/Linux文档为准。",
+      "options": [
+        "仅使用numactl --cpunodebind=1约束CPU执行节点，不能保证已经在Node 0的物理页自动搬迁到Node 1。",
+        "只要malloc成功，就已为所有匿名页分配了Node 0或Node 1的物理页，后续first-touch不再影响放置。",
+        "跨节点interleave可将新页分配分散到多个节点，可能缓解单节点带宽压力，也可能提高特定线程的远程访问比例。",
+        "一次跨Socket的数据读取必然到达远端DRAM，不能由本地Cache命中或远端相干Cache提供。",
+        "Linux自动NUMA平衡可能利用采样/NUMA hinting faults及页面迁移改进局部性，但其开销或共享访问模式也可能让程序变慢。",
+        "NUMA距离和MESI写权限交接的开销一旦发生变化，TSO所允许的Store Buffering结果就会自动改变。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别检查CPU绑核是否移动旧页、malloc是否触发缺页、interleave的粒度、Cache Hit与Remote DRAM的区别、自动迁移的代价以及协议与内存模型的分层。",
+      "explanation": "A、C、E正确。CPU亲和性和物理页放置是独立维度；匿名页通常按首次真正触摸时的策略分配。Interleave发生在页分配层面，优缺点依负载。远程数据可被缓存层服务而不必每次到DRAM。自动平衡有扫描/缺页/迁移开销；NUMA只改变性能条件，不自动改变TSO架构允许的结果。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "两Socket服务器：Node 0、Node 1各有本地DRAM；普通一致性CPU内存；采用确定性教学参数，除题中明确项外忽略其他延迟和竞争。回答A—D，并说明模型边界。\n\nA｜线程/页面放置（12分）：Node 1工作线程执行40000次完全串行且不可重叠的DRAM Miss，本地95ns、远程175ns。比较所有数据页都在Node 0与全部在Node 1两种情况的总访存时间（ms）、节省时间（ms）和加速比；解释怎样用parallel first-touch实现更好的页面初始放置。\n\nB｜MLP与互连瓶颈（10分）：该线程另一阶段连续发起独立远程64B Line Miss，平均每次占用180ns，最多24个未完成请求；远程链路的有效数据传输上限8GB/s、远端DRAM带宽30GB/s、请求发出能力0.30 Line/ns。用Little定律求远程读取的理想吞吐上界（GB/s），指出瓶颈；不得把延迟直接当成IPC。\n\nC｜迁移盈亏点（10分）：把一个热点4KiB页面从Node 0迁到Node 1，一次性有效迁移成本（包括复制、页表、TLB等）为12μs；此后每次无法重叠的DRAM访问由远程175ns变为本地95ns。忽略迁移后的新共享竞争。求要使迁移严格划算至少还需要多少次访问；若只剩100次或400次，分别判断。说明两核交替写同一页为何会使结论失效。\n\nD｜可验证实验与正确性（8分）：提出本地first-touch、远程first-touch、按页interleave、自动NUMA balancing四组公平实验，至少列出四类监测量或实验控制；区分远程DRAM访问与Cache-to-Cache/HITM。最后解释为何NUMA改变了延迟却不自行改变MESI的相干不变量和TSO中经典SB (0,0)的合法性。",
+      "hint": "A把总串行Miss延迟乘次数，注意毫秒转换；B分别计算K/L×64B、互连和内存速率的上界再取最小；C比较剩余访问节省和迁移成本并注意严格大于；D同时锁定CPU和页面放置，查看numa_maps、numastat及相干事件。",
+      "rubric": [
+        "A（12分）：两种放置的时间各4分、节省与加速比3分、first-touch原理及条件1分。",
+        "B（10分）：Little定律及单位换算4分、链路/DRAM/发出上界与瓶颈4分、强调吞吐≠单次延迟或CPI 2分。",
+        "C（10分）：每次节省与阈值5分、100/400次判定3分、共享页迁移/乒乓及同步成本边界2分。",
+        "D（8分）：对照组与线程/页面固定3分、至少四类有效监测指标3分、相干/NUMA/TSO区别2分。"
+      ],
+      "model_answer": "A：全远程为40000×175ns=7,000,000ns=7ms；全本地为40000×95ns=3.8ms；节省3.2ms，按此阶段时间的加速比7/3.8≈1.8421。parallel first-touch由Node 1执行将来使用的页的首次写入，在默认本地优先且资源足够时尽量将页放在Node 1，且要避免事先由Node 0触摸。\n\nB：MSHR吞吐上界K/L=24/180≈0.133333 Line/ns，×64B≈8.5333 B/ns=8.5333GB/s；请求发出0.30×64=19.2GB/s；远端DRAM 30GB/s；远程互连8GB/s。所以最终理想上界8GB/s，瓶颈是跨Socket链路。Little上界须确保足够独立Miss，不能解读为单次访问加速。\n\nC：每次节省175−95=80ns；迁移成本12000ns。严格盈利需要N×80>12000，即N>150，所以最小整数151次；N=150仅收支相等。100次节省8μs<12μs，不划算；400次节省32μs>12μs，净收益20μs。真实共享页可能被两端争用，导致远程读写、cache-line ping-pong、迁移来回，固定N和固定单次节省假设不成立。\n\nD：固定问题规模、物理机与频率、绑核并记录页归属；观察numactl --hardware、/proc/PID/numa_maps、numastat -p、perf/uncore node-local/remote events（支持情况依CPU）、HITM、IPC、P99、带宽及总时间。区分本地Cache命中、远端相干Cache提供数据和真正远端DRAM访问。MESI决定同一行权限/版本，NUMA决定物理位置与访问成本；Store可能先在Store Buffer中退休，TSO仍允许SB (0,0)，并不要求DRAM回写。"
+    }
+  ]
+}
