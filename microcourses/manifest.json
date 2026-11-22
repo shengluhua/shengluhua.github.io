@@ -3196,12 +3196,33 @@
         "ADMM",
         "停止准则"
       ]
+    },
+    {
+      "id": "ai-034",
+      "track": "ai",
+      "number": 34,
+      "date": "2026-11-22",
+      "week": 5,
+      "title": "Speculative Decoding：精确采样、接受率与加速边界",
+      "abstract": "从目标和草稿分布推导精确接受—残差修正采样，分析期望每轮输出、加速瓶颈与 KV/在线 SLO 的正确实现。",
+      "file": "lessons/ai-034.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "inference",
+        "speculative-decoding",
+        "draft-verify",
+        "rejection-sampling",
+        "kv-cache",
+        "latency",
+        "goodput"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-22",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-034"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
