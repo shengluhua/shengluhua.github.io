@@ -3123,10 +3123,41 @@
         "W8A8",
         "Roofline"
       ]
+    },
+    {
+      "id": "arch-034",
+      "track": "arch",
+      "number": 34,
+      "date": "2026-11-22",
+      "week": 5,
+      "title": "第34课｜NUMA与远程内存：First-touch、跨Socket延迟和线程/页面放置",
+      "abstract": "从两Socket NUMA拓扑出发，理解Linux first-touch、绑核与物理页放置的独立性，推导远程访问延迟、互连/MLP吞吐和页面迁移盈亏点，并区分NUMA与MESI/TSO。",
+      "file": "lessons/arch-034.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "NUMA",
+        "first-touch",
+        "page-placement",
+        "Linux",
+        "numactl",
+        "memory-latency",
+        "interconnect",
+        "bandwidth",
+        "migration",
+        "coherence",
+        "TSO"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-21",
+  "indexVerifiedOn": "2026-11-22",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-034",
+    "opt-034",
+    "ai-034"
+  ],
   "orphanQuizzes": []
 }
