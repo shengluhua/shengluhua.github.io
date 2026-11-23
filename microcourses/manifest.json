@@ -3272,12 +3272,35 @@
         "konig-theorem",
         "duality"
       ]
+    },
+    {
+      "id": "opt-035",
+      "track": "opt",
+      "number": 35,
+      "date": "2026-11-23",
+      "week": 5,
+      "title": "第35课｜第五周复盘：坐标下降、ADMM、PDHG 与 KKT 最优性证书",
+      "abstract": "第五周第7天复盘：统一坐标/块近端下降、ADMM 原始与对偶残差、PDHG 的 Fenchel Gap，并辨析耦合约束与 KKT 零乘子。",
+      "file": "lessons/opt-035.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "第五周复盘",
+        "坐标下降",
+        "块近端",
+        "ADMM",
+        "PDHG",
+        "Fenchel对偶",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-23",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-035",
     "ai-035"
   ],
   "orphanQuizzes": []
