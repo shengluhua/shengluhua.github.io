@@ -3247,12 +3247,36 @@
         "first-touch",
         "review"
       ]
+    },
+    {
+      "id": "algo-035",
+      "track": "algo",
+      "number": 35,
+      "date": "2026-11-23",
+      "week": 5,
+      "title": "算法与数据结构第35课：第五周综合复习——从残量网络到匹配与覆盖对偶",
+      "abstract": "统一复习最大流的残量增广与割证书、Edmonds–Karp和Dinic的分层加速、二分图匹配与Kőnig对偶，以可行解—改进路径—上界证书贯通第五周。",
+      "file": "lessons/algo-035.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "weekly-review",
+        "network-flow",
+        "residual-network",
+        "edmonds-karp",
+        "dinic",
+        "bipartite-matching",
+        "hopcroft-karp",
+        "konig-theorem",
+        "duality"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-23",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-035",
     "opt-035",
     "ai-035"
   ],
