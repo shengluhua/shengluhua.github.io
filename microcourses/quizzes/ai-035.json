@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "lesson_id": "ai-035",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "一个在线推理服务的许多请求共享很长的固定 Prompt，当前观察到 TTFT 高但 TPOT 尚可。关于系统优化与可验证结论，哪项判断最严谨？",
+      "options": [
+        "A. 只要开启 Prefix Caching，新 Query 的 Decode 就无需访问任何历史 KV，因此 TTFT 和 TPOT 都必然等比例下降。",
+        "B. 应先分解排队与 Prefill 耗时，检查前缀完整性、缓存身份和真实命中；安全前缀复用可能减少重复 Prefill，但不保证 TPOT 同比改善。",
+        "C. 只要将模型权重转成 INT4，TTFT、TPOT 和所有请求的端到端延迟都会严格缩小四倍。",
+        "D. 只要采用 Continuous Batching，所有请求就都不会排队，并且同一请求的未来 Token 可同时生成。"
+      ],
+      "answer": 1,
+      "hint": "将“省去重复 Prefill”“更快读取模型权重”和“改变请求调度”分开分析，注意两个延迟指标的组成。",
+      "explanation": "B 正确。重复前缀的完整块在模型、位置、租户等上下文一致时可合法复用，主要减少重复 Prefill；排队仍可能主导 TTFT。Decode 的新 Query 仍需历史 KV，所以不能从命中率推出 TPOT 同比改善。C 将存储压缩比误当加速比；D 抹去了排队和自回归依赖。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一台 GPU 上有 3 条互不共享 KV 的请求，各缓存 T=2048 个 Token。模型为 L=24 层、每层 Hkv=4 个 KV Head、dh=128；K 和 V 都采用 BF16（2 bytes/元素），不考虑分页碎片、元数据、分片和其他张量。求三条请求的 KV Payload 合计容量，单位 MiB（1 MiB=2^20 bytes）。只填写数字。",
+      "answer": 288,
+      "tolerance": 0.001,
+      "unit": "MiB",
+      "hint": "先计算每层每 Token 的 K 与 V 元素数，再乘层数、长度、请求数和每元素字节数，最后除以 2^20。",
+      "explanation": "每条请求单 Token 容量为 2×24×4×128×2=49,152 bytes；再乘 T=2048 与 B=3，得到 301,989,888 bytes，即 288 MiB。未计权重与分页/元数据，所以不是完整 HBM 峰值。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "考虑标准全量因果注意力的本地部署 LLM Serving，采用正确实现并明确所述前提。以下哪些判断成立？（多选）",
+      "options": [
+        "A. 增大 Decode Batch 可能改善模型权重访问的单位 Token 摊销，但会增加同时驻留的请求状态，并可能改变单请求时延。",
+        "B. Paged KV 通过物理块映射改善内存分配和共享，本身不会把一个新 Query 与 T 个历史 Key 的稠密交互从 Θ(T) 变成 Θ(1)。",
+        "C. 如果请求的 Prefix Cache 命中率达到 90%，则其后续每个 Decode Token 所需的 Key-Value 读取也严格减少 90%。",
+        "D. KV INT4 和 Weight-only INT4 压缩不同的张量，二者不能直接用同一个“模型全内存缩小四倍”结论评价。",
+        "E. 精确 Speculative Sampling 能在正确条件分布和接受—残差修正规则下保持目标采样分布，但其额外 Draft 负载仍可能使高并发 Goodput 下降。",
+        "F. 只要模型每秒输出 Token 数提高，双重 TTFT/TPOT SLO 下的合格请求数每秒就必然提高。"
+      ],
+      "answer": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "hint": "分别考虑权重读摊销、历史注意力算术、前缀复用的阶段、被压缩的张量、采样分布正确性以及 Goodput 定义。",
+      "explanation": "A 正确：Decode Batch 批量化可提高权重复用，但 KV/调度资源和时延会变化。B 正确：分页主要改变内存布局。C 错：前缀复用主要节省重复 Prefill，不能消除后续密集历史访问。D 正确：KV 与权重的占用范围不同。E 正确：数学采样分布等价与系统加速是不同目标，Draft 也要消耗资源。F 错：总 Token/s 与满足 TTFT/TPOT 双门限的 Goodput 不同。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "研究/设计题：为单节点 GPU 上的 Decoder-only 在线服务提出一个第五周知识整合的系统分析方案。A（12 分）：令模型层数 L、KV 头数 Hkv、头维 dh、KV 元素字节 b、各请求历史长度 Ti、KV 页 Token 容量 g，推导无共享时 KV Payload 与分页占用；再写出全量 Prefill / 单步 Decode 的注意力复杂度。B（10 分）：用 Roofline 和 TTFT/TPOT/Goodput 说明小 Batch 长输出、重复长 Prompt 两种负载可能的瓶颈，分别选择合理的候选优化，并解释为何收益不必相同。C（10 分）：设计带 Chunked Prefill 的调度约束（每轮 Token Budget、活跃序列数、KV Block Pool），说明 Prefix Caching 的合法性边界、INT4/FP8 精度风险、Speculative Sampling 的分布与 KV 回滚要求。D（8 分）：设计至少三组单变量消融，固定目标模型、Tokenizer、GPU、采样策略与开环到达流，报告质量、p95 TTFT/TPOT、Goodput、真实显存/传输、失败和适用范围。",
+      "hint": "A 从 K/V 两份张量计数；B 区分带宽瓶颈与排队/Prefill；C 区分每轮计算 Token 与历史 KV，并核对分布修正和上下文身份；D 让基线与每次改动可归因。",
+      "rubric": [
+        "A（12 分）：正确写出总 KV Payload=2L Hkv dh b ΣTi（4分），无共享页数 Σceil(Ti/g) 与页内浪费及假设（3分），Prefill Θ(LS²Hqdh) 与单步 Decode Θ(LTHqdh) 并区分稠密层（5分）。",
+        "B（10 分）：给出 Roofline t≥max(F/Π,M/W) 并解释 Batch 权重摊销（4分）；区分 TTFT、TPOT 与双 SLO Goodput（3分）；为两种负载选取针对性候选并说明质量/开销权衡（3分）。",
+        "C（10 分）：三项独立调度约束和正确 KV 管理（4分）；完整前缀、模型/位置/租户身份与引用安全（2分）；量化质量风险及验证（2分）；精确 Spec 接受/残差修正与首次拒绝的 KV 处理（2分）。",
+        "D（8 分）：受控对照、开环到达与冷热缓存/不同上下文覆盖（3分），正确性与独立质量评测（2分），p95/p99 SLO、Goodput、吞吐、内存、真实流量、失败率、置信区间及负面结果（3分）。"
+      ],
+      "model_answer": "A：各请求共享层/头配置但长度可不同，总 KV Payload=2LHkv dh b ΣTi；在各逻辑页独占的假设下，页数 Σceil(Ti/g)，总预留 KV 容量=每页 2L gHkv dh b 乘页数；Prefill 注意力 Θ(LS²Hqdh)，单步 Decode Θ(LTHqdh)，并另计稠密层。B：使用 t≥max(F/Π,M/W) 评估算力/带宽；小批长输出通常重点测 Decode 权重/KV 带宽、Continuous Batching/权重量化/Spec；长 Prompt 重复前缀则测 Prefix Cache、排队与 Chunked Prefill，注意 TTFT/TPOT 的不同收益；Goodput 是同时符合双 SLO 的完成请求速率。C：约束 Σx_i+Σc_j≤K_step、活跃序列≤Smax、占用唯一 KV 物理页数≤M；缓存完整因果前缀须匹配 Token、位置、模型、适配器、多模态及隔离；INT4/FP8 需单独测质量/Kernel；Spec 使用 min(1,p/q) 接受、[p−q]_+ 修正，拒绝后废弃后续草稿并正确回滚 KV。D：固定模型及请求轨迹，分别改变批处理/前缀复用/量化/推测长度，覆盖冷热缓存、长短输入输出与低高 QPS，测质量、分位延迟、Goodput、HBM、传输和失败；同质量与同 SLO 下比较。"
+    }
+  ]
+}
