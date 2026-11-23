@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "lesson_id": "arch-035",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "双Socket处理器采用相干Cache，Core0持有X的Modified副本但DRAM尚为旧值；另一核可能读取X，另有两个不同地址上的TSO Store Buffering测试。以下哪一项同时正确地解释相干、内存模型与NUMA？",
+      "options": [
+        "只要有MESI，所有跨地址的Load/Store观察都必须符合SC，NUMA远程访问不影响时间。",
+        "修改后的Line可以经相干路径交付最新值而不等DRAM回写；TSO仍可允许SB的(0,0)；NUMA主要改变访问代价而不改变该合法性。",
+        "Core0持有M说明其所有已退休Store立即对任何核全局可见，也说明Dirty Line已经回写DRAM。",
+        "把Core1绑到Node1会自动移动以前在Node0分配的所有页面，因此无需查看页面实际位置。"
+      ],
+      "answer": 1,
+      "hint": "分别问：最新数据在哪、跨地址读写顺序由谁定义、CPU绑核与页面分配是否同步变化。",
+      "explanation": "B正确。MESI维护同一Line的最新版本与权限，可经相干路径传递M中的新值；TSO可以通过尚未传播的独立Store允许经典SB的(0,0)；NUMA通常改变物理路径和成本，不修改ISA允许结果。A将相干等同SC，C混淆权限、退休、可见和写回，D误解线程与页面放置。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "一个固定工作负载有2400次彼此完全串行的DRAM读Miss，其中25%是远程；本地每次80ns、远程每次160ns。另外有50次写所有权跨核交接，每次额外暴露24ns。假定这些等待与彼此及计算完全不重叠，不计其他成本。求这两类等待的总时间，单位μs。",
+      "answer": 241.2,
+      "tolerance": 0.001,
+      "unit": "μs",
+      "hint": "先对本地与远程读Miss加权，再加50次独立交接成本；最后把ns换成μs。",
+      "explanation": "平均DRAM Miss延迟=(1−0.25)×80+0.25×160=100ns，2400次为240000ns；所有权交接额外50×24=1200ns；总计241200ns=241.2μs。必须先确认等待不重叠，才能直接相加。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "针对普通相干缓存、题中明确的x86-TSO/现代MCA内存模型，以及默认Linux NUMA行为，选择所有正确的陈述（多选）。",
+      "options": [
+        "在严格ACK确认式目录MESI模型中，C0已有S副本并发出升级请求，也必须满足必要的失效确认和授权条件才能合法写入。",
+        "只要不同核的Cache都符合MESI，经典Store Buffering的(0,0)就在TSO下被禁止。",
+        "仅Core0在经典SB的Store与Load之间放置适当完整Fence，仍可能出现两个Load均为0。",
+        "若写满足MCA，且IRIW两个读者均保留各自Load→Load顺序，反序观察两个新写入会产生不可满足的顺序环。",
+        "仅设置numactl --cpunodebind=1，就必然把应用之前分配在Node0的所有页迁移到Node1。",
+        "某Line的最新值只在一个核的Modified Cache副本中而尚未写回DRAM，其他核仍可能通过相干协议取得新值。",
+        "C++的acquire Load即使读取旧flag，也一定与另一个线程未来的release Store建立synchronizes-with。"
+      ],
+      "answer": [
+        0,
+        2,
+        3,
+        5
+      ],
+      "hint": "独立检查写权限授权、Store→Load放松、IRIW所需的读序边、页面是否已经分配，以及Release/Acquire读自关系。",
+      "explanation": "A/C/D/F正确。发出失效不等于授权完成；单侧Fence未关闭另一侧Store→Load放松；MCA加双方读序的IRIW产生循环；脏数据可由相干路径提供。B将MESI当SC，E误认为绑核自动搬页，G忽略Acquire必须读到相关Release的必要关系。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "统一假设：双Socket、两核C0/C1，各有私有相干L1，普通64B Cache Line，X/Y是不同物理Line。题中所有MESI事务逐步完整结束，采用ACK确认式教学协议；没有其他写者。请分别完成A—D。\n\nA（10分，MESI）：初始X=0、(C0,C1)=(I,I)。依次执行C0读X、C1读X、C1写X=5、C0读X。逐步写出每次完成后的两核MESI状态及Load值，说明写升级为何需Invalidate ACK、最后一次读是否必须等待DRAM写回。\n\nB（12分，内存模型）：初始X=Y=0。经典SB：C0执行Store X=1；完整Fence；r0=Load Y，C1执行Store Y=1；r1=Load X。判断(0,0)在TSO下是否可能，构造一条合法的跨核可见顺序；再在C1的Store和Load之间加同类完整Fence，证明(0,0)是否仍可能。区分Store从ROB退休与跨核可见。\n\nC（12分，NUMA）：Node1上的线程执行6000次完全串行的DRAM Miss，30%是远程，Local=100ns、Remote=180ns。求当前访存总时间（μs）；若通过正确first-touch使所有访问本地，求新时间与加速比。若另一个热点页迁移一次成本15μs，每次未来不可重叠的远程访问变成本地节省80ns，求至少多少次未来访问才能严格划算，指出共享访问的反例。\n\nD（6分，验证）：设计区分“相干争用”“NUMA远程访问”“内存模型合法结果”的实验；列出至少四项数据/控制，并解释不能以一次LLC Miss推断Remote DRAM、或以有限运行中未出现某Litmus结果证明其架构禁止。",
+      "hint": "A逐步记录有效副本与写者；B把单侧Fence后未Fence核的Store留在Buffer构造顺序，双侧则尝试画环；C用加权串行延迟和严格不等式；D把模型证明与PMU/完成时间测量分开。",
+      "rubric": [
+        "A（10分）：四次MESI状态及读值正确（6），解释S→M授权/ACK与脏数据转发（4）",
+        "B（12分）：单侧Fence下构造合法可见顺序（5），双侧Fence不可达顺序环（5），退休与传播区别（2）",
+        "C（12分）：混合与全本地访问时间及加速比（6），迁移严格盈亏临界访问数（4），共享页/MLP适用边界（2）",
+        "D（6分）：区分相干/NUMA/内存模型的有效实验设计与至少四项统计或控制（4），说明LLC Miss和有限抽样证据的边界（2）"
+      ],
+      "model_answer": "A：初始(I,I)，C0读X=0→(E,I)；C1读X=0→(S,S)；C1写X=5先升级、让C0失效并取得授权→(I,M)；C0随后读X=5，经相干路径取得最新数据→(S,S)（教学MESI的M持有者降级）。写升级应等待必要ACK；读最新值不必等最终DRAM写回。\nB：单侧完整Fence只强制Sx≺Ly。C1的Sy可先进入本地Buffer而晚传播，可见顺序Lx≺Sx≺Ly≺Sy使两个Load都读0；双侧加Fence同时有Sx≺Ly、Sy≺Lx，加读旧值Ly≺Sy、Lx≺Sx，形成Sx≺Ly≺Sy≺Lx≺Sx的环，禁止(0,0)。退休不是Store全局传播或DRAM写回。\nC：平均Miss时间0.7×100+0.3×180=124ns，6000次共744μs；全本地600μs，加速比744/600=1.24。迁移严格划算需R×80ns>15000ns，故R≥188次；若多个核跨节点共享访问，页迁移可能使另一方变远程甚至反复迁移，这一模型也不适用于被MLP重叠的等待。\nD：固定工作量、绑核和页首触位置/numa_maps，测Invalidate/HITM及写权限交接、远程DRAM PMU事件、跨Socket链路流量、LLC Miss、IPC/完成时间；用herdtools或符合ISA的Litmus验证允许结果。LLC Miss可命中其他Cache或本地DRAM；未观测允许事件不意味着数学禁止。"
+    }
+  ]
+}
