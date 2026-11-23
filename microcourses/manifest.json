@@ -3219,10 +3219,42 @@
         "latency",
         "goodput"
       ]
+    },
+    {
+      "id": "arch-035",
+      "track": "arch",
+      "number": 35,
+      "date": "2026-11-23",
+      "week": 5,
+      "title": "第35课｜相干、内存模型与NUMA综合复盘：从MESI所有权到跨核可见性和页面放置",
+      "abstract": "第5周复盘：统一MESI状态及瞬态、SC与TSO的Store Buffering证明、LB/MP/IRIW、Release-Acquire、NUMA first-touch与性能上界；用综合案例区分正确性、可见性与性能。",
+      "file": "lessons/arch-035.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "coherence",
+        "MESI",
+        "transient-state",
+        "SC",
+        "TSO",
+        "store-buffer",
+        "fence",
+        "IRIW",
+        "MCA",
+        "NUMA",
+        "first-touch",
+        "review"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-22",
+  "indexVerifiedOn": "2026-11-23",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-035",
+    "opt-035",
+    "ai-035"
+  ],
   "orphanQuizzes": []
 }
