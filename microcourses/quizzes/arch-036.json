@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "lesson_id": "arch-036",
+  "questions": [
+    {
+      "id": "q1",
+      "level": 1,
+      "type": "single",
+      "points": 15,
+      "prompt": "同一Bank已打开Row A。CPU发生一次LLC Miss，内存控制器收到对Row A另一列的读请求。以下哪项最严谨？",
+      "options": [
+        "LLC Miss必然意味着DRAM Row Buffer Miss，必须先PRE再ACT。",
+        "只要是Row Buffer Hit，数据就已经在CPU L1中。",
+        "若该行仍打开且命令时序允许，可以直接RD；但仍有列访问、数据传输和可能的排队开销。",
+        "Row Buffer Hit无需RD命令，也不占用数据总线。"
+      ],
+      "answer": 2,
+      "hint": "分别考虑CPU缓存与DRAM感放器中的数据，以及列命令是否仍必要。",
+      "explanation": "LLC与DRAM行缓冲是不同层级。命中已打开行可省去PRE和ACT，但仍需RD、CAS延迟及数据总线传输。"
+    },
+    {
+      "id": "q2",
+      "level": 2,
+      "type": "numeric",
+      "points": 20,
+      "prompt": "单Bank起初关闭，t=0发ACT打开R0，最早时刻发RD读取R0，随后尽早切换到R1并读取。tRCD=12ns，tCL=10ns，tRAS=32ns，tRTP=8ns，tRP=11ns，tRC=43ns，burst=4ns。只考虑上述约束，PRE不得早于前一burst结束；无排队、刷新或其他总线冲突。求R1读出的第一个数据beat最早在哪个时刻到达（ns）？",
+      "answer": 65,
+      "tolerance": 0.001,
+      "unit": "ns",
+      "hint": "分别列出PRE的三个下界，再检查下一次ACT的tRP和tRC约束。",
+      "explanation": "RD0=12，首beat=22，burst结束=26。PRE=max(32,12+8,26)=32；ACT1=max(32+11,0+43)=43；RD1=55；首beat=65ns。"
+    },
+    {
+      "id": "q3",
+      "level": 3,
+      "type": "multi",
+      "points": 25,
+      "prompt": "两个Bank初始均关闭，采用open-page策略。Line编号i映射为Bank=i mod 2、Row=floor(i/8)，每次请求完成后保持对应行打开，无刷新或其他访问。依次请求Line 0,2,1,8,3,10,0。选择所有正确说法。",
+      "options": [
+        "访问Line 2时发生Row Hit。",
+        "访问Line 3时，因前一请求访问了Bank 0的Row 1，所以必然发生Row Conflict。",
+        "整个Trace包含3次Row Hit、2次Closed-row Miss、2次Row Conflict。",
+        "最后访问Line 0时无需ACT，因为它曾在第一次请求中被打开。",
+        "Bank 0与Bank 1可以分别保持各自的打开行，但共享通道仍可能限制实际并行吞吐。",
+        "仅凭上述行命中率，可以唯一确定真实CPU的IPC。"
+      ],
+      "answer": [
+        0,
+        2,
+        4
+      ],
+      "hint": "分别维护两个Bank的当前打开行；不能只记整个通道最近打开的一行。",
+      "explanation": "状态序列：0为B0R0冷，2命中B0R0，1为B1R0冷，8冲突B0R1，3命中B1R0，10命中B0R1，0冲突B0R0。独立Bank状态不意味着总线无限带宽，IPC也取决于依赖与其他资源。"
+    },
+    {
+      "id": "q4",
+      "level": 4,
+      "type": "open",
+      "points": 40,
+      "prompt": "A（12分）：单Bank初始关闭，6个相互独立的64B读请求同时进入队列，按到达次序为R0,R1,R0,R1,R0,R1。采用独立的简化串行服务模型：closed-row=24ns、hit=12ns、conflict=36ns，成本不重叠，忽略其余时序。分别计算FIFO与按行分组（先全部R0再全部R1）的总服务时间、行命中数和加速比，说明重排成立的前提。\nB（12分）：另一个通道有4个独立Bank，每Bank每32ns最多完成一次新的ACT，每次ACT只服务一个64B请求；数据总线有效上限12.8GB/s，最多12个在途请求，平均占用80ns，其他约束忽略。推导Bank、总线、在途容量三种吞吐上界并指出瓶颈；解释改为每次ACT服务多个请求后哪个假设失效。\nC（8分）：若持续到达的R0请求使较老R1冲突请求一直等待，设计一个含年龄阈值或公平仲裁的调度器，指出应监测的尾延迟、吞吐和行命中指标，以及有限服务保证所需假设。\nD（8分）：解释为什么DRAM控制器重排请求不等于ISA允许任意内存重排；用TSO的Store Buffering说明Store退休、全局可见、最终DRAM写回三者，并解释脏Line如何由相干路径提供最新值。",
+      "hint": "A按顺序维护打开行；B分别从每Bank的ACT频率、总线和Little定律出发；C考虑饥饿与资源容量；D区分物理服务顺序与架构观察顺序。",
+      "rubric": [
+        "A（12分）：FIFO和分组的状态/命中数4分，总时间及加速比5分，独立请求与顺序约束3分。",
+        "B（12分）：三个上界各3分，瓶颈及多请求每ACT的边界3分。",
+        "C（8分）：可执行的防饥饿规则4分，指标2分，有限服务前提2分。",
+        "D（8分）：区分控制器重排与ISA约束2分，TSO SB与三时刻4分，相干数据路径2分。"
+      ],
+      "model_answer": "A：FIFO第一个closed，其余5次冲突，0 hit，总时间24+5×36=204ns。分组为closed、hit、hit、conflict、hit、hit，4 hits，总时间24+4×12+36=108ns，加速204/108=17/9≈1.889。仅能重排独立请求，必须尊重依赖、相干、同步和响应匹配等约束。B：Bank上界4×64/32=8 B/ns=8GB/s；总线12.8GB/s；在途上界12×64/80=9.6GB/s；取min得8GB/s，Bank受限。若每ACT服务多个请求，则每请求一次ACT的前提失效，需重新考虑列命令与总线。C：通常优先已就绪行命中，若最老请求等待超过阈值则赋予其优先级并避免新的命中不断抢占；在请求有限服务时间、必要资源可用、公平仲裁等假设下提供进展；记录吞吐、命中率、每类延迟、P95/P99及最大等待。D：控制器服务顺序不等于架构观察顺序，须由LSQ、缓冲及相干系统维持ISA语义。TSO的SB中两个不同地址的Store可先退休并留在各自Buffer中，两个后继Load先读旧值，之后Store传播；全局可见不要求最终DRAM写回，另一核可从相干拥有者取得新值。"
+    }
+  ]
+}
