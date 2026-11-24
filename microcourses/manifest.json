@@ -3389,12 +3389,31 @@
         "线搜索",
         "KKT"
       ]
+    },
+    {
+      "id": "ai-036",
+      "track": "ai",
+      "number": 36,
+      "date": "2026-11-24",
+      "week": 6,
+      "title": "VAE：潜变量、ELBO 与重参数化技巧",
+      "abstract": "从边缘似然和变分推断出发，推导 ELBO、Gaussian KL 和重参数化，理解生成路径与 posterior collapse。",
+      "file": "lessons/ai-036.md",
+      "minutes": 18,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "vae",
+        "latent-variable",
+        "elbo",
+        "variational-inference",
+        "reparameterization"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-24",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-036"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
