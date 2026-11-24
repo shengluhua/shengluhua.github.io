@@ -3367,12 +3367,33 @@
         "monotone-opt",
         "divide-and-conquer"
       ]
+    },
+    {
+      "id": "opt-036",
+      "track": "opt",
+      "number": 36,
+      "date": "2026-11-24",
+      "week": 6,
+      "title": "第36课｜Newton 法：二阶模型、Newton 方向与局部二次收敛",
+      "abstract": "从二阶 Taylor 模型推导 Newton 方向，严格证明 Hessian 局部 Lipschitz 与非退化极小点下的二次收敛，辨析全步发散及 KKT 活跃零乘子。",
+      "file": "lessons/opt-036.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "Newton",
+        "Hessian",
+        "二次收敛",
+        "线搜索",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-24",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-036",
     "ai-036"
   ],
   "orphanQuizzes": []
