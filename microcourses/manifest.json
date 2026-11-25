@@ -3433,12 +3433,32 @@
         "QoS",
         "memory-ordering"
       ]
+    },
+    {
+      "id": "algo-037",
+      "track": "algo",
+      "number": 37,
+      "date": "2026-11-25",
+      "week": 6,
+      "title": "算法与数据结构第37课：分治DP优化——从决策单调性到 O(Kn log n)",
+      "abstract": "利用同层最优切点单调性缩小分治递归的候选区间，手工追踪候选枚举，并证明正确性和逐层复杂度。",
+      "file": "lessons/algo-037.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "dynamic-programming",
+        "divide-and-conquer-dp",
+        "monotone-optima",
+        "monge",
+        "complexity"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-25",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-037",
     "opt-037",
     "ai-037"
   ],
