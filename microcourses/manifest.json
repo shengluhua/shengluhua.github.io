@@ -3410,10 +3410,37 @@
         "variational-inference",
         "reparameterization"
       ]
+    },
+    {
+      "id": "arch-037",
+      "track": "arch",
+      "number": 37,
+      "date": "2026-11-25",
+      "week": 6,
+      "title": "第37课｜DRAM控制器调度：FR-FCFS、Bank级并行与读写切换",
+      "abstract": "从合法命令仲裁、行命中与Bank并行出发，推导激活频率、读写总线利用率及公平调度等待上界，区分物理调度与架构可见顺序。",
+      "file": "lessons/arch-037.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "DRAM",
+        "FR-FCFS",
+        "scheduling",
+        "bank-group",
+        "write-drain",
+        "QoS",
+        "memory-ordering"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-24",
+  "indexVerifiedOn": "2026-11-25",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-037",
+    "opt-037",
+    "ai-037"
+  ],
   "orphanQuizzes": []
 }
