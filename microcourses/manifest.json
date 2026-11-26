@@ -3521,12 +3521,32 @@
         "HBM",
         "MLP"
       ]
+    },
+    {
+      "id": "algo-038",
+      "track": "algo",
+      "number": 38,
+      "date": "2026-11-26",
+      "week": 6,
+      "title": "算法与数据结构第38课：Knuth优化——区间DP的双侧决策界",
+      "abstract": "从相邻石子合并出发，证明区间DP四点不等式与双侧决策单调性，并通过对角线望远镜求和得到平方时间界。",
+      "file": "lessons/algo-038.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "dynamic-programming",
+        "interval-dp",
+        "knuth-optimization",
+        "monge",
+        "quadrangle-inequality"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-038",
     "opt-038",
     "ai-038"
   ],
