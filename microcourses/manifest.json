@@ -3542,12 +3542,33 @@
         "monge",
         "quadrangle-inequality"
       ]
+    },
+    {
+      "id": "opt-038",
+      "track": "opt",
+      "number": 38,
+      "date": "2026-11-26",
+      "week": 6,
+      "title": "第38课｜拟 Newton 法、割线方程与 BFGS",
+      "abstract": "由梯度差构造曲率近似，推导 BFGS 秩二更新、正定性与 Wolfe 曲率条件，证明方向逼近条件下的超线性收敛。",
+      "file": "lessons/opt-038.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "拟Newton",
+        "BFGS",
+        "Wolfe",
+        "超线性收敛",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-038",
     "ai-038"
   ],
   "orphanQuizzes": []
