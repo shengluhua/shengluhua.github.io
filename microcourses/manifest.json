@@ -3497,10 +3497,38 @@
         "maximum-likelihood",
         "coupling"
       ]
+    },
+    {
+      "id": "arch-038",
+      "track": "arch",
+      "number": 38,
+      "date": "2026-11-26",
+      "week": 6,
+      "title": "第38课｜DDR数据率、Channel/Rank/Bank Group与带宽计算",
+      "abstract": "从MT/s、Burst与DDR5子通道出发，推导带宽、Bank Group约束、流量不均与MLP上界，并连接HBM及LLM访存。",
+      "file": "lessons/arch-038.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "DDR",
+        "DDR5",
+        "channel",
+        "rank",
+        "bank-group",
+        "bandwidth",
+        "HBM",
+        "MLP"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-25",
+  "indexVerifiedOn": "2026-11-26",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-038",
+    "opt-038",
+    "ai-038"
+  ],
   "orphanQuizzes": []
 }
