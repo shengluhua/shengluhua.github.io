@@ -3631,12 +3631,33 @@
         "monotone-queue",
         "amortized-analysis"
       ]
+    },
+    {
+      "id": "opt-039",
+      "track": "opt",
+      "number": 39,
+      "date": "2026-11-27",
+      "week": 6,
+      "title": "第39课｜L-BFGS：两层循环与有限内存拟 Newton 法",
+      "abstract": "从逆 BFGS 推导 two-loop recursion，分析有限内存复杂度、统一谱界与线性收敛条件，并区分完整 BFGS 的超线性理论。",
+      "file": "lessons/opt-039.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "LBFGS",
+        "BFGS",
+        "two-loop",
+        "Wolfe",
+        "KKT"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-27",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-039",
     "ai-039"
   ],
   "orphanQuizzes": []
