@@ -3586,10 +3586,38 @@
         "made",
         "vae"
       ]
+    },
+    {
+      "id": "arch-039",
+      "track": "arch",
+      "number": 39,
+      "date": "2026-11-27",
+      "week": 6,
+      "title": "第39课｜DRAM刷新与可靠性：tREFI、tRFC、Refresh调度及ECC",
+      "abstract": "推导刷新占用、随机到达额外等待及尾延迟，分析刷新粒度与截止时间，并从码距理解ECC保护边界。",
+      "file": "lessons/arch-039.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "DRAM",
+        "refresh",
+        "tREFI",
+        "tRFC",
+        "ECC",
+        "SECDED",
+        "reliability",
+        "tail-latency"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-26",
+  "indexVerifiedOn": "2026-11-27",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-039",
+    "opt-039",
+    "ai-039"
+  ],
   "orphanQuizzes": []
 }
