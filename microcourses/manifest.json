@@ -3741,12 +3741,31 @@
         "KKT",
         "负曲率"
       ]
+    },
+    {
+      "id": "ai-040",
+      "track": "ai",
+      "number": 40,
+      "date": "2026-11-28",
+      "week": 6,
+      "title": "Score-based Model：Score Matching、SDE 与概率流 ODE",
+      "abstract": "推导边缘 Score、去噪 Score Matching、反向 SDE 与概率流 ODE，理解随机采样、确定性输运及 NFE 的系统折中。",
+      "file": "lessons/ai-040.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "diffusion",
+        "score-matching",
+        "sde",
+        "ode",
+        "langevin"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [
-    "ai-040"
-  ],
+  "missingLessons": [],
   "orphanQuizzes": []
 }
