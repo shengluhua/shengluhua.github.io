@@ -3719,12 +3719,33 @@
         "segment-tree",
         "coordinate-compression"
       ]
+    },
+    {
+      "id": "opt-040",
+      "track": "opt",
+      "number": 40,
+      "date": "2026-11-28",
+      "week": 6,
+      "title": "第40课｜Trust Region：信赖域、Cauchy 下降与负曲率",
+      "abstract": "推导信赖域子问题全局最优性条件、Cauchy 下降界与实际预测下降比，证明标准半径策略下的一阶全局化结果。",
+      "file": "lessons/opt-040.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "数学优化",
+        "Trust Region",
+        "Newton",
+        "Cauchy point",
+        "KKT",
+        "负曲率"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "opt-040",
     "ai-040"
   ],
   "orphanQuizzes": []
