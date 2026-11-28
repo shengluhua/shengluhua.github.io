@@ -3698,12 +3698,32 @@
         "coalescing",
         "MLP"
       ]
+    },
+    {
+      "id": "algo-040",
+      "track": "algo",
+      "number": 40,
+      "date": "2026-11-28",
+      "week": 6,
+      "title": "算法与数据结构第40课：Li Chao Tree——任意顺序的直线最小值查询",
+      "abstract": "利用两条直线至多发生一次优劣切换的性质，维护根到叶路径上的最优候选，解决非单调斜率和查询顺序的动态规划优化。",
+      "file": "lessons/algo-040.md",
+      "minutes": 17,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "dynamic-programming",
+        "li-chao-tree",
+        "convex-hull-trick",
+        "segment-tree",
+        "coordinate-compression"
+      ]
     }
   ],
   "indexVerifiedOn": "2026-11-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
   "missingLessons": [
-    "algo-040",
     "opt-040",
     "ai-040"
   ],
