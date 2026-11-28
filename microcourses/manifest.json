@@ -3674,10 +3674,38 @@
         "elbo",
         "denoising"
       ]
+    },
+    {
+      "id": "arch-040",
+      "track": "arch",
+      "number": 40,
+      "date": "2026-11-28",
+      "week": 6,
+      "title": "第40课｜HBM内部组织与先进封装：Channel、Pseudo-channel、TSV及带宽利用率",
+      "abstract": "从TSV与宽接口理解HBM，推导PC带宽、地址映射周期、访存合并效率、MLP上界与热约束，联系GPU和LLM推理。",
+      "file": "lessons/arch-040.md",
+      "minutes": 16,
+      "kind": "full",
+      "quiz": true,
+      "diagram": "mermaid",
+      "tags": [
+        "HBM",
+        "DRAM",
+        "TSV",
+        "interposer",
+        "pseudo-channel",
+        "address-mapping",
+        "coalescing",
+        "MLP"
+      ]
     }
   ],
-  "indexVerifiedOn": "2026-11-27",
+  "indexVerifiedOn": "2026-11-28",
   "indexDescription": "自动索引现有 Markdown；kind=review 为复习稿，缺失课稿不计入归档。",
-  "missingLessons": [],
+  "missingLessons": [
+    "algo-040",
+    "opt-040",
+    "ai-040"
+  ],
   "orphanQuizzes": []
 }
